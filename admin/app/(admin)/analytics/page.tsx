@@ -32,7 +32,7 @@ export default async function AnalyticsPage() {
             <h2 className="font-semibold text-foreground">Top Pages</h2>
           </div>
           <div className="divide-y divide-border">
-            {byPath.map(({ path, _count }) => (
+            {byPath.map(({ path, _count }: { path: string; _count: { path: number } }) => (
               <div key={path} className="px-6 py-3 flex items-center justify-between">
                 <span className="text-sm text-foreground font-mono">{path}</span>
                 <span className="text-sm font-semibold text-foreground">{_count.path.toLocaleString()}</span>

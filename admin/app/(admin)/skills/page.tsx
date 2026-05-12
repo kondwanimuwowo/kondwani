@@ -35,22 +35,22 @@ export default function SkillsPage() {
 
   function addPill() {
     if (!newPill.trim()) return
-    setPills(p => [...p, newPill.trim()])
+    setPills(p => [...(p ?? []), newPill.trim()])
     setNewPill("")
   }
 
   function removePill(index: number) {
-    setPills(p => p.filter((_, i) => i !== index))
+    setPills(p => (p ?? []).filter((_, i) => i !== index))
   }
 
   function addSkill(catIndex: number) {
-    setCategories(cats => cats.map((cat, i) =>
-      i === catIndex ? { ...cat, skills: [...cat.skills, { name: "", level: "Intermediate" }] } : cat
+    setCategories(cats => (cats ?? []).map((cat, i) =>
+      i === catIndex ? { ...cat, skills: [...cat.skills, { name: "", level: "Intermediate" as SkillLevel }] } : cat
     ))
   }
 
   function updateSkill(catIndex: number, skillIndex: number, field: keyof Skill, value: string) {
-    setCategories(cats => cats.map((cat, ci) =>
+    setCategories(cats => (cats ?? []).map((cat, ci) =>
       ci === catIndex ? {
         ...cat,
         skills: cat.skills.map((s, si) => si === skillIndex ? { ...s, [field]: value } : s)
@@ -59,7 +59,7 @@ export default function SkillsPage() {
   }
 
   function removeSkill(catIndex: number, skillIndex: number) {
-    setCategories(cats => cats.map((cat, ci) =>
+    setCategories(cats => (cats ?? []).map((cat, ci) =>
       ci === catIndex ? { ...cat, skills: cat.skills.filter((_, si) => si !== skillIndex) } : cat
     ))
   }
