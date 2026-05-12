@@ -46,7 +46,7 @@ export default async function AnalyticsPage() {
             <h2 className="font-semibold text-foreground">Recent Visits</h2>
           </div>
           <div className="divide-y divide-border max-h-[400px] overflow-y-auto">
-            {recent.map((v, i) => (
+            {recent.map((v: { path: string; referrer: string | null; createdAt: Date }, i) => (
               <div key={i} className="px-6 py-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-mono text-foreground">{v.path}</span>

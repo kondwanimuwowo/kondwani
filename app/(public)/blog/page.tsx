@@ -16,7 +16,17 @@ export const metadata: Metadata = {
 
 export const revalidate = 300
 
-async function getPosts() {
+type PostSummary = {
+  id: string
+  title: string
+  slug: string
+  excerpt: string
+  coverImage: string | null
+  tags: string[]
+  publishedAt: Date | null
+}
+
+async function getPosts(): Promise<PostSummary[]> {
   try {
     return await prisma.blogPost.findMany({
       where: { published: true },

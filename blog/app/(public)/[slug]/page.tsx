@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const posts = await prisma.blogPost.findMany({ where: { published: true }, select: { slug: true } })
-  return posts.map((p) => ({ slug: p.slug }))
+  return posts.map((p: { slug: string }) => ({ slug: p.slug }))
 }
 
 function formatDate(date: Date) {
