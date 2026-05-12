@@ -127,7 +127,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
           <div className="bg-white border border-border rounded-2xl p-8 shadow-sm mb-8">
             <h2 className="text-lg font-bold text-foreground mb-5">Outcomes</h2>
             <ul className="space-y-3">
-              {cs.outcomes.map((outcome, i) => (
+              {cs.outcomes.map((outcome: string, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle className="text-primary shrink-0 mt-0.5" sx={{ fontSize: 18 }} />
                   <span className="text-sm text-muted">{outcome}</span>
@@ -142,7 +142,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
           <div className="mb-10">
             <h2 className="text-lg font-bold text-foreground mb-5">Gallery</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {cs.gallery.map((img, i) => (
+              {cs.gallery.map((img: string, i) => (
                 <div key={i} className="relative aspect-video rounded-xl overflow-hidden bg-surface border border-border">
                   <Image src={img} alt={`${cs.title} screenshot ${i + 1}`} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                 </div>
@@ -168,7 +168,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
           <div className="mb-10">
             <h3 className="text-sm font-bold tracking-widest uppercase text-muted mb-3">Tech Stack</h3>
             <div className="flex flex-wrap gap-2">
-              {cs.tech.map((t) => (
+              {cs.tech.map((t: string) => (
                 <span key={t} className="text-xs font-medium bg-surface border border-border text-foreground/70 px-3 py-1.5 rounded-full">
                   {t}
                 </span>
