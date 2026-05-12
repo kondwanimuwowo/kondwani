@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma
+
+inspo-azmec
+inspo-azmec/*
+inspo-elta-creatives
+inspo-elta-creatives/*
+inspo-roan
+inspo-roan/*
+inspo-accomozed
+inspo-accomozed/*
+kondwani-current-portfolio
+kondwani-current-portfolio/*

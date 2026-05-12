@@ -1,0 +1,17 @@
+# Inspiration folders - large, not part of the build
+inspo-accomozed/
+inspo-azmec/
+inspo-elta-creatives/
+inspo-roan/
+
+# Old portfolio - reference only, not being edited
+kondwani-current-portfolio/
+
+# Build outputs & dependencies
+.next/
+out/
+dist/
+node_modules/
+
+# Temp scaffold folder (deleted after bootstrapping)
+_tmp-next/
