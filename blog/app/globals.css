@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FFFFFF;
+  --foreground: #0A0A0A;
+}
+
+@theme {
+  --color-primary: #7E1416;
+  --color-primary-hover: #601012;
+  --color-background: #FFFFFF;
+  --color-surface: #F8F9FA;
+  --color-foreground: #0A0A0A;
+  --color-muted: #6B7280;
+  --color-border: #E5E7EB;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .container-custom {
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .container-custom {
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+
+  .glass {
+    background-color: rgb(255 255 255 / 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgb(229 231 235 / 0.8);
+  }
+
+  /* Tiptap editor prose styles */
+  .prose-editor {
+    outline: none;
+  }
+
+  .prose-editor p { margin-bottom: 1rem; }
+  .prose-editor h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+  .prose-editor h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; }
+  .prose-editor h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+  .prose-editor ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+  .prose-editor ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
+  .prose-editor li { margin-bottom: 0.25rem; }
+  .prose-editor blockquote { border-left: 3px solid #7E1416; padding-left: 1rem; color: #6B7280; font-style: italic; margin-bottom: 1rem; }
+  .prose-editor code { background: #F8F9FA; border: 1px solid #E5E7EB; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; }
+  .prose-editor pre { background: #0A0A0A; color: #F8F9FA; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+  .prose-editor pre code { background: none; border: none; padding: 0; color: inherit; }
+  .prose-editor a { color: #7E1416; text-decoration: underline; }
+  .prose-editor hr { border-color: #E5E7EB; margin: 2rem 0; }
+  .prose-editor img { max-width: 100%; border-radius: 0.5rem; margin: 1rem auto; }
+
+  .prose-editor p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: #9CA3AF;
+    pointer-events: none;
+    height: 0;
+  }
+}
