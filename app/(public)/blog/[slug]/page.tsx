@@ -76,7 +76,7 @@ export default async function BlogPostPage({ params }: Props) {
           </nav>
 
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {post.tags.map((tag) => (
+            {post.tags.map((tag: string) => (
               <span key={tag} className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary/8 px-2.5 py-0.5 rounded-full">
                 {tag}
               </span>
