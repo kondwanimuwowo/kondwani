@@ -3,7 +3,8 @@
 import Image from "next/image"
 import Link from "next/link"
 import { motion, type Variants } from "motion/react"
-import { GitHub, LinkedIn, Twitter, ArrowDownward, FileDownload } from "@mui/icons-material"
+import { GitHub, LinkedIn, Twitter, ArrowDownward } from "@mui/icons-material"
+import { PillLink } from "@/components/ui/PillLink"
 
 const socialLinks = [
   { name: "GitHub", href: "https://github.com/kondwanimuwowo", icon: GitHub },
@@ -52,7 +53,16 @@ export function Hero() {
               className="lg:hidden mb-8 flex justify-center"
             >
               <div className="relative w-56 h-56 sm:w-64 sm:h-64">
-                <div className="absolute inset-0 rounded-full bg-primary/8 scale-110" />
+                <motion.div
+                  className="absolute inset-0 rounded-full bg-primary"
+                  animate={{ scale: [1, 1.3, 1.55], opacity: [0, 0.14, 0] }}
+                  transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut", times: [0, 0.3, 1] }}
+                />
+                <motion.div
+                  className="absolute inset-0 rounded-full bg-primary"
+                  animate={{ scale: [1, 1.3, 1.55], opacity: [0, 0.1, 0] }}
+                  transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut", times: [0, 0.3, 1], delay: 0.9 }}
+                />
                 <Image
                   src="/kondwani.png"
                   alt="Kondwani Muwowo"
@@ -64,16 +74,14 @@ export function Hero() {
               </div>
             </motion.div>
 
-            <motion.p variants={item} className="text-sm font-semibold tracking-widest text-primary uppercase mb-5">
-              Welcome to my digital space
-            </motion.p>
+
 
             <motion.h1
               variants={item}
               className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05]"
             >
-              Hi, I&apos;m{" "}
-              <span className="text-primary">Kondwani</span>
+              <span className="text-primary">Kondwani</span>{" "}
+              Muwowo.
             </motion.h1>
 
             <motion.p
@@ -81,7 +89,6 @@ export function Hero() {
               className="mt-5 text-lg text-muted max-w-xl leading-relaxed"
             >
               Software Developer, UI Designer — and a fighter against human trafficking and child exploitation.
-              I build clean, thoughtful, and smooth digital experiences.
             </motion.p>
 
             <motion.div
@@ -94,24 +101,7 @@ export function Hero() {
               >
                 View My Work
               </Link>
-              <Link
-                href="/contact"
-                className="border border-border text-foreground px-7 py-3.5 rounded-full font-medium hover:border-primary hover:text-primary transition-colors text-sm"
-              >
-                Get In Touch
-              </Link>
-              {/* Roan-style pill button */}
-              <a
-                href="/kondwani-resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-5 rounded-full border border-border pl-6 pr-2 py-2 text-sm font-medium text-foreground hover:border-foreground/50 transition-all duration-300 group"
-              >
-                Download CV
-                <span className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center group-hover:bg-primary transition-colors duration-300 shrink-0">
-                  <FileDownload sx={{ fontSize: 16 }} className="text-white" />
-                </span>
-              </a>
+              <PillLink href="/contact">Get In Touch</PillLink>
             </motion.div>
 
             <motion.div variants={item} className="mt-8 flex items-center gap-5">
@@ -138,9 +128,17 @@ export function Hero() {
             className="hidden lg:flex justify-center lg:justify-end"
           >
             <div className="relative">
-              {/* Decorative rings */}
-              <div className="absolute inset-0 rounded-full bg-primary/6 scale-[1.18]" />
-              <div className="absolute inset-0 rounded-full bg-primary/3 scale-[1.35]" />
+              {/* Animated pulse rings */}
+              <motion.div
+                className="absolute inset-0 rounded-full bg-primary"
+                animate={{ scale: [1, 1.3, 1.55], opacity: [0, 0.14, 0] }}
+                transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut", times: [0, 0.3, 1] }}
+              />
+              <motion.div
+                className="absolute inset-0 rounded-full bg-primary"
+                animate={{ scale: [1, 1.3, 1.55], opacity: [0, 0.1, 0] }}
+                transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut", times: [0, 0.3, 1], delay: 0.9 }}
+              />
               <div className="relative w-80 h-80 xl:w-96 xl:h-96">
                 <Image
                   src="/kondwani.png"

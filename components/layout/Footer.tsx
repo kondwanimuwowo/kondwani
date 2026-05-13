@@ -23,7 +23,7 @@ export function Footer() {
           <div>
             <Link
               href="/"
-              className="text-xl font-extrabold tracking-tight text-white hover:text-primary transition-colors duration-300"
+              className="text-2xl font-extrabold tracking-tight text-white hover:text-primary transition-colors duration-300"
             >
               [&lt;ondwani
             </Link>

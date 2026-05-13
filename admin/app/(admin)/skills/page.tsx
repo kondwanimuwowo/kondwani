@@ -125,12 +125,6 @@ export default function SkillsPage() {
                   <input value={skill.name} onChange={e => updateSkill(ci, si, "name", e.target.value)}
                     placeholder="Skill name"
                     className="flex-1 px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-primary transition-colors" />
-                  <select value={skill.level} onChange={e => updateSkill(ci, si, "level", e.target.value)}
-                    className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-primary transition-colors">
-                    <option value="Advanced">Advanced</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Learning">Learning</option>
-                  </select>
                   <button onClick={() => removeSkill(ci, si)} className="text-muted hover:text-red-500 transition-colors text-sm p-1">&times;</button>
                 </div>
               ))}

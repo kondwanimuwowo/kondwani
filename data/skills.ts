@@ -11,21 +11,21 @@ export interface SkillCategory {
 }
 
 export const techPills = [
-  "HTML5",
-  "CSS3",
+  "TypeScript",
   "JavaScript",
   "React",
+  "Next.js",
   "Node.js",
+  "Express",
   "PostgreSQL",
+  "Prisma",
+  "Supabase",
   "Tailwind CSS",
-  "WordPress",
+  "Framer Motion",
   "Git",
   "Figma",
-  "Adobe CC",
-  "Affinity",
   "VS Code",
   "Claude Code",
-  "Gemini",
   "GitHub Copilot",
 ]
 
@@ -35,12 +35,12 @@ export const skillCategories: SkillCategory[] = [
     title: "Frontend",
     icon: "Code",
     skills: [
-      { name: "HTML5", level: "Advanced" },
-      { name: "CSS3", level: "Advanced" },
-      { name: "JavaScript", level: "Advanced" },
-      { name: "React", level: "Advanced" },
+      { name: "TypeScript", level: "Advanced" },
+      { name: "React 19", level: "Advanced" },
+      { name: "Next.js 15", level: "Advanced" },
       { name: "Tailwind CSS", level: "Advanced" },
-      { name: "Responsive Design", level: "Advanced" },
+      { name: "Framer Motion", level: "Advanced" },
+      { name: "shadcn/ui", level: "Advanced" },
     ],
   },
   {
@@ -49,8 +49,11 @@ export const skillCategories: SkillCategory[] = [
     icon: "Storage",
     skills: [
       { name: "Node.js", level: "Intermediate" },
-      { name: "PostgreSQL", level: "Intermediate" },
+      { name: "Express.js", level: "Intermediate" },
       { name: "REST APIs", level: "Intermediate" },
+      { name: "PostgreSQL", level: "Intermediate" },
+      { name: "Prisma ORM", level: "Intermediate" },
+      { name: "Supabase", level: "Intermediate" },
     ],
   },
   {
@@ -59,23 +62,22 @@ export const skillCategories: SkillCategory[] = [
     icon: "Palette",
     skills: [
       { name: "Figma", level: "Advanced" },
+      { name: "UI/UX Design", level: "Advanced" },
       { name: "Adobe Suite", level: "Intermediate" },
       { name: "Affinity", level: "Intermediate" },
-      { name: "Canva", level: "Advanced" },
-      { name: "UI/UX Design", level: "Advanced" },
     ],
   },
   {
     id: "tools",
-    title: "Tools",
+    title: "Tools & AI",
     icon: "Build",
     skills: [
       { name: "Git & GitHub", level: "Advanced" },
-      { name: "WordPress", level: "Advanced" },
       { name: "VS Code", level: "Advanced" },
       { name: "Claude Code", level: "Advanced" },
+      { name: "GitHub Copilot", level: "Advanced" },
       { name: "Gemini", level: "Intermediate" },
-      { name: "GitHub Copilot", level: "Intermediate" },
+      { name: "WordPress", level: "Advanced" },
     ],
   },
 ]

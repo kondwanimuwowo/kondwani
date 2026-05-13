@@ -3,8 +3,9 @@
 import { motion, type Variants } from "motion/react"
 import { Code, Storage, Palette, Build } from "@mui/icons-material"
 import {
-  SiHtml5, SiCss, SiJavascript, SiReact, SiNodedotjs,
-  SiPostgresql, SiTailwindcss, SiWordpress, SiGit, SiFigma,
+  SiHtml5, SiCss, SiJavascript, SiTypescript, SiReact, SiNextdotjs,
+  SiNodedotjs, SiExpress, SiPostgresql, SiPrisma, SiSupabase,
+  SiTailwindcss, SiFramer, SiWordpress, SiGit, SiFigma,
   SiAffinity, SiClaude, SiGooglegemini, SiGithubcopilot,
 } from "react-icons/si"
 import { VscVscode } from "react-icons/vsc"
@@ -24,10 +25,16 @@ const pillIconMap: Record<string, IconType> = {
   "HTML5": SiHtml5,
   "CSS3": SiCss,
   "JavaScript": SiJavascript,
+  "TypeScript": SiTypescript,
   "React": SiReact,
+  "Next.js": SiNextdotjs,
   "Node.js": SiNodedotjs,
+  "Express": SiExpress,
   "PostgreSQL": SiPostgresql,
+  "Prisma": SiPrisma,
+  "Supabase": SiSupabase,
   "Tailwind CSS": SiTailwindcss,
+  "Framer Motion": SiFramer,
   "WordPress": SiWordpress,
   "Git": SiGit,
   "Figma": SiFigma,
@@ -38,11 +45,6 @@ const pillIconMap: Record<string, IconType> = {
   "GitHub Copilot": SiGithubcopilot,
 }
 
-const levelColors = {
-  Advanced: "bg-primary/10 text-primary",
-  Intermediate: "bg-foreground/5 text-foreground/70",
-  Learning: "bg-border text-muted",
-}
 
 const container: Variants = {
   hidden: {},
@@ -82,9 +84,6 @@ export function Skills({ techPills = defaultPills, skillCategories = defaultCate
             transition={{ duration: 0.8, delay: 0.3 }}
             style={{ transformOrigin: "left" }}
           />
-          <p className="mt-6 text-lg text-muted max-w-2xl mx-auto">
-            Tools and technologies I use to build &amp; design.
-          </p>
         </motion.div>
 
         {/* Tech pills */}
@@ -115,7 +114,7 @@ export function Skills({ techPills = defaultPills, skillCategories = defaultCate
           variants={container}
           initial="hidden"
           animate={revealed ? "show" : "hidden"}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
         >
           {skillCategories.map((category) => {
             const Icon = muiIconMap[category.icon]
@@ -124,24 +123,31 @@ export function Skills({ techPills = defaultPills, skillCategories = defaultCate
                 key={category.id}
                 variants={fadeUp}
                 whileHover={{ y: -6 }}
-                className="bg-white border border-border rounded-2xl p-6 shadow-sm transition-shadow hover:shadow-md"
+                className="relative group overflow-hidden bg-white border border-border rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300"
               >
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  {Icon && <Icon className="text-primary" fontSize="small" />}
+                {/* Watermark icon */}
+                <div className="absolute right-3 bottom-3 pointer-events-none select-none opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-500">
+                  {Icon && <Icon sx={{ fontSize: 140 }} className="text-foreground" />}
                 </div>
-                <h3 className="font-semibold text-foreground mb-4">{category.title}</h3>
-                <ul className="space-y-2.5">
-                  {category.skills.map((skill) => (
-                    <li key={skill.name} className="flex items-center justify-between gap-2">
-                      <span className="text-sm text-foreground/80">{skill.name}</span>
-                      <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${levelColors[skill.level]}`}
-                      >
-                        {skill.level}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+
+                <div className="relative z-10">
+                  {/* Icon + Title row */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      {Icon && <Icon className="text-primary" fontSize="small" />}
+                    </div>
+                    <h3 className="font-bold text-foreground/60 text-base leading-tight">
+                      {category.title}
+                    </h3>
+                  </div>
+                  <ul className="space-y-2.5">
+                    {category.skills.map((skill) => (
+                      <li key={skill.name} className="text-sm text-foreground/80">
+                        {skill.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </motion.div>
             )
           })}

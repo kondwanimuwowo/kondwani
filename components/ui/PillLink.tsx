@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion } from "motion/react"
-import { ArrowOutward } from "@mui/icons-material"
+import { ArrowForward } from "@mui/icons-material"
 import { cn } from "@/lib/utils"
 
 interface PillLinkProps {
@@ -33,14 +33,14 @@ export function PillLink({ href, children, external, dark, className }: PillLink
     >
       {children}
       <motion.span
-        variants={{ hover: { rotate: 32 } }}
+        variants={{ hover: { rotate: -45 } }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
         className={cn(
           "w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-primary transition-colors duration-300 shrink-0",
           dark ? "bg-white/15" : "bg-foreground"
         )}
       >
-        <ArrowOutward sx={{ fontSize: 14 }} className="text-white" />
+        <ArrowForward sx={{ fontSize: 14 }} className="text-white" />
       </motion.span>
     </MotionLink>
   )

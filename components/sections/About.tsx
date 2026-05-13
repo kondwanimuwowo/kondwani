@@ -7,10 +7,10 @@ import { useCountUp } from "@/hooks/useCountUp"
 import { useReveal } from "@/hooks/useReveal"
 
 const stats = [
-  { label: "Clients Served", value: 5, suffix: "+" },
-  { label: "Technologies Used", value: 10, suffix: "+" },
-  { label: "Months Coding", value: 12, suffix: "+" },
-  { label: "Client Satisfaction", value: 100, suffix: "%" },
+  { label: "Clients Served", value: 10, suffix: "+" },
+  { label: "Technologies Used", value: 15, suffix: "+" },
+  { label: "Years Coding", value: 2, suffix: "+" },
+  { label: "Projects Shipped", value: 12, suffix: "+" },
 ]
 
 function StatItem({ label, value, suffix }: { label: string; value: number; suffix: string }) {
@@ -105,7 +105,7 @@ export function About() {
                     practical skills.
                   </p>
                   <p className="font-medium text-foreground/70">
-                    Faith, technology, and impact — and I&apos;m just getting started.
+                    Faith, technology, and impact.
                   </p>
                 </div>
               </motion.div>

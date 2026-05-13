@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "motion/react"
-import { Menu, X } from "@mui/icons-material"
+import { Menu, X, FileDownloadOutlined } from "@mui/icons-material"
 import { cn } from "@/lib/utils"
 
 const baseNavLinks = [
@@ -66,7 +66,7 @@ export function Header({ showBlog = false }: HeaderProps) {
         {/* Logo */}
         <Link
           href="/"
-          className="text-lg font-extrabold tracking-tight text-foreground hover:text-primary transition-colors duration-300"
+          className="text-xl font-extrabold tracking-tight text-foreground/70 hover:text-primary transition-colors duration-300"
         >
           [&lt;ondwani
         </Link>
@@ -89,8 +89,9 @@ export function Header({ showBlog = false }: HeaderProps) {
             href="/kondwani-resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-medium bg-primary text-white px-6 py-2.5 rounded-full hover:bg-primary-hover transition-colors duration-200 shadow-sm"
+            className="inline-flex items-center gap-1.5 text-sm font-medium border border-border text-muted px-5 py-2 rounded-full hover:border-primary hover:text-foreground transition-colors duration-200"
           >
+            <FileDownloadOutlined sx={{ fontSize: 15 }} />
             Resume
           </Link>
         </div>
@@ -145,8 +146,9 @@ export function Header({ showBlog = false }: HeaderProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMobileOpen(false)}
-                  className="block text-center text-sm font-medium bg-primary text-white py-2.5 rounded-full hover:bg-primary-hover transition-colors"
+                  className="flex items-center justify-center gap-1.5 text-sm font-medium border border-border text-muted py-2.5 rounded-full hover:border-primary hover:text-foreground transition-colors"
                 >
+                  <FileDownloadOutlined sx={{ fontSize: 15 }} />
                   Resume
                 </Link>
               </motion.div>
