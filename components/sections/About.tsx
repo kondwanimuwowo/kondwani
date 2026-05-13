@@ -69,7 +69,7 @@ export function About() {
           <motion.p variants={fadeUp} className="text-lg text-muted leading-relaxed">
             I&apos;m{" "}
             <span className="font-semibold text-primary">Kondwani Muwowo</span>, a
-            self-taught Front-End Developer and UI Designer based in Lusaka, Zambia. I started
+            self-taught Software Developer and UI Designer based in Lusaka, Zambia. I started
             building websites with WordPress, discovered real coding in 2024, and instantly fell in
             love — since then I&apos;ve been pushing myself to build digital products that are both
             beautiful and purposeful.

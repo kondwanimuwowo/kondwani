@@ -80,7 +80,7 @@ export function Hero() {
               variants={item}
               className="mt-5 text-lg text-muted max-w-xl leading-relaxed"
             >
-              Front-End Developer, UI Designer — and a fighter against human trafficking and child exploitation.
+              Software Developer, UI Designer — and a fighter against human trafficking and child exploitation.
               I build clean, thoughtful, and smooth digital experiences.
             </motion.p>
 

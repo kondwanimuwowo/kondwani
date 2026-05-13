@@ -37,7 +37,7 @@ export const projects: Project[] = [
     slug: "personal-portfolio",
     title: "Personal Portfolio",
     description:
-      "A minimal, modern portfolio website built with React and Tailwind CSS. Showcasing my work as a front-end developer and UI designer.",
+      "A minimal, modern portfolio website built with React and Tailwind CSS. Showcasing my work as a software developer and UI designer.",
     excerpt: "My digital home — a minimal, animated portfolio built with Next.js and Tailwind CSS.",
     tech: ["Next.js", "React", "Tailwind CSS", "Prisma", "Supabase"],
     liveUrl: "https://kondwanimuwowo.com",

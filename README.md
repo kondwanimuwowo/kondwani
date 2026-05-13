@@ -1,6 +1,6 @@
 # Kondwani Muwowo — Portfolio
 
-> Personal portfolio of Kondwani Muwowo, a self-taught Front-End Developer & UI Designer from Lusaka, Zambia. Built with Next.js 15, Tailwind CSS, Framer Motion, and Supabase.
+> Personal portfolio of Kondwani Muwowo, a self-taught Software Developer & UI Designer from Lusaka, Zambia. Built with Next.js 15, Tailwind CSS, Framer Motion, and Supabase.
 
 ![Portfolio Preview](public/images/projects/portfolio.png)
 

@@ -3,7 +3,7 @@ import { ProjectsGrid } from "@/components/sections/ProjectsGrid"
 
 export const metadata: Metadata = {
   title: "Projects",
-  description: "Web apps, design work, and nonprofit websites by Kondwani Muwowo — a Front-End Developer and UI Designer based in Lusaka, Zambia.",
+  description: "Web apps, design work, and nonprofit websites by Kondwani Muwowo — a Software Developer and UI Designer based in Lusaka, Zambia.",
   alternates: { canonical: "/projects" },
   openGraph: {
     title: "Projects — Kondwani Muwowo",

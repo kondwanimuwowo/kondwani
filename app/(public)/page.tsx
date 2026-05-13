@@ -11,9 +11,9 @@ import { skillCategories, techPills } from "@/data/skills"
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Kondwani Muwowo — Front-End Developer & UI Designer",
+    title: "Kondwani Muwowo — Software Developer & UI Designer",
     description:
-      "Kondwani Muwowo is a self-taught Front-End Developer and UI Designer from Lusaka, Zambia, building purposeful digital products with React, Next.js, and Tailwind CSS.",
+      "Kondwani Muwowo is a self-taught Software Developer and UI Designer from Lusaka, Zambia, building purposeful digital products with React, Next.js, and Tailwind CSS.",
     url: "/",
   },
 }
@@ -22,7 +22,7 @@ const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Kondwani Muwowo",
-  jobTitle: "Front-End Developer & UI Designer",
+  jobTitle: "Software Developer & UI Designer",
   url: "https://kondwanimuwowo.com",
   sameAs: [
     "https://github.com/kondwanimuwowo",
@@ -42,7 +42,7 @@ const faqJsonLd = {
       name: "Who is Kondwani Muwowo?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Kondwani Muwowo is a self-taught Front-End Developer and UI Designer based in Lusaka, Zambia. He builds clean, thoughtful digital experiences using React, Next.js, and Tailwind CSS, and is also involved in fighting human trafficking through TAKUZA.",
+        text: "Kondwani Muwowo is a self-taught Software Developer and UI Designer based in Lusaka, Zambia. He builds clean, thoughtful digital experiences using React, Next.js, and Tailwind CSS, and is also involved in fighting human trafficking through TAKUZA.",
       },
     },
     {
