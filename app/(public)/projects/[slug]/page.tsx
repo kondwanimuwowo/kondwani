@@ -3,19 +3,25 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { OpenInNew, GitHub, ArrowBack } from "@mui/icons-material"
-import { projects } from "@/data/projects"
+import { prisma } from "@/lib/prisma"
+
+export const revalidate = 3600
 
 interface Props {
   params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
-  return projects.map((p) => ({ slug: p.slug }))
+  const projects = await prisma.project.findMany({
+    where: { published: true, slug: { not: null } },
+    select: { slug: true },
+  })
+  return projects.map((p) => ({ slug: p.slug as string }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const project = projects.find((p) => p.slug === slug)
+  const project = await prisma.project.findUnique({ where: { slug } })
   if (!project) return {}
   return {
     title: project.title,
@@ -25,14 +31,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${project.title} — Kondwani Muwowo`,
       description: project.excerpt ?? project.description,
       url: `/projects/${slug}`,
-      images: project.image ? [{ url: project.image }] : [],
+      images: project.imageUrl ? [{ url: project.imageUrl }] : [],
     },
   }
 }
 
 export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params
-  const project = projects.find((p) => p.slug === slug)
+  const project = await prisma.project.findUnique({ where: { slug, published: true } })
   if (!project) notFound()
 
   const jsonLd = {
@@ -56,14 +62,18 @@ export default async function ProjectDetailPage({ params }: Props) {
       <main className="min-h-screen bg-background pt-24 pb-20">
         {/* Cover image */}
         <div className="relative h-64 md:h-96 bg-surface overflow-hidden">
-          <Image
-            src={project.image}
-            alt={`${project.title} — built by Kondwani Muwowo using ${project.tech.join(", ")}`}
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
+          {project.imageUrl ? (
+            <Image
+              src={project.imageUrl}
+              alt={`${project.title} — built by Kondwani Muwowo using ${project.tech.join(", ")}`}
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-surface" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
         </div>
 
@@ -96,10 +106,12 @@ export default async function ProjectDetailPage({ params }: Props) {
 
               {/* Action buttons */}
               <div className="flex flex-wrap gap-3 shrink-0">
-                <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors">
-                  Live Demo <OpenInNew sx={{ fontSize: 16 }} />
-                </a>
+                {project.liveUrl && (
+                  <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors">
+                    Live Demo <OpenInNew sx={{ fontSize: 16 }} />
+                  </a>
+                )}
                 {project.githubUrl && (
                   <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 border border-border text-foreground px-5 py-2.5 rounded-full text-sm font-medium hover:border-primary hover:text-primary transition-colors">

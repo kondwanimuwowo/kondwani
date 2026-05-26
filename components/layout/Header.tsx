@@ -7,6 +7,7 @@ import { Menu, X, FileDownloadOutlined } from "@mui/icons-material"
 import { cn } from "@/lib/utils"
 
 const baseNavLinks = [
+  { name: "src", href: "/" },
   { name: "Projects", href: "/projects" },
   { name: "Beyond Code", href: "/beyond-code" },
   { name: "Contact", href: "/contact" },
@@ -19,7 +20,7 @@ interface HeaderProps {
 }
 
 export function Header({ showBlog = false }: HeaderProps) {
-  const navLinks = showBlog ? [...baseNavLinks.slice(0, 2), blogNavLink, baseNavLinks[2]] : baseNavLinks
+  const navLinks = showBlog ? [...baseNavLinks.slice(0, 3), blogNavLink, baseNavLinks[3]] : baseNavLinks
   const { scrollY } = useScroll()
   const [hidden, setHidden] = React.useState(false)
   const [isScrolled, setIsScrolled] = React.useState(false)
@@ -77,9 +78,20 @@ export function Header({ showBlog = false }: HeaderProps) {
             <Link
               key={link.name}
               href={link.href}
-              className="px-4 py-2 text-sm font-medium text-muted hover:text-foreground transition-colors duration-200"
+              className={cn(
+                "transition-colors duration-200 flex items-center",
+                link.href === "/"
+                  ? "px-2 py-1"
+                  : "px-4 py-2 text-sm font-medium text-muted hover:text-foreground"
+              )}
             >
-              {link.name}
+              {link.href === "/" ? (
+                <span className="inline-flex items-center bg-[#F3F4F6] text-[#7E1416] px-2.5 py-0.5 rounded text-[11px] font-mono font-extrabold border border-black/5 hover:bg-[#E5E7EB] hover:text-[#601012] transition-colors tracking-wider duration-200">
+                  src
+                </span>
+              ) : (
+                link.name
+              )}
             </Link>
           ))}
         </nav>
@@ -129,9 +141,20 @@ export function Header({ showBlog = false }: HeaderProps) {
                   <Link
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="block py-3.5 text-sm font-medium text-foreground hover:text-primary transition-colors border-b border-border/30 last:border-0"
+                    className={cn(
+                      "block py-3.5 text-sm font-medium transition-colors border-b border-border/30 last:border-0",
+                      link.href === "/"
+                        ? "flex items-center py-2"
+                        : "text-foreground hover:text-primary"
+                    )}
                   >
-                    {link.name}
+                    {link.href === "/" ? (
+                      <span className="inline-flex items-center bg-[#F3F4F6] text-[#7E1416] px-2.5 py-0.5 rounded text-[11px] font-mono font-extrabold border border-black/5 tracking-wider">
+                        src
+                      </span>
+                    ) : (
+                      link.name
+                    )}
                   </Link>
                 </motion.div>
               ))}

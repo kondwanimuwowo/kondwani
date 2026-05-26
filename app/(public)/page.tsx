@@ -64,16 +64,21 @@ const faqJsonLd = {
   ],
 }
 
-async function getSkillsData() {
-  try {
-    const config = await prisma.siteConfig.findUnique({ where: { key: "skills" } })
-    if (config) return JSON.parse(config.value)
-  } catch {}
-  return { skillCategories, techPills }
+async function getHomeData() {
+  const [skillsConfig, featuredProjects] = await Promise.all([
+    prisma.siteConfig.findUnique({ where: { key: "skills" } }).catch(() => null),
+    prisma.project.findMany({
+      where: { published: true, featured: true },
+      orderBy: { order: "asc" },
+      take: 3,
+    }).catch(() => []),
+  ])
+  const skillsData = skillsConfig ? JSON.parse(skillsConfig.value) : { skillCategories, techPills }
+  return { skillsData, featuredProjects }
 }
 
 export default async function Home() {
-  const skillsData = await getSkillsData()
+  const { skillsData, featuredProjects } = await getHomeData()
 
   return (
     <>
@@ -83,7 +88,7 @@ export default async function Home() {
         <Hero />
         <About />
         <Skills techPills={skillsData.techPills} skillCategories={skillsData.skillCategories} />
-        <Projects />
+        <Projects projects={featuredProjects} />
         <BeyondCode />
         <Contact />
       </div>

@@ -39,7 +39,7 @@ export const projects: Project[] = [
     description:
       "A minimal, modern portfolio website built with React and Tailwind CSS. Showcasing my work as a software developer and UI designer.",
     excerpt: "My digital home — a minimal, animated portfolio built with Next.js and Tailwind CSS.",
-    tech: ["Next.js", "React", "Tailwind CSS", "Prisma", "Supabase"],
+    tech: ["Next.js", "React", "Tailwind CSS", "Framer Motion", "TypeScript"],
     liveUrl: "https://kondwanimuwowo.com",
     githubUrl: "https://github.com/kondwanimuwowo",
     image: "/images/projects/portfolio.png",

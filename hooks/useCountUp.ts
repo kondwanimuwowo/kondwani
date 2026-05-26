@@ -12,7 +12,6 @@ export function useCountUp(target: number, duration = 2000) {
     if (!isInView) return
 
     const startTime = performance.now()
-    const frames = Math.round((duration / 1000) * 60)
 
     const step = (currentTime: number) => {
       const elapsed = currentTime - startTime

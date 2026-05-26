@@ -126,3 +126,205 @@ model SiteConfig {
   value     String   @db.Text
   updatedAt DateTime @updatedAt
 }
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+// ── Studio ────────────────────────────────────────────────────────────────────
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  company   String?
+  email     String   @unique
+  phone     String?
+  website   String?
+  currency  String   @default("USD")
+  notes     String?  @db.Text
+  status    String   @default("active")
+  /// Supabase Auth UID — linked when the client logs into the portal
+  userId    String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workProjects WorkProject[]
+  documents    Document[]
+  retainers    RetainerContract[]
+  contracts    Contract[]
+}
+
+model WorkProject {
+  id          String    @id @default(cuid())
+  title       String
+  description String?   @db.Text
+  clientId    String?
+  client      Client?   @relation(fields: [clientId], references: [id])
+  status      String    @default("backlog")
+  billingType String    @default("fixed")
+  rate        Float?
+  budget      Float?
+  currency    String    @default("USD")
+  startDate   DateTime?
+  dueDate     DateTime?
+  order       Int       @default(0)
+  portfolioId String?   @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tasks      WorkTask[]
+  documents  Document[]
+  milestones BillingMilestone[]
+  retainer   RetainerContract?
+  contract   Contract?
+  messages   ProjectMessage[]
+}
+
+model WorkTask {
+  id          String      @id @default(cuid())
+  projectId   String
+  project     WorkProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?     @db.Text
+  status      String      @default("todo")
+  priority    String      @default("medium")
+  dueDate     DateTime?
+  position    Float       @default(0)
+  parentId    String?
+  parent      WorkTask?   @relation("subtasks", fields: [parentId], references: [id])
+  subtasks    WorkTask[]  @relation("subtasks")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Document {
+  id          String            @id @default(cuid())
+  type        String
+  number      String            @unique
+  clientId    String
+  client      Client            @relation(fields: [clientId], references: [id])
+  projectId   String?
+  project     WorkProject?      @relation(fields: [projectId], references: [id])
+  milestoneId String?           @unique
+  milestone   BillingMilestone? @relation("MilestoneInvoice", fields: [milestoneId], references: [id])
+  retainerId  String?
+  retainer    RetainerContract? @relation(fields: [retainerId], references: [id])
+  status      String            @default("draft")
+  issueDate   DateTime          @default(now())
+  dueDate     DateTime?
+  currency    String            @default("USD")
+  taxRate     Float             @default(0)
+  notes       String?           @db.Text
+  token       String            @unique
+  pdfUrl      String?
+  /// Lenco payment reference for tracking mobile money collections
+  paymentRef  String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  items DocumentItem[]
+}
+
+model DocumentItem {
+  id          String   @id @default(cuid())
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Float    @default(1)
+  rate        Float
+  amount      Float
+  flat        Boolean  @default(false)
+  position    Int      @default(0)
+}
+
+// ── Billing Milestones ────────────────────────────────────────────────────────
+
+/// A split billing schedule entry for a fixed-price project.
+/// e.g. 50% upfront, 25% mid, 25% on delivery.
+model BillingMilestone {
+  id         String      @id @default(cuid())
+  projectId  String
+  project    WorkProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title      String
+  percentage Float?
+  amount     Float
+  dueDate    DateTime?
+  /// "pending" | "invoiced" | "paid"
+  status     String      @default("pending")
+  position   Int         @default(0)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  /// The invoice generated for this milestone (set on Document side via milestoneId)
+  invoice Document? @relation("MilestoneInvoice")
+}
+
+// ── Retainer Contracts ─────────────────────────────────────────────────────────
+
+/// A recurring billing agreement — monthly, quarterly, or annual retainers.
+model RetainerContract {
+  id             String      @id @default(cuid())
+  clientId       String
+  client         Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  projectId      String?     @unique
+  project        WorkProject? @relation(fields: [projectId], references: [id])
+  title          String
+  amount         Float
+  currency       String      @default("USD")
+  /// "monthly" | "quarterly" | "annually"
+  frequency      String      @default("monthly")
+  startDate      DateTime
+  endDate        DateTime?
+  /// "active" | "paused" | "completed"
+  status         String      @default("active")
+  lastInvoicedAt DateTime?
+  nextInvoiceAt  DateTime
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  invoices Document[]
+}
+
+// ── Contracts ─────────────────────────────────────────────────────────────────
+
+/// A rich-text contract sent to the client for digital signature.
+model Contract {
+  id             String       @id @default(cuid())
+  clientId       String
+  client         Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  projectId      String?      @unique
+  project        WorkProject? @relation(fields: [projectId], references: [id])
+  title          String
+  content        String       @db.Text
+  /// "draft" | "sent" | "signed" | "declined"
+  status         String       @default("draft")
+  signedAt       DateTime?
+  signatureName  String?
+  signatureEmail String?
+  signatureIp    String?
+  pdfUrl         String?
+  token          String       @unique
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+// ── Project Messaging ─────────────────────────────────────────────────────────
+
+/// A message in a per-project threaded chat between developer and client.
+model ProjectMessage {
+  id          String      @id @default(cuid())
+  projectId   String
+  project     WorkProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  /// Supabase Auth UID of the sender
+  senderId    String
+  senderName  String
+  /// "developer" | "client"
+  senderRole  String
+  content     String      @db.Text
+  attachments String[]    @default([])
+  createdAt   DateTime    @default(now())
+
+  @@index([projectId, createdAt])
+}

@@ -20,11 +20,30 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--color-background);
+  background-color: #F8FAFC;
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom crimson scrollbar — used in sidebar, modal bodies, table wrappers */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #601012;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #501010;
 }
 
 @layer utilities {

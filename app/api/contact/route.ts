@@ -32,15 +32,19 @@ export async function POST(request: Request) {
       data: { name, email, subject, message },
     })
 
-    // Send email
-    const resend = new Resend(process.env.RESEND_API_KEY)
-    await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL ?? "portfolio@kondwanimuwowo.com",
-      to: process.env.RESEND_TO_EMAIL ?? "kondwanimuwowo@gmail.com",
-      replyTo: email,
-      subject: subject ? `Portfolio: ${subject}` : "Portfolio: New message",
-      text: `Name: ${name}\nEmail: ${email}${subject ? `\nSubject: ${subject}` : ""}\n\n${message}`,
-    })
+    // Send email — failure is non-fatal; submission is already persisted
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY)
+      await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL ?? "portfolio@kondwanimuwowo.com",
+        to: process.env.RESEND_TO_EMAIL ?? "kondwanimuwowo@gmail.com",
+        replyTo: email,
+        subject: subject ? `Portfolio: ${subject}` : "Portfolio: New message",
+        text: `Name: ${name}\nEmail: ${email}${subject ? `\nSubject: ${subject}` : ""}\n\n${message}`,
+      })
+    } catch (emailErr) {
+      console.error("[contact] email delivery failed", emailErr)
+    }
 
     return NextResponse.json({ ok: true })
   } catch (err) {

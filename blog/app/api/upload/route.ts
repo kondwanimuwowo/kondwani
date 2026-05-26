@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   const type = searchParams.get("type") ?? "image/jpeg"
 
   const ext = filename.split(".").pop() ?? "jpg"
-  const key = `blog/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+  const key = `blogs/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
   const url = await getSignedUrl(
     r2,

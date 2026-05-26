@@ -12,6 +12,13 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "kondwani-current-portfolio/**",
+    "admin/**",
+    "blog/**",
+    "inspo-accomozed/**",
+    "inspo-azmec/**",
+    "inspo-elta-creatives/**",
+    "inspo-roan/**",
   ]),
 ]);
 

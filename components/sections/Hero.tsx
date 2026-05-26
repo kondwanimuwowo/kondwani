@@ -3,13 +3,13 @@
 import Image from "next/image"
 import Link from "next/link"
 import { motion, type Variants } from "motion/react"
-import { GitHub, LinkedIn, Twitter, ArrowDownward } from "@mui/icons-material"
+import { GitHub, LinkedIn, X } from "@mui/icons-material"
 import { PillLink } from "@/components/ui/PillLink"
 
 const socialLinks = [
   { name: "GitHub", href: "https://github.com/kondwanimuwowo", icon: GitHub },
   { name: "LinkedIn", href: "https://linkedin.com/in/kondwanimuwowo", icon: LinkedIn },
-  { name: "Twitter / X", href: "https://x.com/kondwanimuwow0", icon: Twitter },
+  { name: "Twitter / X", href: "https://x.com/kondwanimuwow0", icon: X },
 ]
 
 const container: Variants = {
@@ -25,11 +25,15 @@ const item: Variants = {
 }
 
 const imageVariant: Variants = {
-  hidden: { opacity: 0, scale: 0.88 },
+  hidden: { opacity: 0, y: 20 },
   show: {
     opacity: 1,
-    scale: 1,
-    transition: { duration: 0.8, delay: 0.4, ease: "easeOut" },
+    y: 0,
+    transition: {
+      duration: 1.2,
+      ease: [0.16, 1, 0.3, 1],
+      delay: 0.4
+    },
   },
 }
 
@@ -52,29 +56,34 @@ export function Hero() {
               animate="show"
               className="lg:hidden mb-8 flex justify-center"
             >
-              <div className="relative w-56 h-56 sm:w-64 sm:h-64">
+              <div className="relative">
+                {/* Animated pulse rings */}
                 <motion.div
-                  className="absolute inset-0 rounded-full bg-primary"
-                  animate={{ scale: [1, 1.3, 1.55], opacity: [0, 0.14, 0] }}
-                  transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut", times: [0, 0.3, 1] }}
+                  className="absolute inset-0 rounded-full bg-[#7E1416] bg-opacity-10 border border-[#7E1416] border-opacity-20"
+                  animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.15, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                 />
                 <motion.div
-                  className="absolute inset-0 rounded-full bg-primary"
-                  animate={{ scale: [1, 1.3, 1.55], opacity: [0, 0.1, 0] }}
-                  transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut", times: [0, 0.3, 1], delay: 0.9 }}
+                  className="absolute inset-0 rounded-full bg-[#7E1416] bg-opacity-5 border border-[#7E1416] border-opacity-10"
+                  animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.1, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: 2 }}
                 />
-                <Image
-                  src="/kondwani.png"
-                  alt="Kondwani Muwowo"
-                  fill
-                  className="object-cover rounded-full shadow-lg ring-1 ring-border ring-offset-4 ring-offset-background relative"
-                  priority
-                  sizes="(max-width: 640px) 224px, 256px"
-                />
+                <motion.div
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative w-56 h-56 sm:w-64 sm:h-64 cursor-pointer"
+                >
+                  <Image
+                    src="/kondwani.png"
+                    alt="Kondwani Muwowo"
+                    fill
+                    className="object-cover rounded-full shadow-2xl ring-2 ring-white transition-shadow duration-300 hover:shadow-xl relative"
+                    priority
+                    sizes="(max-width: 640px) 224px, 256px"
+                  />
+                </motion.div>
               </div>
             </motion.div>
-
-
 
             <motion.h1
               variants={item}
@@ -130,25 +139,29 @@ export function Hero() {
             <div className="relative">
               {/* Animated pulse rings */}
               <motion.div
-                className="absolute inset-0 rounded-full bg-primary"
-                animate={{ scale: [1, 1.3, 1.55], opacity: [0, 0.14, 0] }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut", times: [0, 0.3, 1] }}
+                className="absolute inset-0 rounded-full bg-[#7E1416] bg-opacity-10 border border-[#7E1416] border-opacity-20"
+                animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.15, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
               />
               <motion.div
-                className="absolute inset-0 rounded-full bg-primary"
-                animate={{ scale: [1, 1.3, 1.55], opacity: [0, 0.1, 0] }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut", times: [0, 0.3, 1], delay: 0.9 }}
+                className="absolute inset-0 rounded-full bg-[#7E1416] bg-opacity-5 border border-[#7E1416] border-opacity-10"
+                animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.1, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: 2 }}
               />
-              <div className="relative w-80 h-80 xl:w-96 xl:h-96">
+              <motion.div
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="relative w-80 h-80 xl:w-96 xl:h-96 cursor-pointer"
+              >
                 <Image
                   src="/kondwani.png"
                   alt="Kondwani Muwowo"
                   fill
-                  className="object-cover rounded-full shadow-lg ring-1 ring-border ring-offset-8 ring-offset-background"
+                  className="object-cover rounded-full shadow-2xl ring-2 ring-white transition-shadow duration-300 hover:shadow-xl"
                   priority
                   sizes="(max-width: 1280px) 320px, 384px"
                 />
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>

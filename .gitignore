@@ -21,7 +21,8 @@
 /build
 
 # misc
-.DS_Store
+**/.DS_Store
+Thumbs.db
 *.pem
 
 # debug
@@ -30,7 +31,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env*
 
 # vercel
@@ -40,15 +41,23 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# prisma generated client
 /app/generated/prisma
 
-inspo-azmec
-inspo-azmec/*
-inspo-elta-creatives
-inspo-elta-creatives/*
-inspo-roan
-inspo-roan/*
-inspo-accomozed
-inspo-accomozed/*
-kondwani-current-portfolio
-kondwani-current-portfolio/*
+# reference / local-only docs
+LENCO-V2-DOCS/
+implementation_plan.md
+
+# personal files
+bumara-cv-*.tex
+
+# ide
+.idea/
+.vscode/
+
+# inspiration & legacy (reference only, not deployable)
+inspo-azmec/
+inspo-elta-creatives/
+inspo-roan/
+inspo-accomozed/
+kondwani-current-portfolio/

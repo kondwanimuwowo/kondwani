@@ -31,24 +31,25 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // protect /dashboard routes
+  // protect /portal routes
   if (
     !user &&
-    request.nextUrl.pathname.startsWith('/dashboard') &&
-    request.nextUrl.pathname !== '/dashboard/login'
+    request.nextUrl.pathname.startsWith('/portal') &&
+    request.nextUrl.pathname !== '/portal/login' &&
+    !request.nextUrl.pathname.startsWith('/portal/auth')
   ) {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard/login'
+    url.pathname = '/portal/login'
     return NextResponse.redirect(url)
   }
 
-  // Redirect to dashboard if logged in and accessing login page
+  // Redirect to portal if logged in and accessing login page
   if (
     user &&
-    request.nextUrl.pathname === '/dashboard/login'
+    request.nextUrl.pathname === '/portal/login'
   ) {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = '/portal'
     return NextResponse.redirect(url)
   }
 

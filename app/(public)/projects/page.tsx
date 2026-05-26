@@ -1,5 +1,8 @@
 import type { Metadata } from "next"
-import { ProjectsGrid } from "@/components/sections/ProjectsGrid"
+import { ProjectsAndCaseStudies } from "@/components/sections/ProjectsAndCaseStudies"
+import { prisma } from "@/lib/prisma"
+
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -12,7 +15,12 @@ export const metadata: Metadata = {
   },
 }
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const [projects, caseStudies] = await Promise.all([
+    prisma.project.findMany({ where: { published: true }, orderBy: { order: "asc" } }),
+    prisma.caseStudy.findMany({ where: { published: true }, orderBy: { order: "asc" } }),
+  ])
+
   return (
     <main className="min-h-screen bg-background pt-32 pb-20">
       <div className="container-custom">
@@ -26,7 +34,7 @@ export default function ProjectsPage() {
             A full collection of projects — web apps, design work, and nonprofit sites.
           </p>
         </div>
-        <ProjectsGrid />
+        <ProjectsAndCaseStudies projects={projects} caseStudies={caseStudies} />
       </div>
     </main>
   )

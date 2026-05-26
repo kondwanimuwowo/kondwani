@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { ImageUpload } from "@/components/ui/ImageUpload"
+import { GalleryUpload } from "@/components/ui/GalleryUpload"
 
 type CaseStudy = {
   id: string; title: string; slug: string; client?: string | null; excerpt: string
@@ -15,7 +17,7 @@ type CaseStudy = {
 const empty = {
   title: "", slug: "", client: "", excerpt: "", role: "", year: "", duration: "",
   problem: "", solution: "", content: "", coverImage: "", liveUrl: "", githubUrl: "",
-  gallery: "", tech: "", outcomes: "",
+  gallery: [] as string[], tech: "", outcomes: "",
   testimonial: "", testimonialAuthor: "", testimonialRole: "",
   featured: false, published: false,
 }
@@ -57,7 +59,7 @@ export default function CaseStudiesPage() {
         year: form.year ? Number(form.year) : null,
         tech: form.tech.split(",").map((t: string) => t.trim()).filter(Boolean),
         outcomes: form.outcomes.split("\n").map((o: string) => o.trim()).filter(Boolean),
-        gallery: form.gallery.split("\n").map((s: string) => s.trim()).filter(Boolean),
+        gallery: form.gallery,
         client: form.client || null,
         role: form.role || null,
         duration: form.duration || null,
@@ -90,7 +92,7 @@ export default function CaseStudiesPage() {
       role: s.role ?? "", year: s.year?.toString() ?? "", duration: s.duration ?? "",
       problem: s.problem ?? "", solution: s.solution ?? "", content: s.content,
       coverImage: s.coverImage ?? "", liveUrl: s.liveUrl ?? "", githubUrl: s.githubUrl ?? "",
-      gallery: (s.gallery ?? []).join("\n"),
+      gallery: s.gallery ?? [],
       tech: s.tech.join(", "), outcomes: s.outcomes.join("\n"),
       testimonial: s.testimonial ?? "", testimonialAuthor: s.testimonialAuthor ?? "",
       testimonialRole: s.testimonialRole ?? "",
@@ -180,14 +182,15 @@ export default function CaseStudiesPage() {
 
               {/* Media */}
               <p className={sectionTitle}>Media</p>
-              <div>
-                <label className={labelCls}>Cover Image URL</label>
-                <input value={form.coverImage} onChange={f("coverImage")} className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Gallery <span className="font-normal text-muted">(one URL per line)</span></label>
-                <textarea value={form.gallery} onChange={f("gallery")} rows={3} className={`${textareaCls} font-mono text-xs`} />
-              </div>
+              <ImageUpload
+                value={form.coverImage}
+                onChange={url => setForm(v => ({ ...v, coverImage: url }))}
+                label="Cover image"
+              />
+              <GalleryUpload
+                value={form.gallery as string[]}
+                onChange={urls => setForm(v => ({ ...v, gallery: urls }))}
+              />
 
               {/* Stack & Links */}
               <p className={sectionTitle}>Stack & Links</p>
