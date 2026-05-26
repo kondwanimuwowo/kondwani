@@ -118,6 +118,7 @@ export default function WorkPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(empty)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
   const [quickAdd, setQuickAdd] = useState<Record<string, string>>({})
 
@@ -140,27 +141,39 @@ export default function WorkPage() {
   }
 
   async function handleSave() {
+    if (!form.title.trim()) return
     setSaving(true)
-    await fetch("/api/studio/work", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: form.title,
-        clientId: form.clientId || null,
-        status: form.status,
-        billingType: form.billingType,
-        rate: form.rate ? parseFloat(form.rate) : null,
-        budget: form.budget ? parseFloat(form.budget) : null,
-        currency: form.currency,
-        startDate: form.startDate || null,
-        dueDate: form.dueDate || null,
-        description: form.description || null,
-      }),
-    })
-    setSaving(false)
-    setShowForm(false)
-    setForm(empty)
-    load()
+    setSaveError(null)
+    try {
+      const res = await fetch("/api/studio/work", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: form.title.trim(),
+          clientId: form.clientId || null,
+          status: form.status,
+          billingType: form.billingType,
+          rate: form.rate ? parseFloat(form.rate) : null,
+          budget: form.budget ? parseFloat(form.budget) : null,
+          currency: form.currency,
+          startDate: form.startDate || null,
+          dueDate: form.dueDate || null,
+          description: form.description || null,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        setSaveError(err.error ?? `Error ${res.status} — project was not saved`)
+        return
+      }
+      setShowForm(false)
+      setForm(empty)
+      await load()
+    } catch {
+      setSaveError("Network error — please try again")
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -303,12 +316,15 @@ export default function WorkPage() {
                 <textarea value={form.description} onChange={f("description")} rows={3} className={`${inputCls} resize-none`} />
               </div>
             </div>
-            <div className="flex items-center gap-3 mt-6">
-              <button onClick={handleSave} disabled={saving || !form.title}
+            {saveError && (
+              <p className="mt-4 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{saveError}</p>
+            )}
+            <div className="flex items-center gap-3 mt-4">
+              <button onClick={handleSave} disabled={saving || !form.title.trim()}
                 className="flex-1 bg-primary text-white py-2.5 rounded-xl text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60">
                 {saving ? "Saving…" : "Create project"}
               </button>
-              <button onClick={() => { setShowForm(false); setForm(empty) }}
+              <button onClick={() => { setShowForm(false); setForm(empty); setSaveError(null) }}
                 className="flex-1 border border-border py-2.5 rounded-xl text-sm font-medium hover:bg-surface transition-colors">
                 Cancel
               </button>

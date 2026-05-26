@@ -1,11 +1,26 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { Suspense } from "react"
 
-export default function ClientPortalLoginPage() {
+const ERROR_MESSAGES: Record<string, string> = {
+  "no-access": "Your Google account is not linked to a client profile. Please contact Kondwani to gain access.",
+  "auth-code-exchange-failed": "Authentication failed. Please try again.",
+  "missing-code": "Authentication failed. Please try again.",
+  "no-user": "Could not retrieve your account. Please try again.",
+}
+
+function LoginForm() {
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const errCode = searchParams.get("error")
+    if (errCode) setError(ERROR_MESSAGES[errCode] ?? "An error occurred. Please try again.")
+  }, [searchParams])
 
   const handleGoogleLogin = async () => {
     setLoading(true)
@@ -106,5 +121,13 @@ export default function ClientPortalLoginPage() {
         &copy; {new Date().getFullYear()} Kondwani Muwowo. All rights reserved.
       </footer>
     </div>
+  )
+}
+
+export default function ClientPortalLoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }
