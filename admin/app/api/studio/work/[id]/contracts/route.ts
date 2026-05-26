@@ -4,8 +4,6 @@ import { createClient } from "@/lib/supabase/server"
 import { nanoid } from "nanoid"
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -100,6 +98,7 @@ export async function PUT(
 
     if (process.env.RESEND_API_KEY && contract.client.email) {
       try {
+        const resend = new Resend(process.env.RESEND_API_KEY)
         await resend.emails.send({
           from: `Kondwani Muwowo <${fromEmail}>`,
           to: contract.client.email,
