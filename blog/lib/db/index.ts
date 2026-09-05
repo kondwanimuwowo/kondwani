@@ -7,7 +7,15 @@ const globalForDb = globalThis as unknown as { db?: NodePgDatabase<typeof schema
 
 function createDb() {
   const connectionString = env.HYPERDRIVE?.connectionString ?? process.env.DATABASE_URL!
-  const pool = new Pool({ connectionString })
+  const pool = new Pool({
+    connectionString,
+    max: 5,
+    connectionTimeoutMillis: 5000,
+    idleTimeoutMillis: 30000,
+  })
+  // An unhandled error on an idle pooled connection otherwise hangs the whole
+  // isolate instead of surfacing as a catchable query error.
+  pool.on("error", (err) => console.error("Postgres pool error", err))
   return drizzle(pool, { schema })
 }
 
