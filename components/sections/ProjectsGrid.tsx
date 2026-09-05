@@ -6,6 +6,8 @@ import Link from "next/link"
 import { motion, type Variants } from "motion/react"
 import { OpenInNew, GitHub, Circle } from "@mui/icons-material"
 import type { Project } from "@/lib/db"
+import { Tooltip } from "@/components/ui/Tooltip"
+import { getCategoryIcon } from "@/lib/categoryIcon"
 
 const container: Variants = {
   hidden: {},
@@ -78,14 +80,17 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
                   <div className="absolute inset-0 bg-surface" />
                 )}
               </motion.div>
-              <div className="absolute bottom-3 left-3 text-[10px] font-bold tracking-widest uppercase text-white bg-foreground px-3 py-1.5 rounded-full">
-                {project.category}
-              </div>
-              {project.status && (
-                <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-foreground text-white text-[11px] font-semibold px-3 py-1.5 rounded-full">
-                  <Circle className="text-primary animate-pulse" sx={{ fontSize: 8 }} />
-                  {project.status}
+              <Tooltip content={project.category} side="right">
+                <div className="absolute bottom-3 left-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground text-white rounded-full">
+                  {(() => { const Icon = getCategoryIcon(project.category); return <Icon sx={{ fontSize: 18 }} /> })()}
                 </div>
+              </Tooltip>
+              {project.status && (
+                <Tooltip content={project.status} side="left">
+                  <div className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground rounded-full">
+                    <Circle className="text-primary animate-pulse" sx={{ fontSize: 10 }} />
+                  </div>
+                </Tooltip>
               )}
             </div>
 
@@ -110,7 +115,7 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
                 )}
               </div>
               {/* External links sit above the stretched link */}
-              <div className="relative z-10 flex items-center gap-5 pt-4">
+              <div className="relative z-10 flex items-center gap-5 pt-4 border-t border-border">
                 {project.liveUrl && (
                   <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-primary transition-colors">

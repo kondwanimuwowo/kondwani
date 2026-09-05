@@ -6,6 +6,8 @@ import Link from "next/link"
 import { motion, AnimatePresence, type Variants } from "motion/react"
 import { OpenInNew, GitHub, Circle, ArrowForward } from "@mui/icons-material"
 import type { Project, CaseStudy } from "@/lib/db"
+import { Tooltip } from "@/components/ui/Tooltip"
+import { getCategoryIcon } from "@/lib/categoryIcon"
 
 const container: Variants = {
   hidden: {},
@@ -46,14 +48,17 @@ function ProjectCard({ project }: { project: Project }) {
             <div className="absolute inset-0 bg-surface" />
           )}
         </motion.div>
-        <div className="absolute bottom-3 left-3 text-[10px] font-bold tracking-widest uppercase text-white bg-foreground px-3 py-1.5 rounded-full">
-          {project.category}
-        </div>
-        {project.status && (
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-foreground text-white text-[11px] font-semibold px-3 py-1.5 rounded-full">
-            <Circle className="text-primary animate-pulse" sx={{ fontSize: 8 }} />
-            {project.status}
+        <Tooltip content={project.category} side="right">
+          <div className="absolute bottom-3 left-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground text-white rounded-full">
+            {(() => { const Icon = getCategoryIcon(project.category); return <Icon sx={{ fontSize: 18 }} /> })()}
           </div>
+        </Tooltip>
+        {project.status && (
+          <Tooltip content={project.status} side="left">
+            <div className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground rounded-full">
+              <Circle className="text-primary animate-pulse" sx={{ fontSize: 10 }} />
+            </div>
+          </Tooltip>
         )}
       </div>
       <div className="p-6">
@@ -71,7 +76,7 @@ function ProjectCard({ project }: { project: Project }) {
             </span>
           )}
         </div>
-        <div className="relative z-10 flex items-center gap-5 pt-4">
+        <div className="relative z-10 flex items-center gap-5 pt-4 border-t border-border">
           {project.liveUrl && (
             <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-primary transition-colors">
@@ -112,9 +117,11 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
             <div className="absolute inset-0 bg-surface" />
           )}
         </motion.div>
-        <div className="absolute bottom-3 left-3 text-[10px] font-bold tracking-widest uppercase text-white bg-foreground px-3 py-1.5 rounded-full">
-          Case Study
-        </div>
+        <Tooltip content="Case Study" side="right">
+          <div className="absolute bottom-3 left-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground text-white rounded-full">
+            {(() => { const Icon = getCategoryIcon("case study"); return <Icon sx={{ fontSize: 18 }} /> })()}
+          </div>
+        </Tooltip>
       </div>
       <div className="p-6">
         {study.client && (
@@ -134,7 +141,7 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
             </span>
           )}
         </div>
-        <div className="relative z-10 flex items-center gap-5 pt-4">
+        <div className="relative z-10 flex items-center gap-5 pt-4 border-t border-border">
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground group-hover:text-primary transition-colors">
             Read Case Study <ArrowForward sx={{ fontSize: 16 }} />
           </span>
