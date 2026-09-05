@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.54.4",
+    "@vitejs/plugin-rsc": "^0.5.34",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
