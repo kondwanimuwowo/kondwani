@@ -60,7 +60,7 @@ export default async function PublicDocumentPage({ params }: Props) {
       `}</style>
 
       {/* Toolbar — hidden on print */}
-      <div className="no-print sticky top-0 z-10 bg-white shadow-sm px-8 py-3 flex items-center justify-between">
+      <div className="no-print sticky top-0 z-10 bg-white shadow-md px-8 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-sm font-extrabold tracking-tight text-foreground">[&lt;ondwani</span>
           <span className="text-muted">·</span>
@@ -71,7 +71,7 @@ export default async function PublicDocumentPage({ params }: Props) {
 
       {/* Document */}
       <div className="min-h-screen bg-surface py-10 px-4 print:py-0 print:px-0">
-        <div className="print-page max-w-3xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden print:rounded-none print:shadow-none">
+        <div className="print-page max-w-3xl mx-auto bg-white rounded-3xl shadow-lg overflow-hidden print:rounded-none print:shadow-none">
           {/* Header band */}
           <div className="bg-foreground text-white px-10 py-8 relative overflow-hidden">
             {/* Watermark for paid/accepted */}
@@ -172,7 +172,7 @@ export default async function PublicDocumentPage({ params }: Props) {
                     <span>Tax ({doc.taxRate}%)</span><span>{money(taxAmount)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-lg font-bold text-foreground bg-surface rounded-2xl px-3 py-2 mt-2">
+                <div className="flex justify-between text-lg font-bold text-foreground bg-surface rounded-3xl px-3 py-2 mt-2">
                   <span>Total</span><span>{money(total)}</span>
                 </div>
               </div>
@@ -180,7 +180,7 @@ export default async function PublicDocumentPage({ params }: Props) {
 
             {/* Notes */}
             {doc.notes && (
-              <div className="bg-surface rounded-2xl p-6">
+              <div className="bg-surface rounded-3xl p-6">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2">Notes</p>
                 <p className="text-sm text-muted whitespace-pre-wrap">{doc.notes}</p>
               </div>

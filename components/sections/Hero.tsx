@@ -105,7 +105,7 @@ export function Hero() {
             >
               <Link
                 href="/projects"
-                className="bg-foreground text-white px-7 py-3.5 rounded-full font-medium hover:bg-primary transition-colors shadow-sm text-sm"
+                className="bg-foreground text-white px-7 py-3.5 rounded-full font-medium hover:bg-primary transition-colors shadow-md text-sm"
               >
                 View My Work
               </Link>

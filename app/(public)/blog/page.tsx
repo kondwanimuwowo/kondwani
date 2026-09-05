@@ -51,7 +51,7 @@ export default async function BlogPage() {
   const posts = await getPosts()
 
   return (
-    <main className="min-h-screen bg-background pt-32 pb-20">
+    <main className="min-h-screen bg-surface pt-32 pb-20">
       <div className="container-custom max-w-4xl">
         <div className="mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-6">Blog</h1>
@@ -62,7 +62,7 @@ export default async function BlogPage() {
         </div>
 
         {posts.length === 0 ? (
-          <div className="text-center py-24 bg-surface rounded-2xl">
+          <div className="text-center py-24 bg-white rounded-3xl shadow-md">
             <h2 className="text-xl font-bold text-foreground mb-2">Coming soon</h2>
             <p className="text-muted text-sm">First post is on its way, check back soon.</p>
           </div>
@@ -70,7 +70,7 @@ export default async function BlogPage() {
           <div className="space-y-6">
             {posts.map((post) => (
               <Link key={post.id} href={`/blog/${post.slug}`}
-                className="group flex gap-6 bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300">
+                className="group flex gap-6 bg-white rounded-3xl p-6 shadow-md hover:shadow-lg transition-all duration-300">
                 {post.coverImage && (
                   <div className="relative w-36 h-24 rounded-xl overflow-hidden shrink-0 bg-surface">
                     <Image src={post.coverImage} alt={post.title} fill className="object-cover" sizes="144px" />

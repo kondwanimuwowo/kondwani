@@ -29,7 +29,7 @@ function ProjectCard({ project }: { project: Project }) {
     <motion.article
       variants={cardVariant}
       whileHover={{ y: -8 }}
-      className="relative group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300"
+      className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300"
     >
       <Link href={project.slug ? `/projects/${project.slug}` : "#"} className="absolute inset-0 z-0" aria-label={project.title} />
       <div className="relative h-52 overflow-hidden bg-surface">
@@ -95,7 +95,7 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
     <motion.article
       variants={cardVariant}
       whileHover={{ y: -8 }}
-      className="relative group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300"
+      className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300"
     >
       <Link href={`/case-studies/${study.slug}`} className="absolute inset-0 z-0" aria-label={study.title} />
       <div className="relative h-52 overflow-hidden bg-surface">
@@ -164,7 +164,7 @@ export function ProjectsAndCaseStudies({ projects, caseStudies }: Props) {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`px-5 py-2 rounded-full text-sm font-medium shadow-sm transition-colors flex items-center gap-2 ${
+            className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors flex items-center gap-2 ${
               tab === t.id
                 ? "bg-primary text-white"
                 : "bg-white text-muted hover:text-primary"

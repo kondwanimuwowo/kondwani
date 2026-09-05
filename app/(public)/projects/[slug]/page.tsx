@@ -60,7 +60,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main className="min-h-screen bg-background pt-24 pb-20">
+      <main className="min-h-screen bg-surface pt-24 pb-20">
         {/* Cover image */}
         <div className="relative h-64 md:h-96 bg-surface overflow-hidden">
           {proj.imageUrl ? (
@@ -88,7 +88,7 @@ export default async function ProjectDetailPage({ params }: Props) {
           </nav>
 
           {/* Header card */}
-          <div className="bg-white rounded-2xl p-8 shadow-sm mb-8">
+          <div className="bg-white rounded-3xl p-8 shadow-md mb-8">
             <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -114,7 +114,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                 )}
                 {proj.githubUrl && (
                   <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-surface text-foreground px-5 py-2.5 rounded-full text-sm font-medium shadow-sm hover:text-primary transition-colors">
+                    className="inline-flex items-center gap-2 bg-surface text-foreground px-5 py-2.5 rounded-full text-sm font-medium shadow-md hover:text-primary transition-colors">
                     <GitHub sx={{ fontSize: 16 }} /> Code
                   </a>
                 )}
@@ -131,7 +131,7 @@ export default async function ProjectDetailPage({ params }: Props) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main content */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="bg-white rounded-3xl p-8 shadow-md">
                 <h2 className="text-lg font-bold text-foreground mb-4">About This Project</h2>
                 <p className="text-muted leading-relaxed">{proj.description}</p>
               </div>
@@ -139,7 +139,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
             {/* Sidebar */}
             <div className="space-y-5">
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <div className="bg-white rounded-3xl p-6 shadow-md">
                 <h3 className="text-sm font-bold text-foreground mb-4 tracking-wide uppercase">Tech Stack</h3>
                 <div className="flex flex-wrap gap-2">
                   {proj.tech.map((t) => (

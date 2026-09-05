@@ -44,9 +44,9 @@ function LoginForm() {
   }
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground flex flex-col justify-between font-sans">
+    <div className="relative min-h-screen bg-surface text-foreground flex flex-col justify-between font-sans">
       {/* Header */}
-      <header className="relative z-10 px-8 py-6 flex items-center justify-between bg-white shadow-sm">
+      <header className="relative z-10 px-8 py-6 flex items-center justify-between bg-white shadow-md">
         <div className="flex items-center gap-3">
           <span className="text-xl font-black tracking-tight text-foreground">[&lt;ondwani</span>
           <span className="text-muted">·</span>
@@ -56,7 +56,7 @@ function LoginForm() {
 
       {/* Main Content */}
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[440px] bg-white rounded-2xl p-8 shadow-lg">
+        <div className="w-full max-w-[440px] bg-white rounded-3xl p-8 shadow-lg">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-extrabold tracking-tight mb-2 text-foreground">
               Welcome back
@@ -67,7 +67,7 @@ function LoginForm() {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 rounded-2xl bg-danger-bg text-xs text-danger font-mono">
+            <div className="mb-6 p-4 rounded-3xl bg-danger-bg text-xs text-danger font-mono">
               {error}
             </div>
           )}
@@ -75,7 +75,7 @@ function LoginForm() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-surface text-foreground hover:bg-primary-tint py-3.5 px-5 rounded-full font-bold text-sm tracking-tight transition-all duration-300 shadow-sm active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+            className="w-full flex items-center justify-center gap-3 bg-surface text-foreground hover:bg-primary-tint py-3.5 px-5 rounded-full font-bold text-sm tracking-tight transition-all duration-300 shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-foreground border-t-transparent rounded-full animate-spin" />

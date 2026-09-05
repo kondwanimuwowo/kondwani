@@ -22,7 +22,7 @@ export default async function ProjectsPage() {
   ])
 
   return (
-    <main className="min-h-screen bg-background pt-32 pb-20">
+    <main className="min-h-screen bg-surface pt-32 pb-20">
       <div className="container-custom">
         <div className="mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-6">

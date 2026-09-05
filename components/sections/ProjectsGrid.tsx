@@ -30,7 +30,7 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
           <button
             key={cat}
             onClick={() => setActive(cat)}
-            className={`px-5 py-2 rounded-full text-sm font-medium shadow-sm transition-colors ${
+            className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors ${
               active === cat
                 ? "bg-primary text-white"
                 : "bg-white text-muted hover:text-primary"
@@ -54,7 +54,7 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
             key={project.id}
             variants={cardVariant}
             whileHover={{ y: -8 }}
-            className="relative group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300"
+            className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300"
           >
             {/* Stretched link covers the whole card */}
             <Link href={project.slug ? `/projects/${project.slug}` : "#"} className="absolute inset-0 z-0" aria-label={project.title} />

@@ -18,7 +18,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 const inputClass =
-  "w-full px-4 py-3 bg-surface rounded-2xl text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
+  "w-full px-4 py-3 bg-surface rounded-3xl text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
@@ -130,7 +130,7 @@ export function ContactForm() {
             </div>
 
             {status === "error" && (
-              <div className="flex items-center gap-2 text-sm text-danger bg-danger-bg rounded-2xl px-4 py-3">
+              <div className="flex items-center gap-2 text-sm text-danger bg-danger-bg rounded-3xl px-4 py-3">
                 <ErrorIcon fontSize="small" />
                 Something went wrong. Please try again or email me directly.
               </div>

@@ -23,7 +23,7 @@ export function Projects({ projects }: { projects: Project[] }) {
   const featured = projects
 
   return (
-    <section id="projects" className="section-padding bg-background">
+    <section id="projects" className="section-padding bg-surface">
       <motion.div ref={ref} className="container-custom">
         {/* Header */}
         <motion.div
@@ -59,7 +59,7 @@ export function Projects({ projects }: { projects: Project[] }) {
               key={project.id}
               variants={cardVariant}
               whileHover={{ y: -8 }}
-              className="relative group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300"
+              className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300"
             >
               {/* Stretched link covers the whole card */}
               <Link href={project.slug ? `/projects/${project.slug}` : "#"} className="absolute inset-0 z-0" aria-label={project.title} />

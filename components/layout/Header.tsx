@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "motion/react"
-import { Menu, X, Download, Home } from "@mui/icons-material"
+import { Menu, X, Home } from "@mui/icons-material"
 import { cn } from "@/lib/utils"
 
 const baseNavLinks = [
@@ -102,18 +102,6 @@ export function Header({ showBlog = false }: HeaderProps) {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center">
-          <Link
-            href="/kondwani-resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm font-medium bg-surface text-muted px-5 py-2 rounded-full shadow-sm hover:text-primary transition-colors duration-200"
-          >
-            <Download sx={{ fontSize: 15 }} />
-            Resume
-          </Link>
-        </div>
-
         {/* Mobile hamburger */}
         <button
           className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
@@ -166,23 +154,6 @@ export function Header({ showBlog = false }: HeaderProps) {
                   </Link>
                 </motion.div>
               ))}
-              <motion.div
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: navLinks.length * 0.05, duration: 0.2 }}
-                className="pt-4"
-              >
-                <Link
-                  href="/kondwani-resume.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-1.5 text-sm font-medium bg-surface text-muted py-2.5 rounded-full shadow-sm hover:text-primary transition-colors"
-                >
-                  <Download sx={{ fontSize: 15 }} />
-                  Resume
-                </Link>
-              </motion.div>
             </nav>
           </motion.div>
         )}

@@ -18,7 +18,7 @@ const iconMap: Record<string, React.ElementType> = { FitnessCenter, Casino }
 
 export default function BeyondCodePage() {
   return (
-    <main className="min-h-screen bg-background pt-32 pb-20">
+    <main className="min-h-screen bg-surface pt-32 pb-20">
       <div className="container-custom">
         {/* Header */}
         <div className="mb-16 text-center">
@@ -36,7 +36,7 @@ export default function BeyondCodePage() {
           {organizations.map((org) => (
             <div
               key={org.id}
-              className="relative group overflow-hidden bg-white rounded-2xl shadow-sm grayscale hover:grayscale-0 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 flex flex-col min-h-[300px]"
+              className="relative group overflow-hidden bg-white rounded-3xl shadow-md grayscale hover:grayscale-0 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 flex flex-col min-h-[300px]"
             >
               {/* Content */}
               <div className="relative z-10 p-8 flex flex-col flex-1">
@@ -46,7 +46,7 @@ export default function BeyondCodePage() {
                     <Image src={org.logo} alt={org.title} fill className="object-contain" sizes="44px" />
                   </div>
                 ) : (
-                  <div className="w-11 h-11 rounded-2xl bg-primary-tint flex items-center justify-center shrink-0 mb-5">
+                  <div className="w-11 h-11 rounded-3xl bg-primary-tint flex items-center justify-center shrink-0 mb-5">
                     <span className="text-primary font-bold text-xl">{org.title[0]}</span>
                   </div>
                 )}
@@ -98,7 +98,7 @@ export default function BeyondCodePage() {
               const Icon = iconMap[item.icon]
               return (
                 <div key={item.label}
-                  className="flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-sm">
+                  className="flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-md">
                   {Icon && <Icon className="text-primary" sx={{ fontSize: 20 }} />}
                   <div>
                     <span className="text-sm font-semibold text-foreground">{item.label}</span>

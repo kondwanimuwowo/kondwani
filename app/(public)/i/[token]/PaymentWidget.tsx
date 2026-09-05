@@ -106,7 +106,7 @@ export function PaymentWidget({ token, currency, total }: Props) {
   const convertedZMW = currency.toUpperCase() === "USD" ? total * usdToZmwRate : total
 
   return (
-    <div className="w-full bg-white rounded-2xl shadow-md overflow-hidden font-sans">
+    <div className="w-full bg-white rounded-3xl shadow-md overflow-hidden font-sans">
       <div className="bg-surface px-6 py-4 flex items-center justify-between">
         <h3 className="font-bold text-sm tracking-tight text-foreground">Secure payment</h3>
         <span className="text-xs font-mono font-bold text-muted bg-neutral-bg px-2.5 py-1 rounded-full">
@@ -139,7 +139,7 @@ export function PaymentWidget({ token, currency, total }: Props) {
         {/* MOBILE MONEY TAB */}
         {activeTab === "momo" && (
           <form onSubmit={handleMomoPayment} className="space-y-4">
-            <div className="bg-danger-bg rounded-2xl p-4 text-xs text-danger leading-relaxed font-medium">
+            <div className="bg-danger-bg rounded-3xl p-4 text-xs text-danger leading-relaxed font-medium">
               Supports <strong>MTN, Airtel, Zamtel</strong> (Zambia only).
               {currency.toUpperCase() === "USD" && (
                 <div className="mt-1 font-mono font-bold">
@@ -156,7 +156,7 @@ export function PaymentWidget({ token, currency, total }: Props) {
                 <select
                   value={network}
                   onChange={(e) => setNetwork(e.target.value)}
-                  className="w-full bg-surface rounded-2xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
+                  className="w-full bg-surface rounded-3xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
                 >
                   <option value="airtel">Airtel Money</option>
                   <option value="mtn">MTN Mobile Money</option>
@@ -174,13 +174,13 @@ export function PaymentWidget({ token, currency, total }: Props) {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="e.g. 0977123456"
-                  className="w-full bg-surface rounded-2xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
+                  className="w-full bg-surface rounded-3xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
                 />
               </div>
             </div>
 
             {momoStatus && (
-              <div className={`p-4 rounded-2xl text-xs font-mono ${
+              <div className={`p-4 rounded-3xl text-xs font-mono ${
                 momoStatus.type === "success" ? "bg-success-bg text-success" : "bg-danger-bg text-danger"
               }`}>
                 {momoStatus.msg}
@@ -200,7 +200,7 @@ export function PaymentWidget({ token, currency, total }: Props) {
         {/* BANK TRANSFER TAB */}
         {activeTab === "bank" && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-2xl p-4 bg-surface">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-3xl p-4 bg-surface">
               <div className="space-y-1.5 text-xs">
                 <h4 className="font-bold text-foreground">Standard bank account details</h4>
                 <div><span className="text-muted">Bank Name:</span> <strong className="text-foreground">Zambia National Commercial Bank (Zanaco)</strong></div>
@@ -225,7 +225,7 @@ export function PaymentWidget({ token, currency, total }: Props) {
                 </div>
 
                 {bankStatus && (
-                  <div className={`p-3 rounded-2xl text-[10px] font-mono ${
+                  <div className={`p-3 rounded-3xl text-[10px] font-mono ${
                     bankStatus.type === "success" ? "bg-success-bg text-success" : "bg-danger-bg text-danger"
                   }`}>
                     {bankStatus.msg}

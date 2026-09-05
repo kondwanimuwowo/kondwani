@@ -48,13 +48,13 @@ export function ImageUploader({ value, onChange, label = "Image" }: ImageUploade
       <label className="block text-xs font-medium text-muted mb-1">{label}</label>
 
       {value ? (
-        <div className="relative rounded-2xl overflow-hidden shadow-sm group w-full h-40">
+        <div className="relative rounded-3xl overflow-hidden shadow-md group w-full h-40">
           <Image src={value} alt="Uploaded" fill className="object-cover" />
           <div className="absolute inset-0 flex items-end justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               type="button"
               onClick={() => onChange("")}
-              className="bg-white text-danger rounded-full p-1.5 shadow-sm"
+              className="bg-white text-danger rounded-full p-1.5 shadow-md"
               title="Remove"
             >
               <Delete fontSize="small" />
@@ -68,7 +68,7 @@ export function ImageUploader({ value, onChange, label = "Image" }: ImageUploade
           onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
           onDragOver={(e) => e.preventDefault()}
           disabled={uploading}
-          className="w-full h-40 bg-surface rounded-2xl flex flex-col items-center justify-center gap-2 text-muted hover:text-primary transition-colors disabled:opacity-50"
+          className="w-full h-40 bg-surface rounded-3xl flex flex-col items-center justify-center gap-2 text-muted hover:text-primary transition-colors disabled:opacity-50"
         >
           {uploading ? (
             <span className="w-6 h-6 border-2 border-primary-tint border-t-primary rounded-full animate-spin" />
@@ -88,7 +88,7 @@ export function ImageUploader({ value, onChange, label = "Image" }: ImageUploade
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Or paste an image URL"
-        className="mt-2 w-full bg-surface rounded-2xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
+        className="mt-2 w-full bg-surface rounded-3xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
       />
 
       {error && <p className="text-xs text-danger mt-1">{error}</p>}

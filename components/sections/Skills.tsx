@@ -100,7 +100,7 @@ export function Skills({ techPills = defaultPills, skillCategories = defaultCate
                 key={tech}
                 variants={fadeUp}
                 whileHover={{ scale: 1.1, y: -4 }}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full text-sm font-medium text-foreground shadow-sm cursor-default hover:bg-primary-tint transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full text-sm font-medium text-foreground shadow-md cursor-default hover:bg-primary-tint transition-colors"
               >
                 {Icon && <Icon size={16} className="text-primary" />}
                 {tech}
@@ -123,7 +123,7 @@ export function Skills({ techPills = defaultPills, skillCategories = defaultCate
                 key={category.id}
                 variants={fadeUp}
                 whileHover={{ y: -6 }}
-                className="relative group overflow-hidden bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300"
+                className="relative group overflow-hidden bg-white rounded-3xl p-5 shadow-md hover:shadow-md transition-all duration-300"
               >
                 <div className="relative z-10">
                   {/* Icon + Title row */}

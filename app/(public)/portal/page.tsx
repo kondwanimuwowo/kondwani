@@ -172,8 +172,8 @@ export default function ClientPortalDashboard() {
 
   if (error) {
     return (
-      <div className="fixed inset-0 z-50 bg-background text-foreground flex flex-col items-center justify-center px-6 text-center font-sans">
-        <div className="max-w-md w-full bg-white rounded-2xl p-8 shadow-lg">
+      <div className="fixed inset-0 z-50 bg-surface text-foreground flex flex-col items-center justify-center px-6 text-center font-sans">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-lg">
           <div className="w-12 h-12 bg-danger-bg rounded-full flex items-center justify-center text-danger text-xl font-bold mx-auto mb-4">
             !
           </div>
@@ -227,7 +227,7 @@ export default function ClientPortalDashboard() {
   return (
     <div className="fixed inset-0 z-50 bg-background text-foreground flex flex-col font-sans">
       {/* Portal Top Bar */}
-      <header className="relative z-10 px-6 py-4 flex items-center justify-between bg-white shadow-sm shrink-0">
+      <header className="relative z-10 px-6 py-4 flex items-center justify-between bg-white shadow-md shrink-0">
         <div className="flex items-center gap-3">
           <span className="text-lg font-black tracking-tight text-foreground">[&lt;ondwani</span>
           <span className="text-muted">·</span>
@@ -265,9 +265,9 @@ export default function ClientPortalDashboard() {
                   setSelectedProjectId(proj.id)
                   setActiveTab("overview")
                 }}
-                className={`w-full text-left p-3 rounded-2xl transition-all duration-300 group ${
+                className={`w-full text-left p-3 rounded-3xl transition-all duration-300 group ${
                   selectedProjectId === proj.id
-                    ? "bg-white shadow-sm text-foreground"
+                    ? "bg-white shadow-md text-foreground"
                     : "bg-transparent text-muted hover:text-foreground"
                 }`}
               >
@@ -292,11 +292,11 @@ export default function ClientPortalDashboard() {
         </aside>
 
         {/* Main Work Area */}
-        <main className="flex-1 flex flex-col min-w-0 relative">
+        <main className="flex-1 flex flex-col min-w-0 relative bg-surface">
           {activeProject ? (
             <>
               {/* Project Header Row */}
-              <div className="px-6 py-5 bg-white shadow-sm shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="px-6 py-5 bg-white shadow-md shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   {/* Small Screen Project Switcher Trigger */}
                   <div className="md:hidden mb-2">
@@ -333,7 +333,7 @@ export default function ClientPortalDashboard() {
                       onClick={() => setActiveTab(tab)}
                       className={`text-xs font-medium px-3.5 py-1.5 rounded-full capitalize transition-all duration-300 font-mono tracking-tight ${
                         activeTab === tab
-                          ? "bg-white shadow-sm text-foreground"
+                          ? "bg-white shadow-md text-foreground"
                           : "text-muted hover:text-foreground"
                       }`}
                     >
@@ -350,7 +350,7 @@ export default function ClientPortalDashboard() {
                 {activeTab === "overview" && (
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* General Summary Card */}
-                    <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm">
+                    <div className="lg:col-span-2 bg-white rounded-3xl p-6 shadow-md">
                       <h2 className="text-base font-bold tracking-tight mb-4 flex items-center gap-2">
                         <span className="w-1.5 h-3 bg-primary rounded-sm" />
                         Project Execution Progress
@@ -391,7 +391,7 @@ export default function ClientPortalDashboard() {
                     </div>
 
                     {/* Stats Billing Card */}
-                    <div className="bg-white rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div className="bg-white rounded-3xl p-6 shadow-md flex flex-col justify-between">
                       <div>
                         <h2 className="text-base font-bold tracking-tight mb-4 flex items-center gap-2">
                           <span className="w-1.5 h-3 bg-primary rounded-sm" />
@@ -427,7 +427,7 @@ export default function ClientPortalDashboard() {
 
                 {/* 2. TASKS TAB */}
                 {activeTab === "tasks" && (
-                  <div className="bg-white rounded-2xl p-6 shadow-sm">
+                  <div className="bg-white rounded-3xl p-6 shadow-md">
                     <h2 className="text-base font-bold tracking-tight mb-4 flex items-center gap-2">
                       <span className="w-1.5 h-3 bg-primary rounded-sm" />
                       Project Checklist
@@ -438,7 +438,7 @@ export default function ClientPortalDashboard() {
                         activeProject.tasks.map((task: any) => (
                           <div
                             key={task.id}
-                            className={`flex items-start gap-4 p-3.5 rounded-2xl transition-all duration-300 ${
+                            className={`flex items-start gap-4 p-3.5 rounded-3xl transition-all duration-300 ${
                               task.status === "done" ? "bg-surface opacity-60" : "bg-surface"
                             }`}
                           >
@@ -480,7 +480,7 @@ export default function ClientPortalDashboard() {
                   <div className="space-y-6">
                     {/* Fixed milestones */}
                     {activeProject.billingType === "fixed" && (
-                      <div className="bg-white rounded-2xl p-6 shadow-sm">
+                      <div className="bg-white rounded-3xl p-6 shadow-md">
                         <h2 className="text-base font-bold tracking-tight mb-4 flex items-center gap-2">
                           <span className="w-1.5 h-3 bg-primary rounded-sm" />
                           Billing Milestones and Installments
@@ -491,7 +491,7 @@ export default function ClientPortalDashboard() {
                             activeProject.milestones.map((milestone: any) => (
                               <div
                                 key={milestone.id}
-                                className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-2xl bg-surface gap-4"
+                                className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-3xl bg-surface gap-4"
                               >
                                 <div className="space-y-1">
                                   <div className="font-semibold text-sm text-foreground flex items-center gap-2">
@@ -542,7 +542,7 @@ export default function ClientPortalDashboard() {
 
                     {/* Retainer Details */}
                     {activeProject.billingType === "retainer" && (
-                      <div className="bg-white rounded-2xl p-6 shadow-sm">
+                      <div className="bg-white rounded-3xl p-6 shadow-md">
                         <h2 className="text-base font-bold tracking-tight mb-4 flex items-center gap-2">
                           <span className="w-1.5 h-3 bg-primary rounded-sm" />
                           Retainer Billing Details
@@ -553,7 +553,7 @@ export default function ClientPortalDashboard() {
                             const retainer = retainers.find((r: any) => r.projectId === selectedProjectId);
                             return (
                               <div className="space-y-4">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-surface p-4 rounded-2xl">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-surface p-4 rounded-3xl">
                                   <div>
                                     <p className="text-[10px] font-bold tracking-widest text-muted uppercase font-mono">Amount</p>
                                     <p className="text-base font-mono font-bold mt-1">{retainer.currency} {retainer.amount.toLocaleString()}</p>
@@ -585,7 +585,7 @@ export default function ClientPortalDashboard() {
                     )}
 
                     {/* Shared Project Invoices History */}
-                    <div className="bg-white rounded-2xl p-6 shadow-sm">
+                    <div className="bg-white rounded-3xl p-6 shadow-md">
                       <h2 className="text-base font-bold tracking-tight mb-4 flex items-center gap-2">
                         <span className="w-1.5 h-3 bg-primary rounded-sm" />
                         Invoices History
@@ -599,7 +599,7 @@ export default function ClientPortalDashboard() {
                               href={`/i/${inv.token}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center justify-between p-3.5 rounded-2xl bg-surface hover:shadow-sm transition-all duration-300 group"
+                              className="flex items-center justify-between p-3.5 rounded-3xl bg-surface hover:shadow-md transition-all duration-300 group"
                             >
                               <div>
                                 <div className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
@@ -635,7 +635,7 @@ export default function ClientPortalDashboard() {
 
                 {/* 4. CONTRACTS TAB */}
                 {activeTab === "contracts" && (
-                  <div className="bg-white rounded-2xl p-6 shadow-sm">
+                  <div className="bg-white rounded-3xl p-6 shadow-md">
                     <h2 className="text-base font-bold tracking-tight mb-4 flex items-center gap-2">
                       <span className="w-1.5 h-3 bg-primary rounded-sm" />
                       Client Agreements and Contracts
@@ -643,7 +643,7 @@ export default function ClientPortalDashboard() {
 
                     {projectContract ? (
                       <div className="space-y-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-2xl bg-surface gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-3xl bg-surface gap-4">
                           <div className="space-y-1">
                             <h4 className="font-semibold text-sm">{projectContract.title}</h4>
                             <p className="text-xs text-muted">
@@ -674,7 +674,7 @@ export default function ClientPortalDashboard() {
 
                         {/* Signed receipt block */}
                         {projectContract.status === "signed" && (
-                          <div className="bg-surface p-4 rounded-2xl text-xs space-y-2">
+                          <div className="bg-surface p-4 rounded-3xl text-xs space-y-2">
                             <h5 className="font-mono uppercase tracking-wider text-[10px] font-bold text-muted">Digital Signature Certificate Details</h5>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-muted font-mono">
                               <div><strong>IP:</strong> {projectContract.signatureIp || "Not recorded"}</div>
@@ -739,7 +739,7 @@ export default function ClientPortalDashboard() {
                       >
                         <span className="text-[9px] text-muted font-mono mb-1">{msg.senderName}</span>
                         <div
-                          className={`p-3 rounded-2xl text-xs whitespace-pre-wrap leading-relaxed ${
+                          className={`p-3 rounded-3xl text-xs whitespace-pre-wrap leading-relaxed ${
                             isClient
                               ? "bg-primary text-white rounded-tr-none"
                               : "bg-surface text-foreground rounded-tl-none"
@@ -764,7 +764,7 @@ export default function ClientPortalDashboard() {
 
               {/* Chat Input */}
               <form onSubmit={handleSendMessage} className="p-3 bg-surface shrink-0">
-                <div className="flex gap-2 bg-white rounded-2xl p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-primary-tint transition-all duration-300">
+                <div className="flex gap-2 bg-white rounded-3xl p-1.5 shadow-md focus-within:ring-2 focus-within:ring-primary-tint transition-all duration-300">
                   <input
                     type="text"
                     value={newMessage}
@@ -790,7 +790,7 @@ export default function ClientPortalDashboard() {
       {/* 5. DIGITAL SIGNATURE CONTRACT MODAL */}
       {signingContract && (
         <div className="fixed inset-0 z-50 bg-foreground/70 flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
 
             {/* Header */}
             <div className="px-6 py-4 bg-surface flex items-center justify-between shrink-0">
@@ -830,7 +830,7 @@ export default function ClientPortalDashboard() {
                     value={sigName}
                     onChange={(e) => setSigName(e.target.value)}
                     placeholder="e.g. John Doe"
-                    className="w-full bg-white rounded-2xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
+                    className="w-full bg-white rounded-3xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
                   />
                 </div>
                 <div>
@@ -843,7 +843,7 @@ export default function ClientPortalDashboard() {
                     value={sigEmail}
                     onChange={(e) => setSigEmail(e.target.value)}
                     placeholder="e.g. john@doe.com"
-                    className="w-full bg-white rounded-2xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
+                    className="w-full bg-white rounded-3xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
                   />
                 </div>
               </div>
@@ -852,7 +852,7 @@ export default function ClientPortalDashboard() {
                 <button
                   type="button"
                   onClick={() => setSigningContract(null)}
-                  className="bg-white shadow-sm hover:text-primary text-muted py-2.5 px-4 rounded-full text-xs font-bold transition-all font-mono uppercase tracking-wider"
+                  className="bg-white shadow-md hover:text-primary text-muted py-2.5 px-4 rounded-full text-xs font-bold transition-all font-mono uppercase tracking-wider"
                 >
                   Cancel
                 </button>
