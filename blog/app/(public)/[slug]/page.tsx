@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma"
+import { db } from "@/lib/db"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
@@ -11,14 +11,14 @@ type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const post = await prisma.blogPost.findUnique({ where: { slug }, select: { title: true, excerpt: true } })
+  const post = await db.query.blogPost.findFirst({ where: (t, { eq }) => eq(t.slug, slug), columns: { title: true, excerpt: true } })
   if (!post) return {}
   return { title: post.title, description: post.excerpt }
 }
 
 export async function generateStaticParams() {
-  const posts = await prisma.blogPost.findMany({ where: { published: true }, select: { slug: true } })
-  return posts.map((p: { slug: string }) => ({ slug: p.slug }))
+  const posts = await db.query.blogPost.findMany({ where: (t, { eq }) => eq(t.published, true), columns: { slug: true } })
+  return posts.map((p) => ({ slug: p.slug }))
 }
 
 function formatDate(date: Date) {
@@ -27,7 +27,7 @@ function formatDate(date: Date) {
 
 export default async function BlogPost({ params }: Props) {
   const { slug } = await params
-  const post = await prisma.blogPost.findUnique({ where: { slug, published: true } })
+  const post = await db.query.blogPost.findFirst({ where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)) })
   if (!post) notFound()
 
   return (

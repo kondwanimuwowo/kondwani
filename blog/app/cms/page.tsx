@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma"
+import { db, blogPost } from "@/lib/db"
+import { desc } from "drizzle-orm"
 import Link from "next/link"
 import { DeletePostButton } from "./DeletePostButton"
 import { PublishToggle } from "./PublishToggle"
@@ -10,10 +11,18 @@ function formatDate(date: Date) {
 }
 
 export default async function CMSHome() {
-  const posts = await prisma.blogPost.findMany({
-    orderBy: { createdAt: "desc" },
-    select: { id: true, title: true, slug: true, published: true, publishedAt: true, tags: true, createdAt: true },
-  })
+  const posts = await db
+    .select({
+      id: blogPost.id,
+      title: blogPost.title,
+      slug: blogPost.slug,
+      published: blogPost.published,
+      publishedAt: blogPost.publishedAt,
+      tags: blogPost.tags,
+      createdAt: blogPost.createdAt,
+    })
+    .from(blogPost)
+    .orderBy(desc(blogPost.createdAt))
 
   return (
     <div className="container-custom py-10">

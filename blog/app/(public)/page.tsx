@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma"
+import { db, blogPost } from "@/lib/db"
+import { desc, eq } from "drizzle-orm"
 import Link from "next/link"
 import Image from "next/image"
 import type { Metadata } from "next"
@@ -12,11 +13,19 @@ function formatDate(date: Date) {
 }
 
 export default async function BlogListing() {
-  const posts = await prisma.blogPost.findMany({
-    where: { published: true },
-    orderBy: { publishedAt: "desc" },
-    select: { id: true, title: true, slug: true, excerpt: true, coverImage: true, tags: true, publishedAt: true },
-  })
+  const posts = await db
+    .select({
+      id: blogPost.id,
+      title: blogPost.title,
+      slug: blogPost.slug,
+      excerpt: blogPost.excerpt,
+      coverImage: blogPost.coverImage,
+      tags: blogPost.tags,
+      publishedAt: blogPost.publishedAt,
+    })
+    .from(blogPost)
+    .where(eq(blogPost.published, true))
+    .orderBy(desc(blogPost.publishedAt))
 
   return (
     <div className="container-custom py-16">
