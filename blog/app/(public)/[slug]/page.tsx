@@ -57,7 +57,7 @@ export default async function BlogPost({ params }: Props) {
 
       {/* Cover image */}
       {post.coverImage && (
-        <div className="relative h-72 md:h-96 rounded-2xl overflow-hidden bg-surface my-10">
+        <div className="relative h-72 md:h-96 rounded-3xl overflow-hidden bg-surface my-10">
           <Image src={post.coverImage} alt={post.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 768px" priority />
         </div>
       )}
@@ -70,7 +70,7 @@ export default async function BlogPost({ params }: Props) {
           prose-blockquote:border-l-primary prose-blockquote:text-muted
           prose-code:bg-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
           prose-pre:bg-foreground prose-pre:text-white
-          prose-img:rounded-2xl"
+          prose-img:rounded-3xl"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
     </article>

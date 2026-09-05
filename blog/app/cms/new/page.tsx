@@ -57,7 +57,7 @@ export default function NewPostPage() {
         <h1 className="text-xl font-bold text-foreground">New post</h1>
         <div className="flex items-center gap-3">
           <button onClick={() => handleSave(false)} disabled={saving}
-            className="text-sm font-medium text-foreground px-5 py-2 rounded-full bg-surface shadow-sm transition-colors disabled:opacity-50">
+            className="text-sm font-medium text-foreground px-5 py-2 rounded-full bg-surface shadow-md transition-colors disabled:opacity-50">
             Save draft
           </button>
           <button onClick={() => handleSave(true)} disabled={saving}
@@ -80,12 +80,12 @@ export default function NewPostPage() {
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">Slug</label>
             <input value={slug} onChange={(e) => setSlug(e.target.value)}
-              className="w-full px-4 py-2.5 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
+              className="w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
           </div>
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">Tags (comma separated)</label>
             <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="nextjs, design, tips"
-              className="w-full px-4 py-2.5 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
+              className="w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
           </div>
         </div>
 
@@ -93,14 +93,14 @@ export default function NewPostPage() {
           <label className="block text-sm font-medium text-foreground mb-1.5">Excerpt</label>
           <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2}
             placeholder="A short summary shown in the listing"
-            className="w-full px-4 py-2.5 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors resize-none" />
+            className="w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors resize-none" />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-foreground mb-1.5">Cover image URL</label>
           <input value={coverImage} onChange={(e) => setCoverImage(e.target.value)}
             placeholder="https://assets.kondwanimuwowo.com/"
-            className="w-full px-4 py-2.5 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
+            className="w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
         </div>
 
         <div>

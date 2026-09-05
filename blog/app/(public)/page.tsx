@@ -56,7 +56,7 @@ export default async function BlogListing() {
                 </div>
               </div>
               {post.coverImage && (
-                <div className="relative h-48 md:h-auto rounded-2xl overflow-hidden bg-surface order-first md:order-last">
+                <div className="relative h-48 md:h-auto rounded-3xl overflow-hidden bg-surface order-first md:order-last">
                   <Image src={post.coverImage} alt={post.title} fill className="object-cover" sizes="280px" />
                 </div>
               )}

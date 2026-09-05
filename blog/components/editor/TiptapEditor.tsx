@@ -88,7 +88,7 @@ export function TiptapEditor({ content, onChange, onImageUpload }: Props) {
   if (!editor) return null
 
   return (
-    <div className="rounded-2xl overflow-hidden bg-white shadow-sm">
+    <div className="rounded-3xl overflow-hidden bg-white shadow-md">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 bg-surface">
         <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()}

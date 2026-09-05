@@ -29,14 +29,14 @@ export default async function CMSHome() {
       </div>
 
       {posts.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
+        <div className="text-center py-20 bg-white rounded-3xl shadow-md">
           <p className="text-muted mb-4">No posts yet.</p>
           <Link href="/cms/new" className="text-sm font-medium text-primary hover:text-primary-hover transition-colors">
             Write your first post
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-md overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="shadow-[0_1px_0_0_var(--color-border)]">
@@ -49,7 +49,7 @@ export default async function CMSHome() {
             </thead>
             <tbody>
               {posts.map((post) => (
-                <tr key={post.id} className="hover:bg-surface transition-colors">
+                <tr key={post.id} className="shadow-[0_1px_0_0_var(--color-border)] hover:bg-surface transition-colors">
                   <td className="px-6 py-4">
                     <Link href={`/cms/${post.id}/edit`}
                       className="font-medium text-foreground hover:text-primary transition-colors text-sm">
