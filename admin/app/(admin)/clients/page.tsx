@@ -96,7 +96,7 @@ export default function ClientsPage() {
     load()
   }
 
-  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
+  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
 
   return (
@@ -117,7 +117,7 @@ export default function ClientsPage() {
       {/* Create / Edit Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/30 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-lg my-8">
+          <div className="bg-white rounded-3xl shadow-lg p-6 w-full max-w-lg my-8">
             <h2 className="font-bold text-foreground mb-5">{editId ? "Edit" : "New"} Client</h2>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -187,7 +187,7 @@ export default function ClientsPage() {
 
       {/* Client grid */}
       {clients.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm p-16 text-center">
+        <div className="bg-white rounded-3xl shadow-md p-16 text-center">
           <Business sx={{ fontSize: 40 }} className="text-border mx-auto mb-4" />
           <p className="text-sm text-muted mb-1">No clients yet</p>
           <p className="text-xs text-muted">Add your first client to get started</p>
@@ -195,7 +195,7 @@ export default function ClientsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {clients.map(c => (
-            <div key={c.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md p-5 transition-all group">
+            <div key={c.id} className="bg-white rounded-3xl shadow-md hover:shadow-md p-5 transition-all group">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary-tint flex items-center justify-center shrink-0">

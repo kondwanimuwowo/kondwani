@@ -40,7 +40,7 @@ export function GalleryUpload({ value, onChange }: Props) {
       <p className="text-xs font-semibold text-muted uppercase tracking-widest mb-2">Gallery</p>
       <div className="grid grid-cols-3 gap-2">
         {value.map((url, i) => (
-          <div key={i} className="relative rounded-2xl overflow-hidden shadow-sm group aspect-video">
+          <div key={i} className="relative rounded-3xl overflow-hidden shadow-md group aspect-video">
             <Image src={url} alt={`Gallery ${i + 1}`} fill className="object-cover" />
             <button
               type="button"
@@ -55,7 +55,7 @@ export function GalleryUpload({ value, onChange }: Props) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="aspect-video rounded-2xl bg-surface flex flex-col items-center justify-center gap-1 text-muted hover:text-primary transition-colors disabled:opacity-60 cursor-pointer"
+          className="aspect-video rounded-3xl bg-surface flex flex-col items-center justify-center gap-1 text-muted hover:text-primary transition-colors disabled:opacity-60 cursor-pointer"
         >
           {uploading ? (
             <span className="w-4 h-4 rounded-full border-2 border-primary-tint border-t-primary animate-spin" />

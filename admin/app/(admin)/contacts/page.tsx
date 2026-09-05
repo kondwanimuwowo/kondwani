@@ -20,7 +20,7 @@ export default async function ContactsPage() {
       </div>
 
       {contacts.length === 0 ? (
-        <div className="bg-white rounded-2xl px-6 py-16 text-center shadow-sm">
+        <div className="bg-white rounded-3xl px-6 py-16 text-center shadow-md">
           <p className="text-muted">No messages yet.</p>
         </div>
       ) : (
@@ -28,8 +28,8 @@ export default async function ContactsPage() {
           {contacts.map((c) => (
             <div
               key={c.id}
-              className={`bg-white rounded-2xl p-6 hover:shadow-md transition-all duration-200 ${
-                !c.read ? "shadow-md" : "shadow-sm"
+              className={`bg-white rounded-3xl p-6 hover:shadow-md transition-all duration-200 ${
+                !c.read ? "shadow-md" : "shadow-md"
               }`}
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
@@ -57,7 +57,7 @@ export default async function ContactsPage() {
                   &quot;{c.subject}&quot;
                 </p>
               )}
-              <p className="text-sm text-muted leading-relaxed whitespace-pre-wrap font-sans bg-surface p-4 rounded-2xl">
+              <p className="text-sm text-muted leading-relaxed whitespace-pre-wrap font-sans bg-surface p-4 rounded-3xl">
                 {c.message}
               </p>
 

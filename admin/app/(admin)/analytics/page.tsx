@@ -27,7 +27,7 @@ export default async function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-md overflow-hidden">
           <div className="px-6 py-4 shadow-[0_1px_0_0_var(--color-border)]">
             <h2 className="font-semibold text-foreground">Top Pages</h2>
           </div>
@@ -41,7 +41,7 @@ export default async function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-md overflow-hidden">
           <div className="px-6 py-4 shadow-[0_1px_0_0_var(--color-border)]">
             <h2 className="font-semibold text-foreground">Recent Visits</h2>
           </div>

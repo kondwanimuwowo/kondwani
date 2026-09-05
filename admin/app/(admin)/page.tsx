@@ -58,10 +58,10 @@ export default async function DashboardPage() {
             <Link
               key={label}
               href={href}
-              className={`bg-white p-5 hover:shadow-md transition-all flex flex-col justify-between rounded-2xl shadow-sm ${urgent ? "ring-2 ring-warning-bg" : ""}`}
+              className={`bg-white p-5 hover:shadow-md transition-all flex flex-col justify-between rounded-3xl shadow-md ${urgent ? "ring-2 ring-warning-bg" : ""}`}
             >
               <div>
-                <div className={`inline-flex p-2.5 rounded-2xl ${color} mb-4`}>
+                <div className={`inline-flex p-2.5 rounded-3xl ${color} mb-4`}>
                   <Icon sx={{ fontSize: 20 }} />
                 </div>
                 <p className="text-3xl font-extrabold text-foreground tracking-tight">{value}</p>
@@ -87,12 +87,12 @@ export default async function DashboardPage() {
           <Link
             key={label}
             href={href}
-            className={`bg-white p-5 hover:shadow-md transition-all flex flex-col justify-between rounded-2xl shadow-sm ${
+            className={`bg-white p-5 hover:shadow-md transition-all flex flex-col justify-between rounded-3xl shadow-md ${
               urgent ? "ring-2 ring-warning-bg" : ""
             }`}
           >
             <div>
-              <div className={`inline-flex p-2.5 rounded-2xl ${color} mb-4`}>
+              <div className={`inline-flex p-2.5 rounded-3xl ${color} mb-4`}>
                 <Icon sx={{ fontSize: 20 }} />
               </div>
               <p className="text-3xl font-extrabold text-foreground tracking-tight">{value}</p>
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Recent messages */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-md overflow-hidden">
         <div className="px-6 py-4 flex items-center justify-between shadow-[0_1px_0_0_var(--color-border)]">
           <div className="flex items-center gap-2">
             <Message className="text-muted" sx={{ fontSize: 18 }} />

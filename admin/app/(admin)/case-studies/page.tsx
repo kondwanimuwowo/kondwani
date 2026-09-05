@@ -102,7 +102,7 @@ export default function CaseStudiesPage() {
     setShowForm(true)
   }
 
-  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
+  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const textareaCls = `${inputCls} resize-none`
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
   const sectionTitle = "text-xs font-bold uppercase tracking-widest text-muted pt-2"
@@ -122,7 +122,7 @@ export default function CaseStudiesPage() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/30 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-2xl my-8">
+          <div className="bg-white rounded-3xl shadow-lg p-6 w-full max-w-2xl my-8">
             <h2 className="font-bold text-foreground mb-5">{editId ? "Edit" : "New"} Case Study</h2>
             <div className="space-y-4">
 
@@ -249,7 +249,7 @@ export default function CaseStudiesPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-md overflow-hidden">
         {studies.length === 0 ? (
           <p className="px-6 py-12 text-sm text-muted text-center">No case studies yet.</p>
         ) : (

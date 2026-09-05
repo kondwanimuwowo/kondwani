@@ -192,7 +192,7 @@ function TaskRow({ task, onStatusCycle, onDelete, onTitleSave }: {
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-3 px-4 py-2.5 group hover:bg-surface rounded-2xl transition-colors">
+    <div ref={setNodeRef} style={style} className="flex items-center gap-3 px-4 py-2.5 group hover:bg-surface rounded-3xl transition-colors">
       <span {...attributes} {...listeners} className="text-muted hover:text-foreground cursor-grab active:cursor-grabbing">
         <DragIndicator sx={{ fontSize: 16 }} />
       </span>
@@ -247,7 +247,7 @@ function TaskCard({ task, onStatusMove, onDelete }: {
   onDelete: (id: string) => void
 }) {
   return (
-    <div className="bg-white rounded-2xl p-3 group shadow-sm hover:shadow-md transition-all">
+    <div className="bg-white rounded-3xl p-3 group shadow-md hover:shadow-md transition-all">
       <p className={`text-sm mb-2 ${task.status === "done" ? "line-through text-muted" : "text-foreground"}`}>{task.title}</p>
       <div className="flex items-center justify-between">
         <Tooltip content={PRIORITY_TIPS[task.priority] ?? task.priority}>
@@ -272,7 +272,7 @@ function MilestoneRow({ milestone, onInvoice, onDelete }: {
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 }
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center justify-between px-4 py-3 bg-white rounded-2xl shadow-sm transition-colors group">
+    <div ref={setNodeRef} style={style} className="flex items-center justify-between px-4 py-3 bg-white rounded-3xl shadow-md transition-colors group">
       <div className="flex items-center gap-3">
         <span {...attributes} {...listeners} className="text-muted hover:text-foreground cursor-grab active:cursor-grabbing">
           <DragIndicator sx={{ fontSize: 16 }} />
@@ -770,7 +770,7 @@ export default function WorkDetailPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Top bar */}
-      <div className="sticky top-0 z-10 bg-white shadow-sm px-8 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-10 bg-white shadow-md px-8 py-3 flex items-center justify-between">
         <Link href="/work" className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors">
           <ArrowBack sx={{ fontSize: 16 }} /> Work
         </Link>
@@ -810,7 +810,7 @@ export default function WorkDetailPage() {
               onChange={e => setDesc(e.target.value)}
               onBlur={() => { setEditingDesc(false); patchProject({ description: desc || null }) }}
               rows={3}
-              className="w-full text-muted text-sm bg-surface outline-none rounded-2xl p-3 resize-none mb-8"
+              className="w-full text-muted text-sm bg-surface outline-none rounded-3xl p-3 resize-none mb-8"
               placeholder="Add a description"
               autoFocus
             />
@@ -831,7 +831,7 @@ export default function WorkDetailPage() {
                 onClick={() => setActiveTab(tab)}
                 className={`px-5 py-2 text-sm font-semibold rounded-full transition-all capitalize flex items-center gap-1.5 cursor-pointer ${
                   activeTab === tab
-                    ? "bg-white text-foreground shadow-sm"
+                    ? "bg-white text-foreground shadow-md"
                     : "text-muted hover:text-foreground"
                 }`}
               >
@@ -852,13 +852,13 @@ export default function WorkDetailPage() {
                 <div className="flex items-center bg-surface rounded-full p-1">
                   <button
                     onClick={() => setTaskView("list")}
-                    className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${taskView === "list" ? "bg-white text-foreground shadow-sm" : "text-muted hover:text-foreground"}`}
+                    className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${taskView === "list" ? "bg-white text-foreground shadow-md" : "text-muted hover:text-foreground"}`}
                   >
                     <ViewList sx={{ fontSize: 14 }} /> List
                   </button>
                   <button
                     onClick={() => setTaskView("board")}
-                    className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${taskView === "board" ? "bg-white text-foreground shadow-sm" : "text-muted hover:text-foreground"}`}
+                    className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${taskView === "board" ? "bg-white text-foreground shadow-md" : "text-muted hover:text-foreground"}`}
                   >
                     <ViewKanban sx={{ fontSize: 14 }} /> Board
                   </button>
@@ -867,7 +867,7 @@ export default function WorkDetailPage() {
 
               {/* List view */}
               {taskView === "list" && (
-                <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div className="bg-white rounded-3xl shadow-md overflow-hidden">
                   {tasks.length === 0 && (
                     <p className="px-6 py-6 text-sm text-muted text-center">No tasks yet, add one below.</p>
                   )}
@@ -917,7 +917,7 @@ export default function WorkDetailPage() {
                           </Tooltip>
                           <span className="text-xs text-muted">{colTasks.length}</span>
                         </div>
-                        <div className="space-y-2 min-h-[40px] bg-surface rounded-2xl p-2">
+                        <div className="space-y-2 min-h-[40px] bg-surface rounded-3xl p-2">
                           {colTasks.map(t => (
                             <TaskCard key={t.id} task={t} onStatusMove={moveTaskStatus} onDelete={deleteTask} />
                           ))}
@@ -936,7 +936,7 @@ export default function WorkDetailPage() {
                             }
                           }}
                           placeholder="+ Add task"
-                          className="w-full mt-1.5 px-2 py-1.5 text-xs text-muted bg-transparent rounded-2xl hover:bg-white focus:bg-white outline-none transition-colors placeholder:text-muted"
+                          className="w-full mt-1.5 px-2 py-1.5 text-xs text-muted bg-transparent rounded-3xl hover:bg-white focus:bg-white outline-none transition-colors placeholder:text-muted"
                         />
                       </div>
                     )
@@ -951,20 +951,20 @@ export default function WorkDetailPage() {
             <div className="space-y-8">
               {/* Retainer Section */}
               {project.billingType === "retainer" && (
-                <div className="bg-white rounded-2xl shadow-sm p-6">
+                <div className="bg-white rounded-3xl shadow-md p-6">
                   <h3 className="text-base font-bold text-foreground mb-4">Retainer Contract</h3>
 
                   {retainer ? (
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-surface p-4 rounded-2xl">
+                        <div className="bg-surface p-4 rounded-3xl">
                           <span className="text-[10px] uppercase font-bold text-muted tracking-wider">Plan Details</span>
                           <p className="text-sm font-semibold text-foreground mt-1">{retainer.title}</p>
                           <p className="text-lg font-mono font-bold text-primary mt-1">
                             {project.currency} {retainer.amount.toLocaleString()}/{retainer.frequency}
                           </p>
                         </div>
-                        <div className="bg-surface p-4 rounded-2xl">
+                        <div className="bg-surface p-4 rounded-3xl">
                           <span className="text-[10px] uppercase font-bold text-muted tracking-wider">Schedule</span>
                           <div className="text-xs text-foreground mt-1 space-y-1">
                             <p><strong>Starts:</strong> {fmt(retainer.startDate)}</p>
@@ -1014,7 +1014,7 @@ export default function WorkDetailPage() {
                             value={newRetainerTitle}
                             onChange={e => setNewRetainerTitle(e.target.value)}
                             placeholder="e.g. Monthly Support Agreement"
-                            className="w-full mt-1 px-3 py-2 bg-surface rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                            className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                           />
                         </div>
                         <div>
@@ -1024,7 +1024,7 @@ export default function WorkDetailPage() {
                             value={newRetainerAmount}
                             onChange={e => setNewRetainerAmount(e.target.value === "" ? "" : parseFloat(e.target.value))}
                             placeholder="0.00"
-                            className="w-full mt-1 px-3 py-2 bg-surface rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                            className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                           />
                         </div>
                         <div>
@@ -1032,7 +1032,7 @@ export default function WorkDetailPage() {
                           <select
                             value={newRetainerFrequency}
                             onChange={e => setNewRetainerFrequency(e.target.value)}
-                            className="w-full mt-1 px-3 py-2 bg-surface rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                            className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                           >
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
@@ -1045,7 +1045,7 @@ export default function WorkDetailPage() {
                             type="date"
                             value={newRetainerStartDate}
                             onChange={e => setNewRetainerStartDate(e.target.value)}
-                            className="w-full mt-1 px-3 py-2 bg-surface rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                            className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                           />
                         </div>
                       </div>
@@ -1072,15 +1072,15 @@ export default function WorkDetailPage() {
                     </span>
                   </div>
 
-                  <div className="bg-surface rounded-2xl p-4 space-y-4">
+                  <div className="bg-surface rounded-3xl p-4 space-y-4">
                     {/* Add Milestone Form */}
-                    <div className="grid grid-cols-4 gap-3 bg-white p-3 rounded-2xl shadow-sm">
+                    <div className="grid grid-cols-4 gap-3 bg-white p-3 rounded-3xl shadow-md">
                       <div className="col-span-2">
                         <input
                           value={newMilestoneTitle}
                           onChange={e => setNewMilestoneTitle(e.target.value)}
                           placeholder="Milestone Title (e.g. Initial Deposit, MVP Delivery)"
-                          className="w-full px-3 py-2 text-xs bg-surface rounded-2xl outline-none focus:ring-2 focus:ring-primary-tint"
+                          className="w-full px-3 py-2 text-xs bg-surface rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint"
                         />
                       </div>
                       <div>
@@ -1095,7 +1095,7 @@ export default function WorkDetailPage() {
                             }
                           }}
                           placeholder={`Amount (${project.currency})`}
-                          className="w-full px-3 py-2 text-xs bg-surface rounded-2xl outline-none focus:ring-2 focus:ring-primary-tint"
+                          className="w-full px-3 py-2 text-xs bg-surface rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint"
                         />
                       </div>
                       <div>
@@ -1103,7 +1103,7 @@ export default function WorkDetailPage() {
                           type="date"
                           value={newMilestoneDueDate}
                           onChange={e => setNewMilestoneDueDate(e.target.value)}
-                          className="w-full px-3 py-2 text-xs bg-surface rounded-2xl outline-none focus:ring-2 focus:ring-primary-tint text-muted"
+                          className="w-full px-3 py-2 text-xs bg-surface rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint text-muted"
                         />
                       </div>
                       <div className="col-span-4 flex items-center justify-between pt-1">
@@ -1119,7 +1119,7 @@ export default function WorkDetailPage() {
                               }
                             }}
                             placeholder="Split %"
-                            className="w-16 px-2 py-1 text-[10px] bg-surface rounded-2xl outline-none focus:ring-2 focus:ring-primary-tint"
+                            className="w-16 px-2 py-1 text-[10px] bg-surface rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint"
                           />
                           <span className="text-[10px] text-muted font-medium">Split of project budget</span>
                         </div>
@@ -1160,11 +1160,11 @@ export default function WorkDetailPage() {
               <div>
                 <h3 className="text-base font-bold text-foreground mb-3">Invoices & Quotes</h3>
                 {project.documents.length === 0 ? (
-                  <p className="p-6 text-xs text-muted rounded-2xl text-center italic bg-surface">
+                  <p className="p-6 text-xs text-muted rounded-3xl text-center italic bg-surface">
                     No documents generated yet. Use the milestones builder or panel to create documents.
                   </p>
                 ) : (
-                  <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                  <div className="bg-white rounded-3xl shadow-md overflow-hidden">
                     <table className="w-full">
                       <thead>
                         <tr className="bg-surface">
@@ -1209,7 +1209,7 @@ export default function WorkDetailPage() {
           {activeTab === "contracts" && (
             <div className="space-y-6">
               {contracts.length === 0 ? (
-                <div className="bg-white rounded-2xl shadow-sm p-6">
+                <div className="bg-white rounded-3xl shadow-md p-6">
                   <h3 className="text-base font-bold text-foreground mb-4">Draft New Project Contract</h3>
                   
                   <div className="space-y-4">
@@ -1218,7 +1218,7 @@ export default function WorkDetailPage() {
                       <select
                         value={selectedTemplate}
                         onChange={e => applyTemplate(e.target.value)}
-                        className="w-full mt-1 px-3 py-2 bg-surface rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                        className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                       >
                         <option value="">Choose a standard template</option>
                         <option value="web_dev">Web Development Agreement</option>
@@ -1232,7 +1232,7 @@ export default function WorkDetailPage() {
                         value={newContractTitle}
                         onChange={e => setNewContractTitle(e.target.value)}
                         placeholder="e.g. Software Services Agreement"
-                        className="w-full mt-1 px-3 py-2 bg-surface rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                        className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                       />
                     </div>
                     <div>
@@ -1242,7 +1242,7 @@ export default function WorkDetailPage() {
                         onChange={e => setNewContractContent(e.target.value)}
                         rows={12}
                         placeholder="Write or copy-paste contract content here..."
-                        className="w-full mt-1 px-3 py-3 bg-surface rounded-2xl text-sm outline-none font-sans leading-relaxed resize-y focus:ring-2 focus:ring-primary-tint"
+                        className="w-full mt-1 px-3 py-3 bg-surface rounded-3xl text-sm outline-none font-sans leading-relaxed resize-y focus:ring-2 focus:ring-primary-tint"
                       />
                     </div>
                     <button
@@ -1257,7 +1257,7 @@ export default function WorkDetailPage() {
               ) : (
                 <div className="space-y-6">
                   {contracts.map(contract => (
-                    <div key={contract.id} className="bg-white rounded-2xl shadow-sm p-6">
+                    <div key={contract.id} className="bg-white rounded-3xl shadow-md p-6">
                       {editingContractId === contract.id ? (
                         <div className="space-y-4">
                           <div>
@@ -1265,7 +1265,7 @@ export default function WorkDetailPage() {
                             <input
                               value={newContractTitle}
                               onChange={e => setNewContractTitle(e.target.value)}
-                              className="w-full mt-1 px-3 py-2 bg-surface rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                              className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                             />
                           </div>
                           <div>
@@ -1274,7 +1274,7 @@ export default function WorkDetailPage() {
                               value={newContractContent}
                               onChange={e => setNewContractContent(e.target.value)}
                               rows={12}
-                              className="w-full mt-1 px-3 py-3 bg-surface rounded-2xl text-sm outline-none font-sans leading-relaxed resize-y focus:ring-2 focus:ring-primary-tint"
+                              className="w-full mt-1 px-3 py-3 bg-surface rounded-3xl text-sm outline-none font-sans leading-relaxed resize-y focus:ring-2 focus:ring-primary-tint"
                             />
                           </div>
                           <div className="flex gap-2">
@@ -1307,12 +1307,12 @@ export default function WorkDetailPage() {
                             </span>
                           </div>
 
-                          <div className="bg-surface rounded-2xl p-4 max-h-60 overflow-y-auto text-xs text-foreground font-sans leading-relaxed whitespace-pre-wrap">
+                          <div className="bg-surface rounded-3xl p-4 max-h-60 overflow-y-auto text-xs text-foreground font-sans leading-relaxed whitespace-pre-wrap">
                             {contract.content}
                           </div>
 
                           {contract.status === "signed" && (
-                            <div className="bg-success-bg rounded-2xl p-4 text-xs text-success space-y-1">
+                            <div className="bg-success-bg rounded-3xl p-4 text-xs text-success space-y-1">
                               <p className="font-semibold flex items-center gap-1"><CheckCircle sx={{ fontSize: 14 }} /> Contract Signed Digitally</p>
                               <p><strong>Signed by:</strong> {contract.signatureName} ({contract.signatureEmail})</p>
                               <p><strong>Date signed:</strong> {fmt(contract.signedAt)}</p>
@@ -1383,7 +1383,7 @@ export default function WorkDetailPage() {
 
           {/* ── Project Chat Tab ───────────────────────────────────────────── */}
           {activeTab === "chat" && (
-            <div className="bg-white rounded-2xl shadow-sm flex flex-col h-[550px] overflow-hidden">
+            <div className="bg-white rounded-3xl shadow-md flex flex-col h-[550px] overflow-hidden">
               <div className="bg-surface px-6 py-4 flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-foreground">Project Workspace Chat</h3>
@@ -1412,7 +1412,7 @@ export default function WorkDetailPage() {
                           <span className="text-[10px] font-bold text-foreground">{msg.senderName}</span>
                           <span className="text-[9px] text-muted">{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
-                        <div className={`max-w-md p-3 rounded-2xl text-xs leading-relaxed ${
+                        <div className={`max-w-md p-3 rounded-3xl text-xs leading-relaxed ${
                           isDev 
                             ? "bg-foreground text-white rounded-tr-none"
                             : "bg-surface text-foreground rounded-tl-none"
@@ -1433,7 +1433,7 @@ export default function WorkDetailPage() {
                   onChange={e => setNewMessageContent(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && sendMessage()}
                   placeholder="Type a message to the client"
-                  className="flex-1 px-4 py-2 bg-surface rounded-2xl text-xs outline-none focus:ring-2 focus:ring-primary-tint"
+                  className="flex-1 px-4 py-2 bg-surface rounded-3xl text-xs outline-none focus:ring-2 focus:ring-primary-tint"
                 />
                 <button
                   onClick={sendMessage}
@@ -1452,7 +1452,7 @@ export default function WorkDetailPage() {
           <p className="text-[10px] font-bold tracking-widest uppercase text-muted mb-3">Properties</p>
 
           {/* Status */}
-          <div className="bg-white rounded-2xl shadow-sm p-4">
+          <div className="bg-white rounded-3xl shadow-md p-4">
             <p className="text-xs font-semibold text-muted mb-2 uppercase tracking-wider">Status</p>
             <Tooltip content={PROJECT_STATUS_TIPS[statusKey] ?? statusKey} side="left">
               <select
@@ -1468,7 +1468,7 @@ export default function WorkDetailPage() {
           </div>
 
           {/* Client */}
-          <div className="bg-white rounded-2xl shadow-sm p-4">
+          <div className="bg-white rounded-3xl shadow-md p-4">
             <p className="text-xs font-semibold text-muted mb-2 uppercase tracking-wider">Client</p>
             {project.client ? (
               <div>
@@ -1481,7 +1481,7 @@ export default function WorkDetailPage() {
           </div>
 
           {/* Billing */}
-          <div className="bg-white rounded-2xl shadow-sm p-4">
+          <div className="bg-white rounded-3xl shadow-md p-4">
             <p className="text-xs font-semibold text-muted mb-2 uppercase tracking-wider">Billing</p>
             <Tooltip content={BILLING_TIPS[project.billingType] ?? project.billingType} side="left">
               <p className="text-sm font-medium text-foreground cursor-default">{billingLabel[project.billingType] ?? project.billingType}</p>
@@ -1495,7 +1495,7 @@ export default function WorkDetailPage() {
           </div>
 
           {/* Dates */}
-          <div className="bg-white rounded-2xl shadow-sm p-4">
+          <div className="bg-white rounded-3xl shadow-md p-4">
             <p className="text-xs font-semibold text-muted mb-3 uppercase tracking-wider">Dates</p>
             <div className="space-y-2">
               <div>
@@ -1504,7 +1504,7 @@ export default function WorkDetailPage() {
                   type="date"
                   defaultValue={fmtDate(project.startDate)}
                   onBlur={e => patchProject({ startDate: e.target.value || null })}
-                  className="block w-full text-sm text-foreground bg-transparent outline-none rounded-2xl px-1 -mx-1 hover:bg-surface focus:ring-2 focus:ring-primary-tint transition-colors"
+                  className="block w-full text-sm text-foreground bg-transparent outline-none rounded-3xl px-1 -mx-1 hover:bg-surface focus:ring-2 focus:ring-primary-tint transition-colors"
                 />
               </div>
               <div>
@@ -1513,7 +1513,7 @@ export default function WorkDetailPage() {
                   type="date"
                   defaultValue={fmtDate(project.dueDate)}
                   onBlur={e => patchProject({ dueDate: e.target.value || null })}
-                  className="block w-full text-sm text-foreground bg-transparent outline-none rounded-2xl px-1 -mx-1 hover:bg-surface focus:ring-2 focus:ring-primary-tint transition-colors"
+                  className="block w-full text-sm text-foreground bg-transparent outline-none rounded-3xl px-1 -mx-1 hover:bg-surface focus:ring-2 focus:ring-primary-tint transition-colors"
                 />
               </div>
             </div>

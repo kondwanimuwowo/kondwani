@@ -84,7 +84,7 @@ export default function JobsPage() {
         {STATUSES.map(s => {
           const colors = STATUS_COLORS[s] ?? "bg-neutral-bg text-muted"
           return (
-            <div key={s} className="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-all flex flex-col justify-between">
+            <div key={s} className="bg-white rounded-3xl shadow-md p-4 hover:shadow-md transition-all flex flex-col justify-between">
               <span className={`inline-block text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full self-start ${colors}`}>
                 {s}
               </span>
@@ -97,9 +97,9 @@ export default function JobsPage() {
       {/* Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white shadow-2xl w-full max-w-md flex flex-col max-h-[90vh] sm:max-h-[85vh] rounded-2xl overflow-hidden my-auto">
+          <div className="bg-white shadow-2xl w-full max-w-md flex flex-col max-h-[90vh] sm:max-h-[85vh] rounded-3xl overflow-hidden my-auto">
             {/* Modal Header */}
-            <div className="px-6 py-4 shadow-sm flex items-center justify-between flex-shrink-0">
+            <div className="px-6 py-4 shadow-md flex items-center justify-between flex-shrink-0">
               <h2 className="font-bold text-foreground text-base">{editId ? "Edit" : "Add"} Application</h2>
               <button
                 onClick={() => { setShowForm(false); setEditId(null); setForm({ company: "", role: "", status: "applied", appliedAt: new Date().toISOString().split("T")[0], notes: "", url: "" }) }}
@@ -120,7 +120,7 @@ export default function JobsPage() {
                     value={form[field]}
                     onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
                     placeholder={field === "url" ? "https://" : ""}
-                    className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                    className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                 </div>
               ))}
@@ -130,7 +130,7 @@ export default function JobsPage() {
                   <select
                     value={form.status}
                     onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
-                    className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all capitalize"
+                    className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all capitalize"
                   >
                     {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
@@ -141,7 +141,7 @@ export default function JobsPage() {
                     type="date"
                     value={form.appliedAt}
                     onChange={e => setForm(f => ({ ...f, appliedAt: e.target.value }))}
-                    className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all"
+                    className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all"
                   />
                 </div>
               </div>
@@ -151,7 +151,7 @@ export default function JobsPage() {
                   value={form.notes}
                   onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all resize-none"
+                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all resize-none"
                 />
               </div>
             </div>
@@ -176,7 +176,7 @@ export default function JobsPage() {
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-md overflow-hidden">
         {jobs.length === 0 ? (
           <p className="px-6 py-16 text-sm text-muted text-center">No applications tracked yet.</p>
         ) : (

@@ -202,7 +202,7 @@ function InvoicesContent() {
   const clientProjects = projects.filter(p => !fClientId || p.clientId === fClientId)
   const filtered = docs.filter(d => tab === "all" || d.type === tab)
 
-  const inputCls = "w-full px-3 py-2 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors bg-surface"
+  const inputCls = "w-full px-3 py-2 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors bg-surface"
   const labelCls = "block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5"
 
   return (
@@ -227,7 +227,7 @@ function InvoicesContent() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors capitalize ${tab === t ? "bg-white text-foreground shadow-sm" : "text-muted hover:text-foreground"}`}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors capitalize ${tab === t ? "bg-white text-foreground shadow-md" : "text-muted hover:text-foreground"}`}
           >
             {t === "all" ? "All" : t === "invoice" ? "Invoices" : "Quotes"}
           </button>
@@ -235,7 +235,7 @@ function InvoicesContent() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-md overflow-hidden">
         {filtered.length === 0 ? (
           <p className="px-6 py-12 text-sm text-muted text-center">No documents yet.</p>
         ) : (
@@ -323,7 +323,7 @@ function InvoicesContent() {
                     <button
                       key={t}
                       onClick={() => setFType(t)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${fType === t ? "bg-white text-foreground shadow-sm" : "text-muted"}`}
+                      className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${fType === t ? "bg-white text-foreground shadow-md" : "text-muted"}`}
                     >
                       {t}
                     </button>
@@ -420,7 +420,7 @@ function InvoicesContent() {
               </div>
 
               {/* Totals */}
-              <div className="bg-surface rounded-2xl p-4 space-y-2">
+              <div className="bg-surface rounded-3xl p-4 space-y-2">
                 <div className="flex justify-between text-sm text-muted">
                   <span>Subtotal</span>
                   <span>{formatNum(subtotal, fCurrency)}</span>
@@ -455,7 +455,7 @@ function InvoicesContent() {
             {/* Panel footer */}
             <div className="shrink-0 px-6 py-4 shadow-[0_-1px_0_0_var(--color-border)] space-y-3">
               {saveError && (
-                <p className="text-xs text-danger bg-danger-bg rounded-2xl px-3 py-2">{saveError}</p>
+                <p className="text-xs text-danger bg-danger-bg rounded-3xl px-3 py-2">{saveError}</p>
               )}
               <div className="flex items-center gap-3">
                 <button

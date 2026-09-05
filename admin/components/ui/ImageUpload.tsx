@@ -36,7 +36,7 @@ export function ImageUpload({ value, onChange, label = "Cover image" }: Props) {
     <div>
       <p className="text-xs font-semibold text-muted uppercase tracking-widest mb-2">{label}</p>
       {value ? (
-        <div className="relative rounded-2xl overflow-hidden shadow-sm group w-full h-48">
+        <div className="relative rounded-3xl overflow-hidden shadow-md group w-full h-48">
           <Image src={value} alt="Upload preview" fill className="object-cover" />
           <button
             type="button"
@@ -51,7 +51,7 @@ export function ImageUpload({ value, onChange, label = "Cover image" }: Props) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="w-full h-36 rounded-2xl bg-surface flex flex-col items-center justify-center gap-2 text-muted hover:text-primary transition-colors disabled:opacity-60 cursor-pointer"
+          className="w-full h-36 rounded-3xl bg-surface flex flex-col items-center justify-center gap-2 text-muted hover:text-primary transition-colors disabled:opacity-60 cursor-pointer"
         >
           {uploading ? (
             <span className="w-5 h-5 rounded-full border-2 border-primary-tint border-t-primary animate-spin" />

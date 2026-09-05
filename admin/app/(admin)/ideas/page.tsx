@@ -62,7 +62,7 @@ export default function IdeasPage() {
       {/* Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-foreground/40 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white shadow-2xl w-full max-w-md flex flex-col max-h-[90vh] sm:max-h-[85vh] rounded-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
+          <div className="bg-white shadow-2xl w-full max-w-md flex flex-col max-h-[90vh] sm:max-h-[85vh] rounded-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
             {/* Modal Header */}
             <div className="px-6 py-4 shadow-[0_1px_0_0_var(--color-border)] flex items-center justify-between flex-shrink-0">
               <h2 className="font-bold text-foreground text-base">{editId ? "Edit" : "New"} Idea</h2>
@@ -81,7 +81,7 @@ export default function IdeasPage() {
                 <input
                   value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                  className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                 />
               </div>
               <div>
@@ -90,7 +90,7 @@ export default function IdeasPage() {
                   value={form.body}
                   onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
                   rows={4}
-                  className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all resize-none"
+                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all resize-none"
                 />
               </div>
               <div>
@@ -101,7 +101,7 @@ export default function IdeasPage() {
                   value={form.tags}
                   onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
                   placeholder="marketing, design, startup"
-                  className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                 />
               </div>
             </div>
@@ -110,7 +110,7 @@ export default function IdeasPage() {
             <div className="px-6 py-4 shadow-[0_-1px_0_0_var(--color-border)] flex items-center gap-3 bg-surface flex-shrink-0">
               <button
                 onClick={() => { setShowForm(false); setEditId(null); setForm({ title: "", body: "", tags: "" }) }}
-                className="flex-1 bg-white shadow-sm py-2 rounded-full text-sm font-semibold text-foreground hover:bg-neutral-bg transition-colors"
+                className="flex-1 bg-white shadow-md py-2 rounded-full text-sm font-semibold text-foreground hover:bg-neutral-bg transition-colors"
               >
                 Cancel
               </button>
@@ -128,12 +128,12 @@ export default function IdeasPage() {
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {ideas.length === 0 ? (
-          <div className="col-span-full bg-white px-6 py-16 text-center shadow-sm rounded-2xl">
+          <div className="col-span-full bg-white px-6 py-16 text-center shadow-md rounded-3xl">
             <p className="text-muted">No ideas captured yet. Start brainstorming.</p>
           </div>
         ) : (
           ideas.map(idea => (
-            <div key={idea.id} className="bg-white rounded-2xl p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div key={idea.id} className="bg-white rounded-3xl p-5 flex flex-col justify-between shadow-md hover:shadow-md transition-shadow duration-200">
               <div>
                 <p className="font-bold text-foreground leading-snug tracking-tight text-[15px] mb-2">{idea.title}</p>
                 {idea.body && <p className="text-sm text-muted leading-relaxed line-clamp-4 mb-4">{idea.body}</p>}

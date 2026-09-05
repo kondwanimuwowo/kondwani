@@ -80,7 +80,7 @@ function KanbanCard({ project }: { project: WorkProject }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-white rounded-2xl p-4 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all select-none"
+      className="bg-white rounded-3xl p-4 shadow-md cursor-grab active:cursor-grabbing hover:shadow-md transition-all select-none"
     >
       <Link href={`/work/${project.id}`} onClick={e => e.stopPropagation()} className="block mb-2">
         <p className="text-sm font-semibold text-foreground hover:text-primary transition-colors line-clamp-2">{project.title}</p>
@@ -208,7 +208,7 @@ export default function WorkPage() {
   }
 
   const activeProject = projects.find(p => p.id === activeId)
-  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
+  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
 
   return (
@@ -224,13 +224,13 @@ export default function WorkPage() {
           <div className="flex items-center bg-surface rounded-full p-1">
             <button
               onClick={() => setView("list")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${view === "list" ? "bg-white text-foreground shadow-sm" : "text-muted hover:text-foreground"}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${view === "list" ? "bg-white text-foreground shadow-md" : "text-muted hover:text-foreground"}`}
             >
               <ViewList sx={{ fontSize: 15 }} /> List
             </button>
             <button
               onClick={() => setView("board")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${view === "board" ? "bg-white text-foreground shadow-sm" : "text-muted hover:text-foreground"}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${view === "board" ? "bg-white text-foreground shadow-md" : "text-muted hover:text-foreground"}`}
             >
               <ViewKanban sx={{ fontSize: 15 }} /> Board
             </button>
@@ -247,7 +247,7 @@ export default function WorkPage() {
       {/* Create Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/30 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-lg my-8">
+          <div className="bg-white rounded-3xl shadow-lg p-6 w-full max-w-lg my-8">
             <h2 className="font-bold text-foreground mb-5">New Project</h2>
             <div className="space-y-4">
               <div>
@@ -317,7 +317,7 @@ export default function WorkPage() {
               </div>
             </div>
             {saveError && (
-              <p className="mt-4 text-xs text-danger bg-danger-bg rounded-2xl px-3 py-2">{saveError}</p>
+              <p className="mt-4 text-xs text-danger bg-danger-bg rounded-3xl px-3 py-2">{saveError}</p>
             )}
             <div className="flex items-center gap-3 mt-4">
               <button onClick={handleSave} disabled={saving || !form.title.trim()}
@@ -335,7 +335,7 @@ export default function WorkPage() {
 
       {/* ── List view ─────────────────────────────────────────────────────── */}
       {view === "list" && (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-md overflow-hidden">
           {projects.length === 0 ? (
             <p className="px-6 py-12 text-sm text-muted text-center">No projects yet.</p>
           ) : (
@@ -353,7 +353,7 @@ export default function WorkPage() {
               </thead>
               <tbody>
                 {projects.map(p => (
-                  <tr key={p.id} className="hover:bg-surface transition-colors">
+                  <tr key={p.id} className="shadow-[0_1px_0_0_var(--color-border)] hover:bg-surface transition-colors">
                     <td className="px-6 py-4">
                       <Link href={`/work/${p.id}`} className="text-sm font-medium text-foreground hover:text-primary transition-colors">{p.title}</Link>
                     </td>
@@ -418,7 +418,7 @@ export default function WorkPage() {
                   <SortableContext items={colProjects.map(p => p.id)} strategy={verticalListSortingStrategy}>
                     <div
                       data-droppable-id={col.key}
-                      className="space-y-2 min-h-[60px] rounded-2xl p-2 bg-surface"
+                      className="space-y-2 min-h-[60px] rounded-3xl p-2 bg-surface"
                       onDragOver={e => e.preventDefault()}
                       onDrop={async () => {
                         if (activeId) {
@@ -445,7 +445,7 @@ export default function WorkPage() {
                       onChange={e => setQuickAdd(prev => ({ ...prev, [col.key]: e.target.value }))}
                       onKeyDown={e => e.key === "Enter" && handleQuickAdd(col.key)}
                       placeholder="+ Add project"
-                      className="w-full px-3 py-2 text-xs text-muted bg-transparent rounded-2xl hover:bg-white focus:bg-white focus:text-foreground outline-none transition-colors placeholder:text-muted"
+                      className="w-full px-3 py-2 text-xs text-muted bg-transparent rounded-3xl hover:bg-white focus:bg-white focus:text-foreground outline-none transition-colors placeholder:text-muted"
                     />
                   </div>
                 </div>
