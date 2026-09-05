@@ -23,7 +23,7 @@ export function Projects({ projects }: { projects: Project[] }) {
   const featured = projects
 
   return (
-    <section id="projects" className="section-padding bg-surface">
+    <section id="projects" className="section-padding bg-background">
       <motion.div ref={ref} className="container-custom">
         {/* Header */}
         <motion.div
@@ -59,13 +59,13 @@ export function Projects({ projects }: { projects: Project[] }) {
               key={project.id}
               variants={cardVariant}
               whileHover={{ y: -8 }}
-              className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300"
+              className="relative group bg-surface rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300"
             >
               {/* Stretched link covers the whole card */}
               <Link href={project.slug ? `/projects/${project.slug}` : "#"} className="absolute inset-0 z-0" aria-label={project.title} />
 
               {/* Image */}
-              <div className="relative h-52 overflow-hidden bg-surface">
+              <div className="relative h-52 overflow-hidden bg-background">
                 <motion.div
                   className="absolute inset-0"
                   whileHover={{ scale: 1.04 }}
@@ -80,7 +80,7 @@ export function Projects({ projects }: { projects: Project[] }) {
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-surface" />
+                    <div className="absolute inset-0 bg-background" />
                   )}
                 </motion.div>
                 <div className="absolute bottom-3 left-3 text-[10px] font-bold tracking-widest uppercase text-white bg-foreground px-3 py-1.5 rounded-full">
@@ -104,12 +104,12 @@ export function Projects({ projects }: { projects: Project[] }) {
                 </p>
                 <div className="flex items-center gap-1.5 mb-5 overflow-hidden">
                   {project.tech.slice(0, 3).map((t) => (
-                    <span key={t} className="text-[11px] font-medium bg-surface text-muted px-2.5 py-1 rounded-full whitespace-nowrap">
+                    <span key={t} className="text-[11px] font-medium bg-white text-muted px-2.5 py-1 rounded-full whitespace-nowrap">
                       {t}
                     </span>
                   ))}
                   {project.tech.length > 3 && (
-                    <span className="text-[11px] font-medium bg-surface text-muted px-2.5 py-1 rounded-full whitespace-nowrap shrink-0">
+                    <span className="text-[11px] font-medium bg-white text-muted px-2.5 py-1 rounded-full whitespace-nowrap shrink-0">
                       +{project.tech.length - 3}
                     </span>
                   )}

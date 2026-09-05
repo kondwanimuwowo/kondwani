@@ -23,7 +23,7 @@ export function BeyondCode() {
   const { ref, revealed } = useReveal()
 
   return (
-    <section id="beyond-code" className="section-padding bg-surface">
+    <section id="beyond-code" className="section-padding bg-background">
       <motion.div ref={ref} className="container-custom">
         {/* Header */}
         <motion.div
@@ -59,7 +59,7 @@ export function BeyondCode() {
               key={org.id}
               variants={fadeUp}
               whileHover={{ y: -6 }}
-              className="relative group overflow-hidden bg-white rounded-3xl shadow-md grayscale hover:grayscale-0 hover:shadow-xl transition-all duration-500 flex flex-col min-h-[280px]"
+              className="relative group overflow-hidden bg-surface rounded-3xl shadow-md grayscale hover:grayscale-0 hover:shadow-xl transition-all duration-500 flex flex-col min-h-[280px]"
             >
               {/* Content */}
               <div className="relative z-10 p-6 flex flex-col flex-1">
@@ -131,7 +131,7 @@ export function BeyondCode() {
                 key={item.label}
                 variants={fadeUp}
                 whileHover={{ scale: 1.05, y: -2 }}
-                className="flex items-center gap-2.5 bg-white rounded-full px-5 py-3 shadow-md cursor-default"
+                className="flex items-center gap-2.5 bg-surface rounded-full px-5 py-3 shadow-md cursor-default"
               >
                 {Icon && <Icon className="text-primary" sx={{ fontSize: 18 }} />}
                 <span className="text-sm font-medium text-foreground">{item.label}</span>
