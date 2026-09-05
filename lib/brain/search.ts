@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma"
+import { sql } from "drizzle-orm"
+import { db } from "@/lib/db"
 import { embedQuery } from "./ai"
 
 export interface SearchHit {
@@ -20,10 +21,10 @@ export async function semanticSearch(
 ): Promise<SearchHit[]> {
   const limit = Math.min(opts.limit ?? 10, 50)
   const vector = JSON.stringify(await embedQuery(query))
+  const category = opts.category ?? null
+  const provider = opts.provider ?? null
 
-  const rows = await prisma.$queryRaw<
-    Array<Omit<SearchHit, "score"> & { score: number }>
-  >`
+  const result = await db.execute<Omit<SearchHit, "score"> & { score: number }>(sql`
     SELECT
       d."id"        AS "documentId",
       d."title",
@@ -38,10 +39,11 @@ export async function semanticSearch(
     JOIN "BrainDocument" d ON d."id" = c."documentId"
     JOIN "BrainSource"  s ON s."id" = d."sourceId"
     WHERE c."embedding" IS NOT NULL
-      AND (${opts.category ?? null}::text IS NULL OR d."category" = ${opts.category ?? null})
-      AND (${opts.provider ?? null}::text IS NULL OR s."provider" = ${opts.provider ?? null})
+      AND (${category}::text IS NULL OR d."category" = ${category})
+      AND (${provider}::text IS NULL OR s."provider" = ${provider})
     ORDER BY c."embedding" <=> ${vector}::vector
-    LIMIT ${limit}`
+    LIMIT ${limit}
+  `)
 
-  return rows
+  return result.rows
 }

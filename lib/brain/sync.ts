@@ -1,5 +1,5 @@
-import { Prisma, type BrainSource } from "@prisma/client"
-import { prisma } from "@/lib/prisma"
+import { eq } from "drizzle-orm"
+import { db, brainSource, brainSyncRun, type BrainSource } from "@/lib/db"
 import { assertAiConfigured } from "./ai"
 import { removeDocuments, upsertRawDoc, type UpsertedDoc } from "./pipeline"
 import type { Connector } from "./types"
@@ -15,18 +15,20 @@ export interface SyncSummary {
 }
 
 export async function getOrCreateSource(connector: Connector): Promise<BrainSource> {
-  return prisma.brainSource.upsert({
-    where: { provider: connector.provider },
-    create: { provider: connector.provider, displayName: connector.displayName },
-    update: {},
+  await db.insert(brainSource)
+    .values({ provider: connector.provider, displayName: connector.displayName })
+    .onConflictDoNothing({ target: brainSource.provider })
+  const source = await db.query.brainSource.findFirst({
+    where: (t, { eq }) => eq(t.provider, connector.provider),
   })
+  return source!
 }
 
 /** Run one connector end-to-end: pull → ingest → prune → persist cursor + audit. */
 export async function runSync(connector: Connector): Promise<SyncSummary> {
   assertAiConfigured()
   const source = await getOrCreateSource(connector)
-  const run = await prisma.brainSyncRun.create({ data: { sourceId: source.id } })
+  const [run] = await db.insert(brainSyncRun).values({ sourceId: source.id }).returning()
 
   const summary: SyncSummary = {
     provider: connector.provider,
@@ -47,36 +49,24 @@ export async function runSync(connector: Connector): Promise<SyncSummary> {
     }
     summary.removed = await removeDocuments(source.id, removedExternalIds)
 
-    await prisma.brainSource.update({
-      where: { id: source.id },
-      data: {
-        cursor: cursor as Prisma.InputJsonValue,
-        status: "connected",
-        lastSyncedAt: new Date(),
-        lastError: null,
-      },
-    })
-    await prisma.brainSyncRun.update({
-      where: { id: run.id },
-      data: {
-        status: "success",
-        added: summary.added,
-        updated: summary.updated,
-        removed: summary.removed,
-        finishedAt: new Date(),
-      },
-    })
+    await db.update(brainSource).set({
+      cursor,
+      status: "connected",
+      lastSyncedAt: new Date(),
+      lastError: null,
+    }).where(eq(brainSource.id, source.id))
+    await db.update(brainSyncRun).set({
+      status: "success",
+      added: summary.added,
+      updated: summary.updated,
+      removed: summary.removed,
+      finishedAt: new Date(),
+    }).where(eq(brainSyncRun.id, run.id))
     return summary
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    await prisma.brainSource.update({
-      where: { id: source.id },
-      data: { status: "error", lastError: message },
-    })
-    await prisma.brainSyncRun.update({
-      where: { id: run.id },
-      data: { status: "error", error: message, finishedAt: new Date() },
-    })
+    await db.update(brainSource).set({ status: "error", lastError: message }).where(eq(brainSource.id, source.id))
+    await db.update(brainSyncRun).set({ status: "error", error: message, finishedAt: new Date() }).where(eq(brainSyncRun.id, run.id))
     throw err
   }
 }

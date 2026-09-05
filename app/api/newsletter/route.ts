@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod/v4"
 import { Resend } from "resend"
-import { prisma } from "@/lib/prisma"
+import { db, newsletterSubscriber } from "@/lib/db"
 
 const schema = z.object({ email: z.email() })
 
@@ -15,11 +15,7 @@ export async function POST(request: Request) {
 
     const { email } = parsed.data
 
-    await prisma.newsletterSubscriber.upsert({
-      where: { email },
-      update: {},
-      create: { email },
-    })
+    await db.insert(newsletterSubscriber).values({ email }).onConflictDoNothing({ target: newsletterSubscriber.email })
 
     const resend = new Resend(process.env.RESEND_API_KEY)
     await resend.emails.send({

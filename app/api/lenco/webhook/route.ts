@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, document, billingMilestone } from "@/lib/db"
+import { eq } from "drizzle-orm"
 
 export async function POST(req: Request) {
   // Verify shared secret — configure LENCO_WEBHOOK_SECRET in your Lenco dashboard
@@ -36,9 +37,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing transaction reference" }, { status: 400 })
     }
 
-    const doc = await prisma.document.findFirst({
-      where: { paymentRef: reference },
-      include: { client: true },
+    const doc = await db.query.document.findFirst({
+      where: (t, { eq }) => eq(t.paymentRef, reference),
+      with: { client: true },
     })
 
     if (!doc) {
@@ -58,16 +59,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: "Already paid" })
       }
 
-      await prisma.document.update({
-        where: { id: doc.id },
-        data: { status: "paid" },
-      })
+      await db.update(document).set({ status: "paid" }).where(eq(document.id, doc.id))
 
       if (doc.milestoneId) {
-        await prisma.billingMilestone.update({
-          where: { id: doc.milestoneId },
-          data: { status: "paid" },
-        })
+        await db.update(billingMilestone).set({ status: "paid" }).where(eq(billingMilestone.id, doc.milestoneId))
       }
 
       try {

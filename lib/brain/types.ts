@@ -1,4 +1,4 @@
-import type { BrainSource } from "@prisma/client"
+import type { BrainSource } from "@/lib/db"
 
 /** A normalized item pulled from any source, before enrichment/embedding. */
 export interface RawDoc {

@@ -1,4 +1,4 @@
-import type { BrainSource } from "@prisma/client"
+import type { BrainSource } from "@/lib/db"
 import { extractFromBuffer, isSupportedFile } from "../extract"
 import type { Connector, ConnectorResult, RawDoc } from "../types"
 

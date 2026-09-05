@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { motion, AnimatePresence, type Variants } from "motion/react"
 import { OpenInNew, GitHub, Circle, ArrowForward } from "@mui/icons-material"
-import type { Project, CaseStudy } from "@prisma/client"
+import type { Project, CaseStudy } from "@/lib/db"
 
 const container: Variants = {
   hidden: {},

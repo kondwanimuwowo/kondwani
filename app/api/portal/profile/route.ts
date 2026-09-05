@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { prisma } from "@/lib/prisma"
+import { db, client as clientTable } from "@/lib/db"
+import { eq } from "drizzle-orm"
 
 export async function GET() {
   try {
@@ -12,22 +13,20 @@ export async function GET() {
     }
 
     // Try to find client by Supabase User ID
-    let client = await prisma.client.findUnique({
-      where: { userId: user.id },
+    let client = await db.query.client.findFirst({
+      where: (t, { eq }) => eq(t.userId, user.id),
     })
 
     // If not found, check if there is a client with this email that hasn't been linked yet
     if (!client && user.email) {
-      const existingClient = await prisma.client.findUnique({
-        where: { email: user.email },
+      const existingClient = await db.query.client.findFirst({
+        where: (t, { eq }) => eq(t.email, user.email!),
       })
 
       if (existingClient && !existingClient.userId) {
         // Link client to this user id
-        client = await prisma.client.update({
-          where: { id: existingClient.id },
-          data: { userId: user.id },
-        })
+        const [updated] = await db.update(clientTable).set({ userId: user.id }).where(eq(clientTable.id, existingClient.id)).returning()
+        client = updated
       }
     }
 

@@ -3,7 +3,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { ArrowBack } from "@mui/icons-material"
-import { prisma } from "@/lib/prisma"
+import { db } from "@/lib/db"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -14,7 +14,7 @@ export const revalidate = 300
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   try {
-    const post = await prisma.blogPost.findUnique({ where: { slug, published: true } })
+    const post = await db.query.blogPost.findFirst({ where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)) })
     if (!post) return {}
     return {
       title: post.title,
@@ -38,7 +38,7 @@ export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
   let post
   try {
-    post = await prisma.blogPost.findUnique({ where: { slug, published: true } })
+    post = await db.query.blogPost.findFirst({ where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)) })
   } catch {
     notFound()
   }

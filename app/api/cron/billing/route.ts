@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, document, documentItem, retainerContract, billingMilestone } from "@/lib/db"
+import { and, eq, lt, lte } from "drizzle-orm"
 
 // Advance date helper by frequency
 function getNextBillingDate(current: Date, frequency: string): Date {
@@ -49,12 +50,9 @@ export async function GET(req: Request) {
     // ──────────────────────────────────────────────────────────────────────────
     // 1. Process Due Retainer Contracts
     // ──────────────────────────────────────────────────────────────────────────
-    const dueRetainers = await prisma.retainerContract.findMany({
-      where: {
-        status: "active",
-        nextInvoiceAt: { lte: today },
-      },
-      include: { client: true },
+    const dueRetainers = await db.query.retainerContract.findMany({
+      where: (t, { eq, and, lte }) => and(eq(t.status, "active"), lte(t.nextInvoiceAt, today)),
+      with: { client: true },
     })
 
     for (const retainer of dueRetainers) {
@@ -65,8 +63,8 @@ export async function GET(req: Request) {
       dueDate.setDate(dueDate.getDate() + 14) // 14 days grace period for retainers
 
       // Create draft invoice
-      const invoice = await prisma.document.create({
-        data: {
+      await db.transaction(async (tx) => {
+        const [invoice] = await tx.insert(document).values({
           type: "invoice",
           number: invNumber,
           clientId: retainer.clientId,
@@ -77,15 +75,14 @@ export async function GET(req: Request) {
           dueDate,
           currency: retainer.currency,
           token,
-          items: {
-            create: {
-              description: `Recurring Service: ${retainer.title} (${retainer.frequency} retainer cycle)`,
-              quantity: 1,
-              rate: retainer.amount,
-              amount: retainer.amount,
-            },
-          },
-        },
+        }).returning()
+        await tx.insert(documentItem).values({
+          documentId: invoice.id,
+          description: `Recurring Service: ${retainer.title} (${retainer.frequency} retainer cycle)`,
+          quantity: 1,
+          rate: retainer.amount,
+          amount: retainer.amount,
+        })
       })
 
       // Email invoice link to client
@@ -133,13 +130,10 @@ export async function GET(req: Request) {
 
       // Advance nextInvoiceAt
       const nextDate = getNextBillingDate(retainer.nextInvoiceAt, retainer.frequency)
-      await prisma.retainerContract.update({
-        where: { id: retainer.id },
-        data: {
-          lastInvoicedAt: new Date(),
-          nextInvoiceAt: nextDate,
-        },
-      })
+      await db.update(retainerContract).set({
+        lastInvoicedAt: new Date(),
+        nextInvoiceAt: nextDate,
+      }).where(eq(retainerContract.id, retainer.id))
 
       stats.retainersInvoiced++
     }
@@ -147,14 +141,11 @@ export async function GET(req: Request) {
     // ──────────────────────────────────────────────────────────────────────────
     // 2. Process Billing Milestones Due
     // ──────────────────────────────────────────────────────────────────────────
-    const dueMilestones = await prisma.billingMilestone.findMany({
-      where: {
-        status: "pending",
-        dueDate: { lte: today },
-      },
-      include: {
+    const dueMilestones = await db.query.billingMilestone.findMany({
+      where: (t, { eq, and, lte }) => and(eq(t.status, "pending"), lte(t.dueDate, today)),
+      with: {
         project: {
-          include: { client: true },
+          with: { client: true },
         },
       },
     })
@@ -169,11 +160,11 @@ export async function GET(req: Request) {
       dueDate.setDate(dueDate.getDate() + 7) // 7 days payment grace period for project milestones
 
       // Create draft invoice
-      const invoice = await prisma.document.create({
-        data: {
+      await db.transaction(async (tx) => {
+        const [invoice] = await tx.insert(document).values({
           type: "invoice",
           number: invNumber,
-          clientId: milestone.project.clientId,
+          clientId: milestone.project.clientId!,
           projectId: milestone.projectId,
           milestoneId: milestone.id,
           status: "sent",
@@ -181,22 +172,18 @@ export async function GET(req: Request) {
           dueDate,
           currency: milestone.project.currency,
           token,
-          items: {
-            create: {
-              description: `Project Milestone Completion: ${milestone.title} (${milestone.percentage ? milestone.percentage + "%" : "Installment"})`,
-              quantity: 1,
-              rate: milestone.amount,
-              amount: milestone.amount,
-            },
-          },
-        },
+        }).returning()
+        await tx.insert(documentItem).values({
+          documentId: invoice.id,
+          description: `Project Milestone Completion: ${milestone.title} (${milestone.percentage ? milestone.percentage + "%" : "Installment"})`,
+          quantity: 1,
+          rate: milestone.amount,
+          amount: milestone.amount,
+        })
       })
 
       // Update milestone status to invoiced
-      await prisma.billingMilestone.update({
-        where: { id: milestone.id },
-        data: { status: "invoiced" },
-      })
+      await db.update(billingMilestone).set({ status: "invoiced" }).where(eq(billingMilestone.id, milestone.id))
 
       const client = milestone.project.client
 
@@ -252,13 +239,9 @@ export async function GET(req: Request) {
     // ──────────────────────────────────────────────────────────────────────────
     // 3. Process Overdue Reminders
     // ──────────────────────────────────────────────────────────────────────────
-    const overdueInvoices = await prisma.document.findMany({
-      where: {
-        status: "sent",
-        type: "invoice",
-        dueDate: { lt: today },
-      },
-      include: { client: true, items: true },
+    const overdueInvoices = await db.query.document.findMany({
+      where: (t, { eq, and, lt }) => and(eq(t.status, "sent"), eq(t.type, "invoice"), lt(t.dueDate, today)),
+      with: { client: true, items: true },
     })
 
     for (const inv of overdueInvoices) {

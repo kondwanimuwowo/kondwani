@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, pageView } from "@/lib/db"
 
 export async function POST(request: Request) {
   try {
@@ -7,9 +7,10 @@ export async function POST(request: Request) {
     if (!path || typeof path !== "string") {
       return NextResponse.json({ ok: false }, { status: 400 })
     }
-    await prisma.pageView.create({ data: { path, referrer: referrer ?? null } })
+    await db.insert(pageView).values({ path, referrer: referrer ?? null })
     return NextResponse.json({ ok: true })
-  } catch {
+  } catch (err) {
+    console.error("analytics route error:", err)
     return NextResponse.json({ ok: false }, { status: 500 })
   }
 }

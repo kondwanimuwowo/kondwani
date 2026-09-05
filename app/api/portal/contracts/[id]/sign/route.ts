@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { prisma } from "@/lib/prisma"
+import { db, contract as contractTable } from "@/lib/db"
+import { eq } from "drizzle-orm"
 
 export async function POST(
   req: Request,
@@ -27,19 +28,16 @@ export async function POST(
     }
 
     // Verify client and contract ownership
-    const client = await prisma.client.findUnique({
-      where: { userId: user.id },
+    const client = await db.query.client.findFirst({
+      where: (t, { eq }) => eq(t.userId, user.id),
     })
 
     if (!client) {
       return NextResponse.json({ error: "Client profile not found" }, { status: 404 })
     }
 
-    const contract = await prisma.contract.findFirst({
-      where: {
-        id: contractId,
-        clientId: client.id,
-      },
+    const contract = await db.query.contract.findFirst({
+      where: (t, { eq, and }) => and(eq(t.id, contractId), eq(t.clientId, client.id)),
     })
 
     if (!contract) {
@@ -53,16 +51,13 @@ export async function POST(
     // Extract IP address from request headers
     const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "127.0.0.1"
 
-    const signedContract = await prisma.contract.update({
-      where: { id: contractId },
-      data: {
-        status: "signed",
-        signedAt: new Date(),
-        signatureName,
-        signatureEmail,
-        signatureIp: ip,
-      },
-    })
+    const [signedContract] = await db.update(contractTable).set({
+      status: "signed",
+      signedAt: new Date(),
+      signatureName,
+      signatureEmail,
+      signatureIp: ip,
+    }).where(eq(contractTable.id, contractId)).returning()
 
     // Notify developer and client via Resend (non-blocking)
     try {

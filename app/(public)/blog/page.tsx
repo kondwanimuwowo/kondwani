@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import Image from "next/image"
-import { prisma } from "@/lib/prisma"
+import { db, blogPost } from "@/lib/db"
+import { desc, eq } from "drizzle-orm"
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -28,11 +29,19 @@ type PostSummary = {
 
 async function getPosts(): Promise<PostSummary[]> {
   try {
-    return await prisma.blogPost.findMany({
-      where: { published: true },
-      orderBy: { publishedAt: "desc" },
-      select: { id: true, title: true, slug: true, excerpt: true, coverImage: true, tags: true, publishedAt: true },
-    })
+    return await db
+      .select({
+        id: blogPost.id,
+        title: blogPost.title,
+        slug: blogPost.slug,
+        excerpt: blogPost.excerpt,
+        coverImage: blogPost.coverImage,
+        tags: blogPost.tags,
+        publishedAt: blogPost.publishedAt,
+      })
+      .from(blogPost)
+      .where(eq(blogPost.published, true))
+      .orderBy(desc(blogPost.publishedAt))
   } catch {
     return []
   }

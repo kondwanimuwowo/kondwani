@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { prisma } from "@/lib/prisma"
+import { db } from "@/lib/db"
 import { PrintButton } from "./PrintButton"
 import { PaymentWidget } from "./PaymentWidget"
 
@@ -12,7 +12,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { token } = await params
-  const doc = await prisma.document.findUnique({ where: { token }, select: { number: true, type: true } })
+  const doc = await db.query.document.findFirst({ where: (t, { eq }) => eq(t.token, token), columns: { number: true, type: true } })
   if (!doc) return {}
   return {
     title: `${doc.number} — Kondwani Muwowo`,
@@ -22,11 +22,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PublicDocumentPage({ params }: Props) {
   const { token } = await params
-  const doc = await prisma.document.findUnique({
-    where: { token },
-    include: {
+  const doc = await db.query.document.findFirst({
+    where: (t, { eq }) => eq(t.token, token),
+    with: {
       client: true,
-      items: { orderBy: { position: "asc" } },
+      items: { orderBy: (t, { asc }) => asc(t.position) },
     },
   })
   if (!doc) return notFound()

@@ -1,5 +1,6 @@
-import type { BrainSource } from "@prisma/client"
-import { prisma } from "@/lib/prisma"
+import type { BrainSource } from "@/lib/db"
+import { db, brainSource } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { extractFromBuffer, htmlToPlainText, isSupportedFile } from "../extract"
 import type { Connector, ConnectorResult, RawDoc } from "../types"
 
@@ -67,10 +68,7 @@ async function getAccessToken(source: BrainSource): Promise<string> {
 
   // Microsoft rotates refresh tokens — persist the new one immediately.
   if (data.refresh_token && data.refresh_token !== creds.refreshToken) {
-    await prisma.brainSource.update({
-      where: { id: source.id },
-      data: { credentials: { refreshToken: data.refresh_token } },
-    })
+    await db.update(brainSource).set({ credentials: { refreshToken: data.refresh_token } }).where(eq(brainSource.id, source.id))
   }
   return data.access_token
 }

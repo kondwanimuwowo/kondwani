@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, document } from "@/lib/db"
+import { eq } from "drizzle-orm"
 
 // Constant exchange rate for USD to ZMW mobile money billing
 const USD_TO_ZMW_RATE = 26.5
@@ -17,9 +18,9 @@ export async function POST(req: Request) {
     }
 
     // Retrieve invoice by token
-    const doc = await prisma.document.findUnique({
-      where: { token },
-      include: { items: true, client: true },
+    const doc = await db.query.document.findFirst({
+      where: (t, { eq }) => eq(t.token, token),
+      with: { items: true, client: true },
     })
 
     if (!doc) {
@@ -57,10 +58,7 @@ export async function POST(req: Request) {
     const paymentRef = `pay_${doc.id.substring(0, 8)}_${timestamp}`
 
     // Update document with payment reference
-    await prisma.document.update({
-      where: { id: doc.id },
-      data: { paymentRef },
-    })
+    await db.update(document).set({ paymentRef }).where(eq(document.id, doc.id))
 
     if (!process.env.LENCO_API_KEY) {
       return NextResponse.json({

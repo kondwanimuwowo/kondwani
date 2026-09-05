@@ -4,7 +4,8 @@
 // Stores the refresh token on the BrainSource row.
 import "dotenv/config"
 import { createServer } from "node:http"
-import { prisma } from "@/lib/prisma"
+import { db, brainSource } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { googleConnector, GOOGLE_SCOPES } from "@/lib/brain/connectors/google"
 import { getOrCreateSource } from "@/lib/brain/sync"
 
@@ -70,10 +71,11 @@ async function main() {
   if (!data.refresh_token) throw new Error("no refresh_token returned — remove the app's prior grant and retry")
 
   const source = await getOrCreateSource(googleConnector)
-  await prisma.brainSource.update({
-    where: { id: source.id },
-    data: { credentials: { refreshToken: data.refresh_token }, status: "connected", lastError: null },
-  })
+  await db.update(brainSource).set({
+    credentials: { refreshToken: data.refresh_token },
+    status: "connected",
+    lastError: null,
+  }).where(eq(brainSource.id, source.id))
   console.log("Google account connected. Run: npm run brain:sync -- google")
   process.exit(0)
 }

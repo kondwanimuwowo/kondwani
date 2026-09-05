@@ -3,7 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { OpenInNew, GitHub, ArrowBack, CheckCircle } from "@mui/icons-material"
-import { prisma } from "@/lib/prisma"
+import { db } from "@/lib/db"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -14,7 +14,7 @@ export const revalidate = 3600
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   try {
-    const cs = await prisma.caseStudy.findUnique({ where: { slug, published: true } })
+    const cs = await db.query.caseStudy.findFirst({ where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)) })
     if (!cs) return {}
     return {
       title: cs.title,
@@ -36,7 +36,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
   const { slug } = await params
   let cs
   try {
-    cs = await prisma.caseStudy.findUnique({ where: { slug, published: true } })
+    cs = await db.query.caseStudy.findFirst({ where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)) })
   } catch {
     notFound()
   }

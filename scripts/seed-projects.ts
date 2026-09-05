@@ -1,12 +1,13 @@
-import { PrismaClient } from "@prisma/client"
-import { PrismaPg } from "@prisma/adapter-pg"
+import { drizzle } from "drizzle-orm/node-postgres"
+import { Pool } from "pg"
 import * as dotenv from "dotenv"
+import { project } from "../lib/db/schema"
 
 dotenv.config({ path: ".env" })
 
 const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL!
-const adapter = new PrismaPg({ connectionString })
-const prisma = new PrismaClient({ adapter })
+const pool = new Pool({ connectionString })
+const db = drizzle(pool)
 
 const projects = [
   {
@@ -201,13 +202,9 @@ const projects = [
 async function main() {
   console.log("Seeding projects...")
 
-  for (const project of projects) {
-    await prisma.project.upsert({
-      where: { slug: project.slug },
-      update: project,
-      create: project,
-    })
-    console.log(`✓ ${project.title}`)
+  for (const p of projects) {
+    await db.insert(project).values(p).onConflictDoUpdate({ target: project.slug, set: p })
+    console.log(`✓ ${p.title}`)
   }
 
   console.log(`\nDone — ${projects.length} projects seeded.`)
@@ -215,4 +212,4 @@ async function main() {
 
 main()
   .catch(e => { console.error(e); process.exit(1) })
-  .finally(() => prisma.$disconnect())
+  .finally(() => pool.end())

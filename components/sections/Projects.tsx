@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { motion, type Variants } from "motion/react"
 import { OpenInNew, GitHub, Circle } from "@mui/icons-material"
-import type { Project } from "@prisma/client"
+import type { Project } from "@/lib/db"
 import { useReveal } from "@/hooks/useReveal"
 import { PillLink } from "@/components/ui/PillLink"
 

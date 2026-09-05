@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto"
 import { promises as fs } from "node:fs"
 import path from "node:path"
-import type { BrainSource } from "@prisma/client"
-import { prisma } from "@/lib/prisma"
+import type { BrainSource } from "@/lib/db"
+import { db, brainDocument } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { extractFromBuffer, isSupportedFile } from "../extract"
 import type { Connector, ConnectorResult, RawDoc } from "../types"
 import type { SyncSummary } from "../sync"
@@ -65,9 +66,9 @@ export const localConnector: Connector = {
 export async function organizeInbox(summary: SyncSummary): Promise<string[]> {
   const moved: string[] = []
   for (const result of summary.results) {
-    const doc = await prisma.brainDocument.findUnique({
-      where: { id: result.documentId },
-      select: { id: true, category: true, metadata: true },
+    const doc = await db.query.brainDocument.findFirst({
+      where: (t, { eq }) => eq(t.id, result.documentId),
+      columns: { id: true, category: true, metadata: true },
     })
     const meta = (doc?.metadata ?? {}) as { filename?: string; inboxPath?: string; size?: number }
     if (!doc || !meta.inboxPath) continue
@@ -84,13 +85,10 @@ export async function organizeInbox(summary: SyncSummary): Promise<string[]> {
     }
 
     const relative = path.relative(process.cwd(), target).split(path.sep).join("/")
-    await prisma.brainDocument.update({
-      where: { id: doc.id },
-      data: {
-        path: relative,
-        metadata: { ...meta, inboxPath: undefined, vaultPath: relative },
-      },
-    })
+    await db.update(brainDocument).set({
+      path: relative,
+      metadata: { ...meta, inboxPath: undefined, vaultPath: relative },
+    }).where(eq(brainDocument.id, doc.id))
     moved.push(`${meta.filename} → ${relative}`)
   }
   return moved

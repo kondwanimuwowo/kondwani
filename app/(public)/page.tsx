@@ -5,7 +5,7 @@ import { Skills } from "@/components/sections/Skills"
 import { Projects } from "@/components/sections/Projects"
 import { BeyondCode } from "@/components/sections/BeyondCode"
 import { Contact } from "@/components/sections/Contact"
-import { prisma } from "@/lib/prisma"
+import { db } from "@/lib/db"
 import { skillCategories, techPills } from "@/data/skills"
 
 export const metadata: Metadata = {
@@ -66,11 +66,11 @@ const faqJsonLd = {
 
 async function getHomeData() {
   const [skillsConfig, featuredProjects] = await Promise.all([
-    prisma.siteConfig.findUnique({ where: { key: "skills" } }).catch(() => null),
-    prisma.project.findMany({
-      where: { published: true, featured: true },
-      orderBy: { order: "asc" },
-      take: 3,
+    db.query.siteConfig.findFirst({ where: (t, { eq }) => eq(t.key, "skills") }).catch(() => null),
+    db.query.project.findMany({
+      where: (t, { eq, and }) => and(eq(t.published, true), eq(t.featured, true)),
+      orderBy: (t, { asc }) => asc(t.order),
+      limit: 3,
     }).catch(() => []),
   ])
   const skillsData = skillsConfig ? JSON.parse(skillsConfig.value) : { skillCategories, techPills }

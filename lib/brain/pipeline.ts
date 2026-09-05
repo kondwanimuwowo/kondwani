@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto"
-import { Prisma } from "@prisma/client"
-import { prisma } from "@/lib/prisma"
+import { and, eq, inArray } from "drizzle-orm"
+import { db, brainChunk, brainDocument } from "@/lib/db"
 import { embedTexts, enrichDocument } from "./ai"
 import { chunkText } from "./chunk"
 import type { RawDoc } from "./types"
@@ -28,16 +28,18 @@ export async function upsertRawDoc(sourceId: string, raw: RawDoc): Promise<Upser
   const content = raw.content.slice(0, MAX_CONTENT_CHARS).trim()
   const contentHash = hashContent(content)
 
-  const existing = await prisma.brainDocument.findUnique({
-    where: { sourceId_externalId: { sourceId, externalId: raw.externalId } },
-    select: { id: true, contentHash: true, category: true },
+  const existing = await db.query.brainDocument.findFirst({
+    where: (t, { eq, and }) => and(eq(t.sourceId, sourceId), eq(t.externalId, raw.externalId)),
+    columns: { id: true, contentHash: true, category: true },
   })
 
   if (existing && existing.contentHash === contentHash) {
-    await prisma.brainDocument.update({
-      where: { id: existing.id },
-      data: { syncedAt: new Date(), title: raw.title, sourceUrl: raw.sourceUrl, path: raw.path },
-    })
+    await db.update(brainDocument).set({
+      syncedAt: new Date(),
+      title: raw.title,
+      sourceUrl: raw.sourceUrl,
+      path: raw.path,
+    }).where(eq(brainDocument.id, existing.id))
     return { outcome: "unchanged", documentId: existing.id, externalId: raw.externalId, category: existing.category }
   }
 
@@ -53,15 +55,17 @@ export async function upsertRawDoc(sourceId: string, raw: RawDoc): Promise<Upser
 
   const doc = await saveDocument(sourceId, raw, content, contentHash, enrichment)
 
-  // Replace chunks atomically; embeddings need raw SQL because Prisma can't
-  // write Unsupported("vector") columns.
-  await prisma.$transaction(async (tx) => {
-    await tx.brainChunk.deleteMany({ where: { documentId: doc.id } })
+  // Replace chunks atomically.
+  await db.transaction(async (tx) => {
+    await tx.delete(brainChunk).where(eq(brainChunk.documentId, doc.id))
     for (let i = 0; i < chunks.length; i++) {
-      await tx.$executeRaw`
-        INSERT INTO "BrainChunk" ("id", "documentId", "index", "text", "tokenCount", "embedding")
-        VALUES (${cuidLike()}, ${doc.id}, ${chunks[i].index}, ${chunks[i].text}, ${chunks[i].tokenCount},
-                ${JSON.stringify(embeddings[i])}::vector)`
+      await tx.insert(brainChunk).values({
+        documentId: doc.id,
+        index: chunks[i].index,
+        text: chunks[i].text,
+        tokenCount: chunks[i].tokenCount,
+        embedding: embeddings[i],
+      })
     }
   })
 
@@ -83,29 +87,24 @@ async function saveDocument(
     path: raw.path,
     content,
     contentHash,
-    metadata: (raw.metadata ?? undefined) as Prisma.InputJsonValue | undefined,
+    metadata: raw.metadata ?? undefined,
     sourceModifiedAt: raw.sourceModifiedAt,
     syncedAt: new Date(),
     ...(enrichment
       ? { summary: enrichment.summary, tags: enrichment.tags, category: enrichment.category }
       : {}),
   }
-  return prisma.brainDocument.upsert({
-    where: { sourceId_externalId: { sourceId, externalId: raw.externalId } },
-    create: { sourceId, externalId: raw.externalId, ...data },
-    update: data,
-  })
+  const [doc] = await db.insert(brainDocument)
+    .values({ sourceId, externalId: raw.externalId, ...data })
+    .onConflictDoUpdate({ target: [brainDocument.sourceId, brainDocument.externalId], set: data })
+    .returning()
+  return doc
 }
 
 export async function removeDocuments(sourceId: string, externalIds: string[]): Promise<number> {
   if (externalIds.length === 0) return 0
-  const res = await prisma.brainDocument.deleteMany({
-    where: { sourceId, externalId: { in: externalIds } },
-  })
-  return res.count
-}
-
-/** Prisma's cuid() default doesn't apply on raw inserts — generate a compatible id. */
-function cuidLike(): string {
-  return "c" + createHash("sha1").update(`${Date.now()}${Math.random()}`).digest("hex").slice(0, 23)
+  const res = await db.delete(brainDocument)
+    .where(and(eq(brainDocument.sourceId, sourceId), inArray(brainDocument.externalId, externalIds)))
+    .returning({ id: brainDocument.id })
+  return res.length
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { prisma } from "@/lib/prisma"
+import { db } from "@/lib/db"
 
 export async function GET() {
   try {
@@ -12,8 +12,8 @@ export async function GET() {
     }
 
     // Find the client linked to this user
-    const client = await prisma.client.findUnique({
-      where: { userId: user.id },
+    const client = await db.query.client.findFirst({
+      where: (t, { eq }) => eq(t.userId, user.id),
     })
 
     if (!client) {
@@ -23,43 +23,43 @@ export async function GET() {
     const clientId = client.id
 
     // Fetch projects with their tasks and milestones
-    const projects = await prisma.workProject.findMany({
-      where: { clientId },
-      include: {
+    const projects = await db.query.workProject.findMany({
+      where: (t, { eq }) => eq(t.clientId, clientId),
+      with: {
         tasks: {
-          orderBy: { position: "asc" },
+          orderBy: (t, { asc }) => asc(t.position),
         },
         milestones: {
-          orderBy: { position: "asc" },
-          include: {
+          orderBy: (t, { asc }) => asc(t.position),
+          with: {
             invoice: true,
           },
         },
       },
-      orderBy: { updatedAt: "desc" },
+      orderBy: (t, { desc }) => desc(t.updatedAt),
     })
 
     // Fetch documents (invoices, proposals, etc.)
-    const documents = await prisma.document.findMany({
-      where: { clientId },
-      include: {
+    const documents = await db.query.document.findMany({
+      where: (t, { eq }) => eq(t.clientId, clientId),
+      with: {
         items: {
-          orderBy: { position: "asc" },
+          orderBy: (t, { asc }) => asc(t.position),
         },
       },
-      orderBy: { issueDate: "desc" },
+      orderBy: (t, { desc }) => desc(t.issueDate),
     })
 
     // Fetch contracts
-    const contracts = await prisma.contract.findMany({
-      where: { clientId },
-      orderBy: { updatedAt: "desc" },
+    const contracts = await db.query.contract.findMany({
+      where: (t, { eq }) => eq(t.clientId, clientId),
+      orderBy: (t, { desc }) => desc(t.updatedAt),
     })
 
     // Fetch retainers
-    const retainers = await prisma.retainerContract.findMany({
-      where: { clientId },
-      orderBy: { startDate: "desc" },
+    const retainers = await db.query.retainerContract.findMany({
+      where: (t, { eq }) => eq(t.clientId, clientId),
+      orderBy: (t, { desc }) => desc(t.startDate),
     })
 
     return NextResponse.json({

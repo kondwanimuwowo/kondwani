@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, document } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { r2, R2_BUCKET, R2_PUBLIC_URL } from "@/lib/r2"
 import { PutObjectCommand } from "@aws-sdk/client-s3"
 
@@ -17,9 +18,9 @@ export async function POST(
     }
 
     // Find the invoice first
-    const doc = await prisma.document.findUnique({
-      where: { token },
-      include: { client: true },
+    const doc = await db.query.document.findFirst({
+      where: (t, { eq }) => eq(t.token, token),
+      with: { client: true },
     })
 
     if (!doc) {
@@ -57,14 +58,11 @@ export async function POST(
     // Update document status to review and add receipt url to notes or save as PDF URL/payment reference
     const updatedNotes = `${doc.notes || ""}\n\n[System Alert] Client uploaded a bank transfer receipt: ${fileUrl}`
     
-    await prisma.document.update({
-      where: { id: doc.id },
-      data: {
-        status: "review",
-        notes: updatedNotes,
-        pdfUrl: fileUrl, // Store upload URL in pdfUrl for simple tracking
-      },
-    })
+    await db.update(document).set({
+      status: "review",
+      notes: updatedNotes,
+      pdfUrl: fileUrl, // Store upload URL in pdfUrl for simple tracking
+    }).where(eq(document.id, doc.id))
 
     // Notify developer via Resend
     try {

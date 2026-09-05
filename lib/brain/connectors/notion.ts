@@ -1,6 +1,6 @@
 import { Client } from "@notionhq/client"
 import { NotionToMarkdown } from "notion-to-md"
-import type { BrainSource } from "@prisma/client"
+import type { BrainSource } from "@/lib/db"
 import type { Connector, ConnectorResult, RawDoc } from "../types"
 
 interface NotionCursor {

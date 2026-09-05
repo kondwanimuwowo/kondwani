@@ -2,7 +2,8 @@
 //   npm run brain:auth:ms
 // Stores the refresh token on the BrainSource row; syncs renew it silently.
 import "dotenv/config"
-import { prisma } from "@/lib/prisma"
+import { db, brainSource } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { microsoftConnector, MS_SCOPES } from "@/lib/brain/connectors/microsoft"
 import { getOrCreateSource } from "@/lib/brain/sync"
 
@@ -54,10 +55,11 @@ async function main() {
     if (!data.refresh_token) throw new Error("no refresh_token returned — is the app a public client with offline_access?")
 
     const source = await getOrCreateSource(microsoftConnector)
-    await prisma.brainSource.update({
-      where: { id: source.id },
-      data: { credentials: { refreshToken: data.refresh_token }, status: "connected", lastError: null },
-    })
+    await db.update(brainSource).set({
+      credentials: { refreshToken: data.refresh_token },
+      status: "connected",
+      lastError: null,
+    }).where(eq(brainSource.id, source.id))
     console.log("Microsoft account connected. Run: npm run brain:sync -- microsoft")
     process.exit(0)
   }

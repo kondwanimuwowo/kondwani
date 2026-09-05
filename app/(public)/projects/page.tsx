@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { ProjectsAndCaseStudies } from "@/components/sections/ProjectsAndCaseStudies"
-import { prisma } from "@/lib/prisma"
+import { db } from "@/lib/db"
 
 export const revalidate = 300
 
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 
 export default async function ProjectsPage() {
   const [projects, caseStudies] = await Promise.all([
-    prisma.project.findMany({ where: { published: true }, orderBy: { order: "asc" } }),
-    prisma.caseStudy.findMany({ where: { published: true }, orderBy: { order: "asc" } }),
+    db.query.project.findMany({ where: (t, { eq }) => eq(t.published, true), orderBy: (t, { asc }) => asc(t.order) }),
+    db.query.caseStudy.findMany({ where: (t, { eq }) => eq(t.published, true), orderBy: (t, { asc }) => asc(t.order) }),
   ])
 
   return (

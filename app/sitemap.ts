@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next"
-import { prisma } from "@/lib/prisma"
+import { db, project, caseStudy, blogPost } from "@/lib/db"
+import { and, eq, isNotNull } from "drizzle-orm"
 
 const BASE_URL = "https://kondwanimuwowo.com"
 
@@ -17,10 +18,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let blogRoutes: MetadataRoute.Sitemap = []
 
   try {
-    const projects = await prisma.project.findMany({
-      where: { published: true, slug: { not: null } },
-      select: { slug: true, updatedAt: true },
-    })
+    const projects = await db
+      .select({ slug: project.slug, updatedAt: project.updatedAt })
+      .from(project)
+      .where(and(eq(project.published, true), isNotNull(project.slug)))
     projectRoutes = projects
       .filter((p) => p.slug)
       .map((p) => ({
@@ -32,10 +33,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } catch {}
 
   try {
-    const caseStudies = await prisma.caseStudy.findMany({
-      where: { published: true },
-      select: { slug: true, updatedAt: true },
-    })
+    const caseStudies = await db
+      .select({ slug: caseStudy.slug, updatedAt: caseStudy.updatedAt })
+      .from(caseStudy)
+      .where(eq(caseStudy.published, true))
     caseStudyRoutes = caseStudies.map((cs) => ({
       url: `${BASE_URL}/case-studies/${cs.slug}`,
       lastModified: cs.updatedAt,
@@ -45,10 +46,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } catch {}
 
   try {
-    const posts = await prisma.blogPost.findMany({
-      where: { published: true },
-      select: { slug: true, updatedAt: true },
-    })
+    const posts = await db
+      .select({ slug: blogPost.slug, updatedAt: blogPost.updatedAt })
+      .from(blogPost)
+      .where(eq(blogPost.published, true))
     blogRoutes = posts.map((post) => ({
       url: `${BASE_URL}/blog/${post.slug}`,
       lastModified: post.updatedAt,

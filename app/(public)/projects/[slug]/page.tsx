@@ -3,7 +3,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { OpenInNew, GitHub, ArrowBack } from "@mui/icons-material"
-import { prisma } from "@/lib/prisma"
+import { db, project } from "@/lib/db"
+import { and, eq, isNotNull } from "drizzle-orm"
 
 export const revalidate = 3600
 
@@ -12,47 +13,47 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const projects = await prisma.project.findMany({
-    where: { published: true, slug: { not: null } },
-    select: { slug: true },
-  })
+  const projects = await db
+    .select({ slug: project.slug })
+    .from(project)
+    .where(and(eq(project.published, true), isNotNull(project.slug)))
   return projects.map((p) => ({ slug: p.slug as string }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const project = await prisma.project.findUnique({ where: { slug } })
-  if (!project) return {}
+  const proj = await db.query.project.findFirst({ where: (t, { eq }) => eq(t.slug, slug) })
+  if (!proj) return {}
   return {
-    title: project.title,
-    description: project.excerpt ?? project.description,
+    title: proj.title,
+    description: proj.excerpt ?? proj.description,
     alternates: { canonical: `/projects/${slug}` },
     openGraph: {
-      title: `${project.title} — Kondwani Muwowo`,
-      description: project.excerpt ?? project.description,
+      title: `${proj.title} — Kondwani Muwowo`,
+      description: proj.excerpt ?? proj.description,
       url: `/projects/${slug}`,
-      images: project.imageUrl ? [{ url: project.imageUrl }] : [],
+      images: proj.imageUrl ? [{ url: proj.imageUrl }] : [],
     },
   }
 }
 
 export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params
-  const project = await prisma.project.findUnique({ where: { slug, published: true } })
-  if (!project) notFound()
+  const proj = await db.query.project.findFirst({ where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)) })
+  if (!proj) notFound()
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: project.title,
-    description: project.excerpt ?? project.description,
+    name: proj.title,
+    description: proj.excerpt ?? proj.description,
     applicationCategory: "WebApplication",
     author: {
       "@type": "Person",
       name: "Kondwani Muwowo",
       url: "https://kondwanimuwowo.com",
     },
-    url: project.liveUrl,
+    url: proj.liveUrl,
     operatingSystem: "Web",
   }
 
@@ -62,10 +63,10 @@ export default async function ProjectDetailPage({ params }: Props) {
       <main className="min-h-screen bg-background pt-24 pb-20">
         {/* Cover image */}
         <div className="relative h-64 md:h-96 bg-surface overflow-hidden">
-          {project.imageUrl ? (
+          {proj.imageUrl ? (
             <Image
-              src={project.imageUrl}
-              alt={`${project.title} — built by Kondwani Muwowo using ${project.tech.join(", ")}`}
+              src={proj.imageUrl}
+              alt={`${proj.title} — built by Kondwani Muwowo using ${proj.tech.join(", ")}`}
               fill
               className="object-cover"
               priority
@@ -84,7 +85,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             <span>/</span>
             <Link href="/projects" className="hover:text-primary transition-colors">Projects</Link>
             <span>/</span>
-            <span className="text-foreground">{project.title}</span>
+            <span className="text-foreground">{proj.title}</span>
           </nav>
 
           {/* Header card */}
@@ -93,27 +94,27 @@ export default async function ProjectDetailPage({ params }: Props) {
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">
                   <span className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary/8 px-3 py-1 rounded-full">
-                    {project.category}
+                    {proj.category}
                   </span>
-                  {project.status && (
+                  {proj.status && (
                     <span className="text-[10px] font-bold tracking-widest uppercase text-muted bg-surface border border-border px-3 py-1 rounded-full">
-                      {project.status}
+                      {proj.status}
                     </span>
                   )}
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-foreground">{project.title}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-foreground">{proj.title}</h1>
               </div>
 
               {/* Action buttons */}
               <div className="flex flex-wrap gap-3 shrink-0">
-                {project.liveUrl && (
-                  <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
+                {proj.liveUrl && (
+                  <a href={proj.liveUrl} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors">
                     Live Demo <OpenInNew sx={{ fontSize: 16 }} />
                   </a>
                 )}
-                {project.githubUrl && (
-                  <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"
+                {proj.githubUrl && (
+                  <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 border border-border text-foreground px-5 py-2.5 rounded-full text-sm font-medium hover:border-primary hover:text-primary transition-colors">
                     <GitHub sx={{ fontSize: 16 }} /> Code
                   </a>
@@ -123,8 +124,8 @@ export default async function ProjectDetailPage({ params }: Props) {
 
             {/* Meta row */}
             <div className="flex flex-wrap gap-6 text-sm text-muted border-t border-border pt-5">
-              {project.year && <span><span className="font-medium text-foreground">Year</span> · {project.year}</span>}
-              {project.role && <span><span className="font-medium text-foreground">Role</span> · {project.role}</span>}
+              {proj.year && <span><span className="font-medium text-foreground">Year</span> · {proj.year}</span>}
+              {proj.role && <span><span className="font-medium text-foreground">Role</span> · {proj.role}</span>}
             </div>
           </div>
 
@@ -133,7 +134,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-white border border-border rounded-2xl p-8 shadow-sm">
                 <h2 className="text-lg font-bold text-foreground mb-4">About This Project</h2>
-                <p className="text-muted leading-relaxed">{project.description}</p>
+                <p className="text-muted leading-relaxed">{proj.description}</p>
               </div>
             </div>
 
@@ -142,7 +143,7 @@ export default async function ProjectDetailPage({ params }: Props) {
               <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
                 <h3 className="text-sm font-bold text-foreground mb-4 tracking-wide uppercase">Tech Stack</h3>
                 <div className="flex flex-wrap gap-2">
-                  {project.tech.map((t) => (
+                  {proj.tech.map((t) => (
                     <span key={t} className="text-xs font-medium bg-surface border border-border text-foreground/70 px-3 py-1.5 rounded-full">
                       {t}
                     </span>

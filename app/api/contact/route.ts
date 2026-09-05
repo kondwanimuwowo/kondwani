@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod/v4"
 import { Resend } from "resend"
-import { prisma } from "@/lib/prisma"
+import { db, contactSubmission } from "@/lib/db"
 
 const schema = z.object({
   name: z.string().min(2),
@@ -28,9 +28,7 @@ export async function POST(request: Request) {
     }
 
     // Save to database
-    await prisma.contactSubmission.create({
-      data: { name, email, subject, message },
-    })
+    await db.insert(contactSubmission).values({ name, email, subject, message })
 
     // Send email — failure is non-fatal; submission is already persisted
     try {

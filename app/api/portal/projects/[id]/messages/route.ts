@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { prisma } from "@/lib/prisma"
+import { db, projectMessage } from "@/lib/db"
 
 // Get messages for a specific project
 export async function GET(
@@ -18,28 +18,25 @@ export async function GET(
     const { id: projectId } = await params
 
     // Verify client and project ownership
-    const client = await prisma.client.findUnique({
-      where: { userId: user.id },
+    const client = await db.query.client.findFirst({
+      where: (t, { eq }) => eq(t.userId, user.id),
     })
 
     if (!client) {
       return NextResponse.json({ error: "Client profile not found" }, { status: 404 })
     }
 
-    const project = await prisma.workProject.findFirst({
-      where: {
-        id: projectId,
-        clientId: client.id,
-      },
+    const proj = await db.query.workProject.findFirst({
+      where: (t, { eq, and }) => and(eq(t.id, projectId), eq(t.clientId, client.id)),
     })
 
-    if (!project) {
+    if (!proj) {
       return NextResponse.json({ error: "Project not found or unauthorized" }, { status: 404 })
     }
 
-    const messages = await prisma.projectMessage.findMany({
-      where: { projectId },
-      orderBy: { createdAt: "asc" },
+    const messages = await db.query.projectMessage.findMany({
+      where: (t, { eq }) => eq(t.projectId, projectId),
+      orderBy: (t, { asc }) => asc(t.createdAt),
     })
 
     return NextResponse.json(messages)
@@ -70,37 +67,32 @@ export async function POST(
     }
 
     // Verify client and project ownership
-    const client = await prisma.client.findUnique({
-      where: { userId: user.id },
+    const client = await db.query.client.findFirst({
+      where: (t, { eq }) => eq(t.userId, user.id),
     })
 
     if (!client) {
       return NextResponse.json({ error: "Client profile not found" }, { status: 404 })
     }
 
-    const project = await prisma.workProject.findFirst({
-      where: {
-        id: projectId,
-        clientId: client.id,
-      },
+    const proj = await db.query.workProject.findFirst({
+      where: (t, { eq, and }) => and(eq(t.id, projectId), eq(t.clientId, client.id)),
     })
 
-    if (!project) {
+    if (!proj) {
       return NextResponse.json({ error: "Project not found or unauthorized" }, { status: 404 })
     }
 
     const name = client.name || user.user_metadata?.full_name || "Client"
 
-    const message = await prisma.projectMessage.create({
-      data: {
-        projectId,
-        senderId: user.id,
-        senderName: name,
-        senderRole: "client",
-        content: body.content,
-        attachments: body.attachments ?? [],
-      },
-    })
+    const [message] = await db.insert(projectMessage).values({
+      projectId,
+      senderId: user.id,
+      senderName: name,
+      senderRole: "client",
+      content: body.content,
+      attachments: body.attachments ?? [],
+    }).returning()
 
     // Notify the developer (non-blocking)
     try {
@@ -115,7 +107,7 @@ export async function POST(
         await resend.emails.send({
           from: `Kondwani Muwowo Studio <${fromEmail}>`,
           to: devEmail,
-          subject: `[Studio Chat] New client message on: ${project.title}`,
+          subject: `[Studio Chat] New client message on: ${proj.title}`,
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
               <h3 style="color: #1a1a1a;">New message from ${name} (${client.company ?? "No Company"})</h3>
