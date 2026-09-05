@@ -61,7 +61,7 @@ export default async function ContactsPage() {
                 {c.message}
               </p>
 
-              <div className="mt-4 pt-4 flex items-center justify-between">
+              <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
                 <a
                   href={`mailto:${c.email}`}
                   className="text-xs font-semibold text-primary hover:text-primary-hover transition-colors flex items-center gap-0.5"

@@ -96,7 +96,7 @@ export default function ClientsPage() {
     load()
   }
 
-  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
+  const inputCls = "w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
 
   return (
@@ -229,7 +229,7 @@ export default function ClientsPage() {
                 )}
               </div>
 
-              <div className="flex items-center justify-between pt-3">
+              <div className="flex items-center justify-between pt-3 border-t border-border">
                 <span className="text-[11px] text-muted">{c.currency}</span>
                 <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={() => openEdit(c)} className="text-xs font-medium text-muted hover:text-foreground transition-colors flex items-center gap-1">

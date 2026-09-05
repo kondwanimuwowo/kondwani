@@ -120,7 +120,7 @@ export default function JobsPage() {
                     value={form[field]}
                     onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
                     placeholder={field === "url" ? "https://" : ""}
-                    className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                    className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                 </div>
               ))}
@@ -130,7 +130,7 @@ export default function JobsPage() {
                   <select
                     value={form.status}
                     onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
-                    className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all capitalize"
+                    className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all capitalize"
                   >
                     {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
@@ -141,7 +141,7 @@ export default function JobsPage() {
                     type="date"
                     value={form.appliedAt}
                     onChange={e => setForm(f => ({ ...f, appliedAt: e.target.value }))}
-                    className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all"
+                    className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all"
                   />
                 </div>
               </div>
@@ -151,13 +151,13 @@ export default function JobsPage() {
                   value={form.notes}
                   onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all resize-none"
+                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all resize-none"
                 />
               </div>
             </div>
 
             {/* Sticky Modal Footer */}
-            <div className="px-6 py-4 shadow-[0_-1px_0_0_var(--color-border)] flex items-center gap-3 bg-surface flex-shrink-0">
+            <div className="px-6 py-4 border-t border-border flex items-center gap-3 bg-surface flex-shrink-0">
               <button
                 onClick={() => { setShowForm(false); setEditId(null); setForm({ company: "", role: "", status: "applied", appliedAt: new Date().toISOString().split("T")[0], notes: "", url: "" }) }}
                 className="flex-1 bg-white py-2 rounded-full text-sm font-semibold text-muted hover:bg-neutral-bg transition-colors"
@@ -183,7 +183,7 @@ export default function JobsPage() {
           <div className="overflow-x-auto scrollbar-thin">
             <table className="w-full">
               <thead>
-                <tr className="shadow-[0_1px_0_0_var(--color-border)] bg-surface">
+                <tr className="border-b border-border bg-surface">
                   <th className="text-left text-xs font-bold text-muted uppercase tracking-wider px-6 py-3.5">Company</th>
                   <th className="text-left text-xs font-bold text-muted uppercase tracking-wider px-4 py-3.5 hidden sm:table-cell">Role</th>
                   <th className="text-left text-xs font-bold text-muted uppercase tracking-wider px-4 py-3.5">Status</th>

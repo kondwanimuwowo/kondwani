@@ -1014,7 +1014,7 @@ export default function WorkDetailPage() {
                             value={newRetainerTitle}
                             onChange={e => setNewRetainerTitle(e.target.value)}
                             placeholder="e.g. Monthly Support Agreement"
-                            className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                            className="w-full mt-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                           />
                         </div>
                         <div>
@@ -1024,7 +1024,7 @@ export default function WorkDetailPage() {
                             value={newRetainerAmount}
                             onChange={e => setNewRetainerAmount(e.target.value === "" ? "" : parseFloat(e.target.value))}
                             placeholder="0.00"
-                            className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                            className="w-full mt-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                           />
                         </div>
                         <div>
@@ -1032,7 +1032,7 @@ export default function WorkDetailPage() {
                           <select
                             value={newRetainerFrequency}
                             onChange={e => setNewRetainerFrequency(e.target.value)}
-                            className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                            className="w-full mt-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                           >
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
@@ -1045,7 +1045,7 @@ export default function WorkDetailPage() {
                             type="date"
                             value={newRetainerStartDate}
                             onChange={e => setNewRetainerStartDate(e.target.value)}
-                            className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                            className="w-full mt-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                           />
                         </div>
                       </div>
@@ -1080,7 +1080,7 @@ export default function WorkDetailPage() {
                           value={newMilestoneTitle}
                           onChange={e => setNewMilestoneTitle(e.target.value)}
                           placeholder="Milestone Title (e.g. Initial Deposit, MVP Delivery)"
-                          className="w-full px-3 py-2 text-xs bg-surface rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint"
+                          className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint"
                         />
                       </div>
                       <div>
@@ -1095,7 +1095,7 @@ export default function WorkDetailPage() {
                             }
                           }}
                           placeholder={`Amount (${project.currency})`}
-                          className="w-full px-3 py-2 text-xs bg-surface rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint"
+                          className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint"
                         />
                       </div>
                       <div>
@@ -1103,7 +1103,7 @@ export default function WorkDetailPage() {
                           type="date"
                           value={newMilestoneDueDate}
                           onChange={e => setNewMilestoneDueDate(e.target.value)}
-                          className="w-full px-3 py-2 text-xs bg-surface rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint text-muted"
+                          className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint text-muted"
                         />
                       </div>
                       <div className="col-span-4 flex items-center justify-between pt-1">
@@ -1119,7 +1119,7 @@ export default function WorkDetailPage() {
                               }
                             }}
                             placeholder="Split %"
-                            className="w-16 px-2 py-1 text-[10px] bg-surface rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint"
+                            className="w-16 px-2 py-1 text-[10px] bg-surface border border-border rounded-3xl outline-none focus:ring-2 focus:ring-primary-tint"
                           />
                           <span className="text-[10px] text-muted font-medium">Split of project budget</span>
                         </div>
@@ -1218,7 +1218,7 @@ export default function WorkDetailPage() {
                       <select
                         value={selectedTemplate}
                         onChange={e => applyTemplate(e.target.value)}
-                        className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                        className="w-full mt-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                       >
                         <option value="">Choose a standard template</option>
                         <option value="web_dev">Web Development Agreement</option>
@@ -1232,7 +1232,7 @@ export default function WorkDetailPage() {
                         value={newContractTitle}
                         onChange={e => setNewContractTitle(e.target.value)}
                         placeholder="e.g. Software Services Agreement"
-                        className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                        className="w-full mt-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                       />
                     </div>
                     <div>
@@ -1242,7 +1242,7 @@ export default function WorkDetailPage() {
                         onChange={e => setNewContractContent(e.target.value)}
                         rows={12}
                         placeholder="Write or copy-paste contract content here..."
-                        className="w-full mt-1 px-3 py-3 bg-surface rounded-3xl text-sm outline-none font-sans leading-relaxed resize-y focus:ring-2 focus:ring-primary-tint"
+                        className="w-full mt-1 px-3 py-3 bg-surface border border-border rounded-3xl text-sm outline-none font-sans leading-relaxed resize-y focus:ring-2 focus:ring-primary-tint"
                       />
                     </div>
                     <button
@@ -1265,7 +1265,7 @@ export default function WorkDetailPage() {
                             <input
                               value={newContractTitle}
                               onChange={e => setNewContractTitle(e.target.value)}
-                              className="w-full mt-1 px-3 py-2 bg-surface rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                              className="w-full mt-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                             />
                           </div>
                           <div>
@@ -1274,7 +1274,7 @@ export default function WorkDetailPage() {
                               value={newContractContent}
                               onChange={e => setNewContractContent(e.target.value)}
                               rows={12}
-                              className="w-full mt-1 px-3 py-3 bg-surface rounded-3xl text-sm outline-none font-sans leading-relaxed resize-y focus:ring-2 focus:ring-primary-tint"
+                              className="w-full mt-1 px-3 py-3 bg-surface border border-border rounded-3xl text-sm outline-none font-sans leading-relaxed resize-y focus:ring-2 focus:ring-primary-tint"
                             />
                           </div>
                           <div className="flex gap-2">
@@ -1433,7 +1433,7 @@ export default function WorkDetailPage() {
                   onChange={e => setNewMessageContent(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && sendMessage()}
                   placeholder="Type a message to the client"
-                  className="flex-1 px-4 py-2 bg-surface rounded-3xl text-xs outline-none focus:ring-2 focus:ring-primary-tint"
+                  className="flex-1 px-4 py-2 bg-surface border border-border rounded-3xl text-xs outline-none focus:ring-2 focus:ring-primary-tint"
                 />
                 <button
                   onClick={sendMessage}
@@ -1504,7 +1504,7 @@ export default function WorkDetailPage() {
                   type="date"
                   defaultValue={fmtDate(project.startDate)}
                   onBlur={e => patchProject({ startDate: e.target.value || null })}
-                  className="block w-full text-sm text-foreground bg-transparent outline-none rounded-3xl px-1 -mx-1 hover:bg-surface focus:ring-2 focus:ring-primary-tint transition-colors"
+                  className="block w-full text-sm text-foreground bg-transparent outline-none rounded-3xl px-1 -mx-1 hover:bg-surface border border-border focus:ring-2 focus:ring-primary-tint transition-colors"
                 />
               </div>
               <div>
@@ -1513,7 +1513,7 @@ export default function WorkDetailPage() {
                   type="date"
                   defaultValue={fmtDate(project.dueDate)}
                   onBlur={e => patchProject({ dueDate: e.target.value || null })}
-                  className="block w-full text-sm text-foreground bg-transparent outline-none rounded-3xl px-1 -mx-1 hover:bg-surface focus:ring-2 focus:ring-primary-tint transition-colors"
+                  className="block w-full text-sm text-foreground bg-transparent outline-none rounded-3xl px-1 -mx-1 hover:bg-surface border border-border focus:ring-2 focus:ring-primary-tint transition-colors"
                 />
               </div>
             </div>

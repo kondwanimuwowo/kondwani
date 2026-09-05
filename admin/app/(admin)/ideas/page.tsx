@@ -64,7 +64,7 @@ export default function IdeasPage() {
         <div className="fixed inset-0 bg-foreground/40 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white shadow-2xl w-full max-w-md flex flex-col max-h-[90vh] sm:max-h-[85vh] rounded-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
             {/* Modal Header */}
-            <div className="px-6 py-4 shadow-[0_1px_0_0_var(--color-border)] flex items-center justify-between flex-shrink-0">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between flex-shrink-0">
               <h2 className="font-bold text-foreground text-base">{editId ? "Edit" : "New"} Idea</h2>
               <button
                 onClick={() => { setShowForm(false); setEditId(null); setForm({ title: "", body: "", tags: "" }) }}
@@ -81,7 +81,7 @@ export default function IdeasPage() {
                 <input
                   value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                 />
               </div>
               <div>
@@ -90,7 +90,7 @@ export default function IdeasPage() {
                   value={form.body}
                   onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
                   rows={4}
-                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all resize-none"
+                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all resize-none"
                 />
               </div>
               <div>
@@ -101,13 +101,13 @@ export default function IdeasPage() {
                   value={form.tags}
                   onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
                   placeholder="marketing, design, startup"
-                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                 />
               </div>
             </div>
 
             {/* Sticky Modal Footer */}
-            <div className="px-6 py-4 shadow-[0_-1px_0_0_var(--color-border)] flex items-center gap-3 bg-surface flex-shrink-0">
+            <div className="px-6 py-4 border-t border-border flex items-center gap-3 bg-surface flex-shrink-0">
               <button
                 onClick={() => { setShowForm(false); setEditId(null); setForm({ title: "", body: "", tags: "" }) }}
                 className="flex-1 bg-white shadow-md py-2 rounded-full text-sm font-semibold text-foreground hover:bg-neutral-bg transition-colors"

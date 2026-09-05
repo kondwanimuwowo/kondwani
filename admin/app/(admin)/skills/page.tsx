@@ -126,7 +126,7 @@ export default function SkillsPage() {
             onChange={e => setNewPill(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addPill() } }}
             placeholder="Add technology"
-            className="flex-1 px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+            className="flex-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
           />
           <button
             onClick={addPill}
@@ -149,12 +149,12 @@ export default function SkillsPage() {
                     value={skill.name}
                     onChange={e => updateSkill(ci, si, "name", e.target.value)}
                     placeholder="Skill name"
-                    className="flex-1 px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                    className="flex-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                   <select
                     value={skill.level}
                     onChange={e => updateSkill(ci, si, "level", e.target.value as SkillLevel)}
-                    className="px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-semibold text-foreground"
+                    className="px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-semibold text-foreground"
                   >
                     <option value="Advanced">Advanced</option>
                     <option value="Intermediate">Intermediate</option>

@@ -102,7 +102,7 @@ export default function CaseStudiesPage() {
     setShowForm(true)
   }
 
-  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
+  const inputCls = "w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const textareaCls = `${inputCls} resize-none`
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
   const sectionTitle = "text-xs font-bold uppercase tracking-widest text-muted pt-2"

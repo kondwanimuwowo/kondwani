@@ -202,7 +202,7 @@ function InvoicesContent() {
   const clientProjects = projects.filter(p => !fClientId || p.clientId === fClientId)
   const filtered = docs.filter(d => tab === "all" || d.type === tab)
 
-  const inputCls = "w-full px-3 py-2 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors bg-surface"
+  const inputCls = "w-full px-3 py-2 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors bg-surface border border-border"
   const labelCls = "block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5"
 
   return (
@@ -241,7 +241,7 @@ function InvoicesContent() {
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="shadow-[0_1px_0_0_var(--color-border)]">
+              <tr className="border-b border-border">
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-6 py-3">Number</th>
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3">Client</th>
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3 hidden md:table-cell">Project</th>
@@ -316,7 +316,7 @@ function InvoicesContent() {
           <div className="flex-1 bg-black/20" onClick={() => setShowPanel(false)} />
           <div className="w-[560px] bg-white h-full flex flex-col overflow-hidden shadow-2xl">
             {/* Panel header */}
-            <div className="flex items-center justify-between px-6 py-4 shadow-[0_1px_0_0_var(--color-border)] shrink-0">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
               <div className="flex items-center gap-3">
                 <div className="flex items-center bg-surface rounded-full p-0.5">
                   {(["invoice", "quote"] as const).map(t => (
@@ -439,7 +439,7 @@ function InvoicesContent() {
                   </div>
                   <span className="text-sm text-muted">{formatNum(taxAmount, fCurrency)}</span>
                 </div>
-                <div className="flex justify-between text-base font-bold text-foreground pt-2 shadow-[0_-1px_0_0_var(--color-border)]">
+                <div className="flex justify-between text-base font-bold text-foreground pt-2 border-t border-border">
                   <span>Total</span>
                   <span>{formatNum(total, fCurrency)}</span>
                 </div>
@@ -453,7 +453,7 @@ function InvoicesContent() {
             </div>
 
             {/* Panel footer */}
-            <div className="shrink-0 px-6 py-4 shadow-[0_-1px_0_0_var(--color-border)] space-y-3">
+            <div className="shrink-0 px-6 py-4 border-t border-border space-y-3">
               {saveError && (
                 <p className="text-xs text-danger bg-danger-bg rounded-3xl px-3 py-2">{saveError}</p>
               )}

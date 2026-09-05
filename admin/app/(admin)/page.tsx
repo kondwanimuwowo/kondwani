@@ -119,7 +119,7 @@ export default async function DashboardPage() {
 
       {/* Recent messages */}
       <div className="bg-white rounded-3xl shadow-md overflow-hidden">
-        <div className="px-6 py-4 flex items-center justify-between shadow-[0_1px_0_0_var(--color-border)]">
+        <div className="px-6 py-4 flex items-center justify-between border-b border-border">
           <div className="flex items-center gap-2">
             <Message className="text-muted" sx={{ fontSize: 18 }} />
             <h2 className="font-semibold text-foreground">Recent Messages</h2>

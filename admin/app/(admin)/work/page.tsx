@@ -208,7 +208,7 @@ export default function WorkPage() {
   }
 
   const activeProject = projects.find(p => p.id === activeId)
-  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
+  const inputCls = "w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
 
   return (
@@ -341,7 +341,7 @@ export default function WorkPage() {
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="shadow-[0_1px_0_0_var(--color-border)]">
+                <tr className="border-b border-border">
                   <th className="text-left text-xs font-semibold text-muted tracking-wider px-6 py-3">Project</th>
                   <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3 hidden md:table-cell">Client</th>
                   <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3">Status</th>
@@ -353,7 +353,7 @@ export default function WorkPage() {
               </thead>
               <tbody>
                 {projects.map(p => (
-                  <tr key={p.id} className="shadow-[0_1px_0_0_var(--color-border)] hover:bg-surface transition-colors">
+                  <tr key={p.id} className="border-b border-border hover:bg-surface transition-colors">
                     <td className="px-6 py-4">
                       <Link href={`/work/${p.id}`} className="text-sm font-medium text-foreground hover:text-primary transition-colors">{p.title}</Link>
                     </td>

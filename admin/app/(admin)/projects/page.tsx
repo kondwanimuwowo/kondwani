@@ -112,7 +112,7 @@ export default function ProjectsPage() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh] sm:max-h-[85vh] rounded-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
             {/* Modal Header */}
-            <div className="px-6 py-4 shadow-[0_1px_0_0_var(--color-border)] flex items-center justify-between flex-shrink-0">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between flex-shrink-0">
               <h2 className="font-bold text-foreground text-base">{editId ? "Edit" : "New"} Project</h2>
               <button
                 onClick={() => { setShowForm(false); setEditId(null); setForm(empty) }}
@@ -132,7 +132,7 @@ export default function ProjectsPage() {
                     const title = e.target.value
                     setForm(v => ({ ...v, title, slug: editId ? v.slug : toSlug(title) }))
                   }}
-                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                 />
               </div>
               <div>
@@ -141,7 +141,7 @@ export default function ProjectsPage() {
                   value={form.slug as string}
                   onChange={f("slug")}
                   placeholder="auto-generated from title"
-                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-mono"
+                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-mono"
                 />
               </div>
               <div>
@@ -152,7 +152,7 @@ export default function ProjectsPage() {
                   value={form.excerpt as string}
                   onChange={f("excerpt")}
                   rows={2}
-                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans resize-none"
+                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans resize-none"
                 />
               </div>
               <div>
@@ -161,7 +161,7 @@ export default function ProjectsPage() {
                   value={form.description}
                   onChange={f("description")}
                   rows={3}
-                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans resize-none"
+                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans resize-none"
                 />
               </div>
               <div>
@@ -170,7 +170,7 @@ export default function ProjectsPage() {
                   value={form.category}
                   onChange={f("category")}
                   placeholder="e.g. Web App"
-                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -180,7 +180,7 @@ export default function ProjectsPage() {
                     value={form.role as string}
                     onChange={f("role")}
                     placeholder="e.g. Lead Developer"
-                    className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                    className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                 </div>
                 <div>
@@ -190,7 +190,7 @@ export default function ProjectsPage() {
                     value={form.year as string}
                     onChange={f("year")}
                     placeholder="2025"
-                    className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                    className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                 </div>
               </div>
@@ -202,7 +202,7 @@ export default function ProjectsPage() {
                   value={form.tech as string}
                   onChange={f("tech")}
                   placeholder="React, Next.js, Tailwind"
-                  className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -215,7 +215,7 @@ export default function ProjectsPage() {
                       value={form[field] as string}
                       onChange={f(field)}
                       placeholder="https://"
-                      className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                      className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                     />
                   </div>
                 ))}
@@ -235,7 +235,7 @@ export default function ProjectsPage() {
                     value={form.status as string}
                     onChange={f("status")}
                     placeholder="e.g. Live · In Progress"
-                    className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                    className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                 </div>
                 <div>
@@ -244,7 +244,7 @@ export default function ProjectsPage() {
                     type="number"
                     value={form.order}
                     onChange={f("order")}
-                    className="w-full px-3 py-2 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
+                    className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                 </div>
               </div>
@@ -271,7 +271,7 @@ export default function ProjectsPage() {
             </div>
 
             {/* Sticky Modal Footer */}
-            <div className="px-6 py-4 shadow-[0_-1px_0_0_var(--color-border)] flex items-center gap-3 bg-surface flex-shrink-0">
+            <div className="px-6 py-4 border-t border-border flex items-center gap-3 bg-surface flex-shrink-0">
               <button
                 onClick={() => { setShowForm(false); setEditId(null); setForm(empty) }}
                 className="flex-1 bg-white shadow-md py-2 rounded-full text-sm font-semibold text-foreground hover:bg-neutral-bg transition-colors"
@@ -331,7 +331,7 @@ export default function ProjectsPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between px-5 py-3.5 bg-surface shadow-[0_-1px_0_0_var(--color-border)]">
+              <div className="flex items-center justify-between px-5 py-3.5 bg-surface border-t border-border">
                 <div className="flex items-center gap-3">
                   <button onClick={() => startEdit(p)} className="text-xs font-semibold text-muted hover:text-foreground transition-colors">Edit</button>
                   <button onClick={() => handleDelete(p.id)} className="text-xs font-semibold text-danger hover:text-danger transition-colors">Delete</button>
