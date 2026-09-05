@@ -104,25 +104,25 @@ export default function EditPostPage() {
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">Slug</label>
             <input value={slug} onChange={(e) => setSlug(e.target.value)}
-              className="w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
+              className="w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
           </div>
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">Tags (comma separated)</label>
             <input value={tags} onChange={(e) => setTags(e.target.value)}
-              className="w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
+              className="w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-foreground mb-1.5">Excerpt</label>
           <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2}
-            className="w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors resize-none" />
+            className="w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors resize-none" />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-foreground mb-1.5">Cover image URL</label>
           <input value={coverImage} onChange={(e) => setCoverImage(e.target.value)}
-            className="w-full px-4 py-2.5 bg-surface rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
+            className="w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors" />
         </div>
 
         <div>

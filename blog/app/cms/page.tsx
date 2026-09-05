@@ -48,7 +48,7 @@ export default async function CMSHome() {
         <div className="bg-white rounded-3xl shadow-md overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="shadow-[0_1px_0_0_var(--color-border)]">
+              <tr className="border-b border-border">
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-6 py-3">Title</th>
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3 hidden sm:table-cell">Tags</th>
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3 hidden md:table-cell">Date</th>
@@ -58,7 +58,7 @@ export default async function CMSHome() {
             </thead>
             <tbody>
               {posts.map((post) => (
-                <tr key={post.id} className="shadow-[0_1px_0_0_var(--color-border)] hover:bg-surface transition-colors">
+                <tr key={post.id} className="border-b border-border hover:bg-surface transition-colors">
                   <td className="px-6 py-4">
                     <Link href={`/cms/${post.id}/edit`}
                       className="font-medium text-foreground hover:text-primary transition-colors text-sm">
