@@ -33,7 +33,7 @@ function ToolbarButton({
     <button type="button" onClick={onClick} disabled={disabled} title={title}
       className={cn(
         "p-1.5 rounded transition-colors",
-        active ? "bg-primary/10 text-primary" : "text-muted hover:text-foreground hover:bg-surface",
+        active ? "bg-primary-tint text-primary" : "text-muted hover:text-foreground hover:bg-surface",
         disabled && "opacity-30 cursor-not-allowed"
       )}>
       {children}
@@ -88,9 +88,9 @@ export function TiptapEditor({ content, onChange, onImageUpload }: Props) {
   if (!editor) return null
 
   return (
-    <div className="border border-border rounded-xl overflow-hidden bg-white">
+    <div className="rounded-2xl overflow-hidden bg-white shadow-sm">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-border bg-surface">
+      <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 bg-surface">
         <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()}
           active={editor.isActive("bold")} title="Bold">
           <FormatBold sx={{ fontSize: 18 }} />
@@ -147,8 +147,8 @@ export function TiptapEditor({ content, onChange, onImageUpload }: Props) {
         </ToolbarButton>
       </div>
       <EditorContent editor={editor} />
-      <div className="px-4 py-2 border-t border-border flex justify-end">
-        <span className="text-xs text-muted/60">
+      <div className="px-4 py-2 bg-surface flex justify-end">
+        <span className="text-xs text-muted">
           {editor.storage.characterCount.words()} words
         </span>
       </div>

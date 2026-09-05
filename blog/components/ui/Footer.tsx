@@ -23,7 +23,7 @@ export function Footer() {
       {/* Wordmark + links block */}
       <div className="container-custom pt-16 pb-8 text-center">
         <p
-          className="font-extrabold leading-none tracking-tighter text-white/[0.06] select-none whitespace-nowrap"
+          className="font-extrabold leading-none tracking-tighter text-subtle-dark select-none whitespace-nowrap"
           style={{ fontSize: "clamp(48px, 9vw, 140px)" }}
         >
           [&lt;ondwani
@@ -33,7 +33,7 @@ export function Footer() {
             <Link
               key={link.name}
               href={link.href}
-              className="text-xs text-white/30 hover:text-white transition-colors duration-200"
+              className="text-xs text-muted-dark hover:text-white transition-colors duration-200"
             >
               {link.name}
             </Link>
@@ -49,10 +49,10 @@ export function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/[0.06]">
+      <div className="shadow-[0_-1px_0_0_rgba(255,255,255,0.06)]">
         <div className="container-custom py-4 flex items-center justify-between">
-          <p className="text-xs text-white/20">
-            &copy; {year} Kondwani Muwowo. Built with Next.js &amp; Tailwind CSS.
+          <p className="text-xs text-muted-dark">
+            &copy; {year} Kondwani Muwowo. Built with Next.js and Tailwind CSS.
           </p>
           <div className="flex items-center gap-5">
             {socialLinks.map(({ name, href, icon: Icon }) => (
@@ -62,7 +62,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={name}
-                className="text-white/30 hover:text-white transition-colors duration-200"
+                className="text-muted-dark hover:text-white transition-colors duration-200"
               >
                 <Icon sx={{ fontSize: 15 }} />
               </a>

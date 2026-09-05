@@ -10,14 +10,14 @@ export default async function CMSLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border bg-white">
+      <header className="shadow-sm bg-white">
         <div className="container-custom flex items-center justify-between h-14">
           <div className="flex items-center gap-6">
             <Link href="/cms" className="font-bold text-foreground hover:text-primary transition-colors text-sm">
               Blog CMS
             </Link>
             <Link href="/" target="_blank" className="text-sm text-muted hover:text-foreground transition-colors">
-              View blog ↗
+              View blog
             </Link>
           </div>
           <div className="flex items-center gap-3">

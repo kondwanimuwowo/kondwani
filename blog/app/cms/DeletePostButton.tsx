@@ -16,7 +16,7 @@ export function DeletePostButton({ id }: { id: string }) {
 
   return (
     <button onClick={handleDelete} disabled={loading}
-      className="text-xs font-medium text-red-500 hover:text-red-600 transition-colors disabled:opacity-40">
+      className="text-xs font-medium text-danger transition-colors disabled:opacity-40">
       Delete
     </button>
   )

@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://blog.kondwanimuwowo.com"),
-  title: { default: "Blog — Kondwani Muwowo", template: "%s — Kondwani Muwowo" },
+  title: { default: "Blog, Kondwani Muwowo", template: "%s, Kondwani Muwowo" },
   description: "Thoughts on front-end development, design, and building things that matter.",
 }
 

@@ -3,6 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
+import { ArrowBack } from "@mui/icons-material"
 
 export const revalidate = 60
 
@@ -32,14 +33,14 @@ export default async function BlogPost({ params }: Props) {
   return (
     <article className="container-custom py-16 max-w-3xl mx-auto">
       {/* Back */}
-      <Link href="/" className="inline-flex items-center gap-1 text-sm text-muted hover:text-foreground transition-colors mb-10">
-        ← All posts
+      <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-10">
+        <ArrowBack sx={{ fontSize: 16 }} /> All posts
       </Link>
 
       {/* Tags */}
       <div className="flex flex-wrap gap-2 mb-4">
         {post.tags.map((tag) => (
-          <span key={tag} className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary/8 px-2.5 py-0.5 rounded-full">
+          <span key={tag} className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary-tint px-2.5 py-0.5 rounded-full">
             {tag}
           </span>
         ))}
@@ -51,7 +52,7 @@ export default async function BlogPost({ params }: Props) {
       </h1>
       <p className="text-muted mb-3">{post.excerpt}</p>
       {post.publishedAt && (
-        <time className="text-sm text-muted/70">{formatDate(post.publishedAt)}</time>
+        <time className="text-sm text-muted">{formatDate(post.publishedAt)}</time>
       )}
 
       {/* Cover image */}
@@ -63,13 +64,13 @@ export default async function BlogPost({ params }: Props) {
 
       {/* Content */}
       <div
-        className="prose prose-neutral max-w-none mt-10 text-foreground/90 leading-relaxed
+        className="prose prose-neutral max-w-none mt-10 text-foreground leading-relaxed
           prose-headings:font-bold prose-headings:text-foreground
           prose-a:text-primary prose-a:no-underline hover:prose-a:underline
           prose-blockquote:border-l-primary prose-blockquote:text-muted
           prose-code:bg-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
           prose-pre:bg-foreground prose-pre:text-white
-          prose-img:rounded-xl"
+          prose-img:rounded-2xl"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
     </article>

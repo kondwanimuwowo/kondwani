@@ -46,17 +46,15 @@ export function Header() {
       animate={hidden ? "hidden" : "visible"}
       transition={{ duration: 0.35, ease: "easeInOut" }}
       className={cn(
-        "fixed top-0 inset-x-0 z-50 border-b transition-all duration-300",
-        isScrolled
-          ? "glass py-4 shadow-[0_1px_2px_0_rgb(0_0_0/0.033)] border-border/50"
-          : "bg-transparent py-5 border-transparent"
+        "fixed top-0 inset-x-0 z-50 transition-all duration-300",
+        isScrolled ? "glass py-4 shadow-md" : "bg-transparent py-5"
       )}
     >
       <div className="container-custom flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-extrabold tracking-tight text-foreground/70 hover:text-primary transition-colors duration-300"
+          className="text-xl font-extrabold tracking-tight text-foreground hover:text-primary transition-colors duration-300"
         >
           [&lt;ondwani / blog
         </Link>
@@ -95,7 +93,7 @@ export function Header() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="md:hidden overflow-hidden glass border-t border-border/40"
+            className="md:hidden overflow-hidden glass shadow-md"
           >
             <nav className="container-custom flex flex-col py-4">
               {navLinks.map((link, i) => (
@@ -108,7 +106,7 @@ export function Header() {
                   <Link
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="block py-3.5 text-sm font-medium text-foreground hover:text-primary transition-colors border-b border-border/30 last:border-0"
+                    className="block py-3.5 text-sm font-medium text-foreground hover:text-primary transition-colors"
                   >
                     {link.name}
                   </Link>

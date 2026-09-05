@@ -21,7 +21,6 @@ export default async function BlogListing() {
   return (
     <div className="container-custom py-16">
       <div className="max-w-2xl mb-14">
-        <p className="text-sm font-semibold tracking-widest text-primary uppercase mb-3">Writing</p>
         <h1 className="text-4xl font-bold tracking-tight text-foreground mb-4">Blog</h1>
         <p className="text-muted">Thoughts on front-end development, design, and building things that matter.</p>
       </div>
@@ -31,11 +30,11 @@ export default async function BlogListing() {
       ) : (
         <div className="space-y-10">
           {posts.map((post) => (
-            <article key={post.id} className="group grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6 pb-10 border-b border-border last:border-0">
+            <article key={post.id} className="group grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6 pb-10">
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {post.tags.map((tag) => (
-                    <span key={tag} className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary/8 px-2.5 py-0.5 rounded-full">
+                    <span key={tag} className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary-tint px-2.5 py-0.5 rounded-full">
                       {tag}
                     </span>
                   ))}
@@ -52,12 +51,12 @@ export default async function BlogListing() {
                   </time>
                   <Link href={`/${post.slug}`}
                     className="text-sm font-medium text-primary hover:text-primary-hover transition-colors">
-                    Read more →
+                    Read more
                   </Link>
                 </div>
               </div>
               {post.coverImage && (
-                <div className="relative h-48 md:h-auto rounded-xl overflow-hidden bg-surface order-first md:order-last">
+                <div className="relative h-48 md:h-auto rounded-2xl overflow-hidden bg-surface order-first md:order-last">
                   <Image src={post.coverImage} alt={post.title} fill className="object-cover" sizes="280px" />
                 </div>
               )}

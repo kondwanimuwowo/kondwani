@@ -25,8 +25,8 @@ export function PublishToggle({ id, published }: { id: string; published: boolea
     <button onClick={toggle} disabled={loading}
       className={`text-xs font-semibold px-2.5 py-1 rounded-full transition-colors ${
         current
-          ? "bg-green-50 text-green-700 hover:bg-green-100"
-          : "bg-surface text-muted hover:bg-border"
+          ? "bg-success-bg text-success"
+          : "bg-surface text-muted hover:bg-neutral-bg"
       }`}>
       {loading ? "…" : current ? "Published" : "Draft"}
     </button>

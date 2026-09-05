@@ -29,17 +29,17 @@ export default async function CMSHome() {
       </div>
 
       {posts.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl border border-border">
+        <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
           <p className="text-muted mb-4">No posts yet.</p>
           <Link href="/cms/new" className="text-sm font-medium text-primary hover:text-primary-hover transition-colors">
-            Write your first post →
+            Write your first post
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border">
+              <tr className="shadow-[0_1px_0_0_var(--color-border)]">
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-6 py-3">Title</th>
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3 hidden sm:table-cell">Tags</th>
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3 hidden md:table-cell">Date</th>
@@ -47,9 +47,9 @@ export default async function CMSHome() {
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody>
               {posts.map((post) => (
-                <tr key={post.id} className="hover:bg-surface/50 transition-colors">
+                <tr key={post.id} className="hover:bg-surface transition-colors">
                   <td className="px-6 py-4">
                     <Link href={`/cms/${post.id}/edit`}
                       className="font-medium text-foreground hover:text-primary transition-colors text-sm">
@@ -60,7 +60,7 @@ export default async function CMSHome() {
                   <td className="px-4 py-4 hidden sm:table-cell">
                     <div className="flex flex-wrap gap-1">
                       {post.tags.slice(0, 3).map((tag) => (
-                        <span key={tag} className="text-[10px] font-bold tracking-wide uppercase bg-surface border border-border text-muted px-2 py-0.5 rounded-full">
+                        <span key={tag} className="text-[10px] font-bold tracking-wide uppercase bg-surface text-muted px-2 py-0.5 rounded-full">
                           {tag}
                         </span>
                       ))}
