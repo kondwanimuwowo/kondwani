@@ -102,7 +102,7 @@ export default function CaseStudiesPage() {
     setShowForm(true)
   }
 
-  const inputCls = "w-full px-4 py-2.5 border border-border rounded-xl text-sm focus:outline-none focus:border-primary transition-colors"
+  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const textareaCls = `${inputCls} resize-none`
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
   const sectionTitle = "text-xs font-bold uppercase tracking-widest text-muted pt-2"
@@ -122,7 +122,7 @@ export default function CaseStudiesPage() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/30 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl border border-border p-6 w-full max-w-2xl my-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-2xl my-8">
             <h2 className="font-bold text-foreground mb-5">{editId ? "Edit" : "New"} Case Study</h2>
             <div className="space-y-4">
 
@@ -241,15 +241,15 @@ export default function CaseStudiesPage() {
 
             <div className="flex items-center gap-3 mt-6">
               <button onClick={handleSave}
-                className="flex-1 bg-primary text-white py-2.5 rounded-xl text-sm font-medium hover:bg-primary-hover transition-colors">Save</button>
+                className="flex-1 bg-primary text-white py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors">Save</button>
               <button onClick={() => { setShowForm(false); setEditId(null); setForm(empty) }}
-                className="flex-1 border border-border py-2.5 rounded-xl text-sm font-medium hover:bg-surface transition-colors">Cancel</button>
+                className="flex-1 bg-surface py-2.5 rounded-full text-sm font-medium hover:bg-neutral-bg transition-colors">Cancel</button>
             </div>
           </div>
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         {studies.length === 0 ? (
           <p className="px-6 py-12 text-sm text-muted text-center">No case studies yet.</p>
         ) : (
@@ -265,26 +265,26 @@ export default function CaseStudiesPage() {
             </thead>
             <tbody className="divide-y divide-border">
               {studies.map(s => (
-                <tr key={s.id} className="hover:bg-surface/50 transition-colors">
+                <tr key={s.id} className="hover:bg-surface transition-colors">
                   <td className="px-6 py-4">
                     <p className="text-sm font-medium text-foreground">{s.title}</p>
                     <p className="text-xs font-mono text-muted">/{s.slug}</p>
                   </td>
                   <td className="px-4 py-4 hidden sm:table-cell">
-                    <p className="text-sm text-muted">{s.client ?? "—"}</p>
+                    <p className="text-sm text-muted">{s.client ?? "Not set"}</p>
                   </td>
                   <td className="px-4 py-4 hidden md:table-cell">
-                    <p className="text-sm text-muted">{s.year ?? "—"}</p>
+                    <p className="text-sm text-muted">{s.year ?? "Not set"}</p>
                   </td>
                   <td className="px-4 py-4">
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${s.published ? "bg-green-50 text-green-700" : "bg-surface text-muted"}`}>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${s.published ? "bg-success-bg text-success" : "bg-surface text-muted"}`}>
                       {s.published ? "Published" : "Draft"}
                     </span>
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3 justify-end">
                       <button onClick={() => startEdit(s)} className="text-xs font-medium text-muted hover:text-foreground transition-colors">Edit</button>
-                      <button onClick={() => handleDelete(s.id)} className="text-xs font-medium text-red-500 hover:text-red-600 transition-colors">Delete</button>
+                      <button onClick={() => handleDelete(s.id)} className="text-xs font-medium text-danger hover:text-danger transition-colors">Delete</button>
                     </div>
                   </td>
                 </tr>

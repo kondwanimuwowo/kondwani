@@ -12,7 +12,7 @@ export function MobileHeader({ onMenuToggle }: MobileHeaderProps) {
       <span className="text-sm font-extrabold tracking-tight">[&lt;ondwani / admin</span>
       <button
         onClick={onMenuToggle}
-        className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+        className="p-2 rounded-full hover:bg-subtle-dark transition-colors"
         aria-label="Open navigation menu"
       >
         <Menu sx={{ fontSize: 22 }} />

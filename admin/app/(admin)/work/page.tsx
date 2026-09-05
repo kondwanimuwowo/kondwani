@@ -32,13 +32,13 @@ type WorkProject = {
 }
 
 const STATUSES = [
-  { key: "backlog", label: "Backlog", color: "bg-slate-100 text-slate-600", tip: "Not started — ideas and future work" },
-  { key: "scoping", label: "Scoping", color: "bg-purple-50 text-purple-700", tip: "Defining requirements and pricing with the client" },
-  { key: "active", label: "Active", color: "bg-blue-50 text-blue-700", tip: "Currently in progress" },
-  { key: "review", label: "Review", color: "bg-amber-50 text-amber-700", tip: "Work is done — awaiting client feedback" },
-  { key: "staged", label: "Staged", color: "bg-orange-50 text-orange-700", tip: "Approved and ready to deploy / hand off" },
-  { key: "shipped", label: "Shipped", color: "bg-emerald-50 text-emerald-700", tip: "Delivered and complete" },
-  { key: "paused", label: "Paused", color: "bg-slate-100 text-slate-400", tip: "On hold — waiting on client or external blocker" },
+  { key: "backlog", label: "Backlog", color: "bg-neutral-bg text-muted", tip: "Not started, ideas and future work" },
+  { key: "scoping", label: "Scoping", color: "bg-info-bg text-info", tip: "Defining requirements and pricing with the client" },
+  { key: "active", label: "Active", color: "bg-primary-tint text-primary", tip: "Currently in progress" },
+  { key: "review", label: "Review", color: "bg-warning-bg text-warning", tip: "Work is done, awaiting client feedback" },
+  { key: "staged", label: "Staged", color: "bg-info-bg text-info", tip: "Approved and ready to deploy or hand off" },
+  { key: "shipped", label: "Shipped", color: "bg-success-bg text-success", tip: "Delivered and complete" },
+  { key: "paused", label: "Paused", color: "bg-neutral-bg text-muted", tip: "On hold, waiting on client or external blocker" },
 ]
 
 const BILLING_LABELS: Record<string, string> = {
@@ -49,7 +49,7 @@ const BILLING_TIPS: Record<string, string> = {
   fixed: "Flat project fee agreed upfront",
   hourly: "Billed by hours worked at a set rate",
   retainer: "Recurring monthly fee for ongoing work",
-  pro_bono: "No charge — volunteer or personal project",
+  pro_bono: "No charge, volunteer or personal project",
 }
 
 const empty = {
@@ -58,7 +58,7 @@ const empty = {
 }
 
 function statusStyle(s: string) {
-  return STATUSES.find(x => x.key === s)?.color ?? "bg-slate-100 text-slate-500"
+  return STATUSES.find(x => x.key === s)?.color ?? "bg-neutral-bg text-muted"
 }
 
 function fmt(date: string | null) {
@@ -80,7 +80,7 @@ function KanbanCard({ project }: { project: WorkProject }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-white border border-border rounded-xl p-4 cursor-grab active:cursor-grabbing hover:border-primary/30 hover:shadow-sm transition-all select-none"
+      className="bg-white rounded-2xl p-4 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all select-none"
     >
       <Link href={`/work/${project.id}`} onClick={e => e.stopPropagation()} className="block mb-2">
         <p className="text-sm font-semibold text-foreground hover:text-primary transition-colors line-clamp-2">{project.title}</p>
@@ -163,14 +163,14 @@ export default function WorkPage() {
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        setSaveError(err.error ?? `Error ${res.status} — project was not saved`)
+        setSaveError(err.error ?? `Error ${res.status}, project was not saved`)
         return
       }
       setShowForm(false)
       setForm(empty)
       await load()
     } catch {
-      setSaveError("Network error — please try again")
+      setSaveError("Network error, please try again")
     } finally {
       setSaving(false)
     }
@@ -208,7 +208,7 @@ export default function WorkPage() {
   }
 
   const activeProject = projects.find(p => p.id === activeId)
-  const inputCls = "w-full px-4 py-2.5 border border-border rounded-xl text-sm focus:outline-none focus:border-primary transition-colors"
+  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
 
   return (
@@ -221,7 +221,7 @@ export default function WorkPage() {
         </div>
         <div className="flex items-center gap-3">
           {/* View toggle */}
-          <div className="flex items-center bg-surface border border-border rounded-full p-1">
+          <div className="flex items-center bg-surface rounded-full p-1">
             <button
               onClick={() => setView("list")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${view === "list" ? "bg-white text-foreground shadow-sm" : "text-muted hover:text-foreground"}`}
@@ -247,11 +247,11 @@ export default function WorkPage() {
       {/* Create Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/30 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl border border-border p-6 w-full max-w-lg my-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-lg my-8">
             <h2 className="font-bold text-foreground mb-5">New Project</h2>
             <div className="space-y-4">
               <div>
-                <label className={labelCls}>Title <span className="text-red-500">*</span></label>
+                <label className={labelCls}>Title <span className="text-danger">*</span></label>
                 <input value={form.title} onChange={f("title")} className={inputCls} placeholder="Project name" autoFocus />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -317,15 +317,15 @@ export default function WorkPage() {
               </div>
             </div>
             {saveError && (
-              <p className="mt-4 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{saveError}</p>
+              <p className="mt-4 text-xs text-danger bg-danger-bg rounded-2xl px-3 py-2">{saveError}</p>
             )}
             <div className="flex items-center gap-3 mt-4">
               <button onClick={handleSave} disabled={saving || !form.title.trim()}
-                className="flex-1 bg-primary text-white py-2.5 rounded-xl text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60">
-                {saving ? "Saving…" : "Create project"}
+                className="flex-1 bg-primary text-white py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60">
+                {saving ? "Saving..." : "Create project"}
               </button>
               <button onClick={() => { setShowForm(false); setForm(empty); setSaveError(null) }}
-                className="flex-1 border border-border py-2.5 rounded-xl text-sm font-medium hover:bg-surface transition-colors">
+                className="flex-1 bg-surface py-2.5 rounded-full text-sm font-medium hover:bg-neutral-bg transition-colors">
                 Cancel
               </button>
             </div>
@@ -335,13 +335,13 @@ export default function WorkPage() {
 
       {/* ── List view ─────────────────────────────────────────────────────── */}
       {view === "list" && (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           {projects.length === 0 ? (
             <p className="px-6 py-12 text-sm text-muted text-center">No projects yet.</p>
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border">
+                <tr className="shadow-[0_1px_0_0_var(--color-border)]">
                   <th className="text-left text-xs font-semibold text-muted tracking-wider px-6 py-3">Project</th>
                   <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3 hidden md:table-cell">Client</th>
                   <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3">Status</th>
@@ -351,14 +351,14 @@ export default function WorkPage() {
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody>
                 {projects.map(p => (
-                  <tr key={p.id} className="hover:bg-surface/50 transition-colors">
+                  <tr key={p.id} className="hover:bg-surface transition-colors">
                     <td className="px-6 py-4">
                       <Link href={`/work/${p.id}`} className="text-sm font-medium text-foreground hover:text-primary transition-colors">{p.title}</Link>
                     </td>
                     <td className="px-4 py-4 hidden md:table-cell">
-                      <p className="text-sm text-muted">{p.client ? (p.client.company ?? p.client.name) : "—"}</p>
+                      <p className="text-sm text-muted">{p.client ? (p.client.company ?? p.client.name) : "No client"}</p>
                     </td>
                     <td className="px-4 py-4">
                       <Tooltip content={STATUSES.find(s => s.key === p.status)?.tip ?? p.status}>
@@ -373,7 +373,7 @@ export default function WorkPage() {
                       </Tooltip>
                     </td>
                     <td className="px-4 py-4 hidden lg:table-cell">
-                      <p className="text-sm text-muted">{fmt(p.dueDate) ?? "—"}</p>
+                      <p className="text-sm text-muted">{fmt(p.dueDate) ?? "Not set"}</p>
                     </td>
                     <td className="px-4 py-4 hidden sm:table-cell">
                       <p className="text-sm text-muted">{p.doneTaskCount}/{p._count.tasks}</p>
@@ -418,7 +418,7 @@ export default function WorkPage() {
                   <SortableContext items={colProjects.map(p => p.id)} strategy={verticalListSortingStrategy}>
                     <div
                       data-droppable-id={col.key}
-                      className="space-y-2 min-h-[60px] rounded-xl p-2 bg-surface/50 border border-border/50"
+                      className="space-y-2 min-h-[60px] rounded-2xl p-2 bg-surface"
                       onDragOver={e => e.preventDefault()}
                       onDrop={async () => {
                         if (activeId) {
@@ -445,7 +445,7 @@ export default function WorkPage() {
                       onChange={e => setQuickAdd(prev => ({ ...prev, [col.key]: e.target.value }))}
                       onKeyDown={e => e.key === "Enter" && handleQuickAdd(col.key)}
                       placeholder="+ Add project"
-                      className="w-full px-3 py-2 text-xs text-muted bg-transparent border border-transparent rounded-lg hover:border-border focus:border-border focus:text-foreground outline-none transition-colors placeholder:text-muted/40"
+                      className="w-full px-3 py-2 text-xs text-muted bg-transparent rounded-2xl hover:bg-white focus:bg-white focus:text-foreground outline-none transition-colors placeholder:text-muted"
                     />
                   </div>
                 </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
+import { Close } from "@mui/icons-material"
 import { ImageUpload } from "@/components/ui/ImageUpload"
 import { GalleryUpload } from "@/components/ui/GalleryUpload"
 
@@ -95,12 +96,12 @@ export default function ProjectsPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-800 tracking-tight">Projects</h1>
-          <p className="text-sm text-slate-500 mt-0.5">{projects.length} projects total</p>
+          <h1 className="text-xl font-bold text-foreground tracking-tight">Projects</h1>
+          <p className="text-sm text-muted mt-0.5">{projects.length} projects total</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="text-sm font-semibold bg-[#7E1416] text-white px-4 py-2 rounded-lg hover:bg-[#601012] transition-colors"
+          className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
         >
           Add Project
         </button>
@@ -109,112 +110,112 @@ export default function ProjectsPage() {
       {/* Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white border border-slate-200 shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh] sm:max-h-[85vh] rounded-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
+          <div className="bg-white shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh] sm:max-h-[85vh] rounded-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
-              <h2 className="font-bold text-slate-850 text-base">{editId ? "Edit" : "New"} Project</h2>
+            <div className="px-6 py-4 shadow-[0_1px_0_0_var(--color-border)] flex items-center justify-between flex-shrink-0">
+              <h2 className="font-bold text-foreground text-base">{editId ? "Edit" : "New"} Project</h2>
               <button
                 onClick={() => { setShowForm(false); setEditId(null); setForm(empty) }}
-                className="text-slate-400 hover:text-slate-600 transition-colors text-xl leading-none"
+                className="text-muted hover:text-foreground transition-colors"
               >
-                &times;
+                <Close sx={{ fontSize: 20 }} />
               </button>
             </div>
 
             {/* Scrollable Modal Body */}
             <div className="flex-1 overflow-y-auto scrollbar-thin px-6 py-5 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Title</label>
+                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Title</label>
                 <input
                   value={form.title}
                   onChange={e => {
                     const title = e.target.value
                     setForm(v => ({ ...v, title, slug: editId ? v.slug : toSlug(title) }))
                   }}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-sans"
+                  className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Slug</label>
+                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Slug</label>
                 <input
                   value={form.slug as string}
                   onChange={f("slug")}
                   placeholder="auto-generated from title"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-mono"
+                  className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-mono"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Excerpt <span className="text-slate-400 font-normal lowercase">(1–2 sentence teaser)</span>
+                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">
+                  Excerpt <span className="text-muted font-normal lowercase">(1 to 2 sentence teaser)</span>
                 </label>
                 <textarea
                   value={form.excerpt as string}
                   onChange={f("excerpt")}
                   rows={2}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-sans resize-none"
+                  className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans resize-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Description</label>
+                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Description</label>
                 <textarea
                   value={form.description}
                   onChange={f("description")}
                   rows={3}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-sans resize-none"
+                  className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans resize-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Category</label>
+                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Category</label>
                 <input
                   value={form.category}
                   onChange={f("category")}
                   placeholder="e.g. Web App"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-sans"
+                  className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Role</label>
+                  <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Role</label>
                   <input
                     value={form.role as string}
                     onChange={f("role")}
                     placeholder="e.g. Lead Developer"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-sans"
+                    className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Year</label>
+                  <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Year</label>
                   <input
                     type="number"
                     value={form.year as string}
                     onChange={f("year")}
                     placeholder="2025"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-sans"
+                    className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Tech <span className="text-slate-400 font-normal lowercase">(comma separated)</span>
+                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">
+                  Tech <span className="text-muted font-normal lowercase">(comma separated)</span>
                 </label>
                 <input
                   value={form.tech as string}
                   onChange={f("tech")}
                   placeholder="React, Next.js, Tailwind"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-sans"
+                  className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {(["liveUrl", "githubUrl"] as const).map(field => (
                   <div key={field}>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">
                       {field === "liveUrl" ? "Live URL" : "GitHub URL"}
                     </label>
                     <input
                       value={form[field] as string}
                       onChange={f(field)}
                       placeholder="https://"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-sans"
+                      className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                     />
                   </div>
                 ))}
@@ -229,40 +230,40 @@ export default function ProjectsPage() {
               />
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Status badge</label>
+                  <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Status badge</label>
                   <input
                     value={form.status as string}
                     onChange={f("status")}
                     placeholder="e.g. Live · In Progress"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-sans"
+                    className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Order</label>
+                  <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Order</label>
                   <input
                     type="number"
                     value={form.order}
                     onChange={f("order")}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7E1416]/20 focus:border-[#7E1416] transition-all font-sans"
+                    className="w-full px-3 py-2 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
                   />
                 </div>
               </div>
               <div className="flex items-center gap-6 pt-2">
-                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer select-none">
+                <label className="flex items-center gap-2 text-sm font-semibold text-foreground cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={form.featured}
                     onChange={e => setForm(v => ({ ...v, featured: e.target.checked }))}
-                    className="rounded border-slate-300 text-[#7E1416] focus:ring-[#7E1416]"
+                    className="rounded text-primary focus:ring-primary"
                   />
                   Featured
                 </label>
-                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer select-none">
+                <label className="flex items-center gap-2 text-sm font-semibold text-foreground cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={form.published}
                     onChange={e => setForm(v => ({ ...v, published: e.target.checked }))}
-                    className="rounded border-slate-300 text-[#7E1416] focus:ring-[#7E1416]"
+                    className="rounded text-primary focus:ring-primary"
                   />
                   Published
                 </label>
@@ -270,16 +271,16 @@ export default function ProjectsPage() {
             </div>
 
             {/* Sticky Modal Footer */}
-            <div className="px-6 py-4 border-t border-slate-100 flex items-center gap-3 bg-slate-50/50 flex-shrink-0">
+            <div className="px-6 py-4 shadow-[0_-1px_0_0_var(--color-border)] flex items-center gap-3 bg-surface flex-shrink-0">
               <button
                 onClick={() => { setShowForm(false); setEditId(null); setForm(empty) }}
-                className="flex-1 border border-slate-200 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+                className="flex-1 bg-white shadow-sm py-2 rounded-full text-sm font-semibold text-foreground hover:bg-neutral-bg transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="flex-1 bg-[#7E1416] text-white py-2 rounded-lg text-sm font-semibold hover:bg-[#601012] transition-colors"
+                className="flex-1 bg-primary text-white py-2 rounded-full text-sm font-semibold hover:bg-primary-hover transition-colors"
               >
                 Save Project
               </button>
@@ -291,56 +292,56 @@ export default function ProjectsPage() {
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.length === 0 ? (
-          <div className="col-span-full bg-white border border-slate-200 px-6 py-16 text-center shadow-sm">
-            <p className="text-slate-400">No projects yet.</p>
+          <div className="col-span-full bg-white px-6 py-16 text-center shadow-sm rounded-2xl">
+            <p className="text-muted">No projects yet.</p>
           </div>
         ) : (
           projects.map(p => (
-            <div key={p.id} className="bg-white border border-slate-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow duration-200">
+            <div key={p.id} className="bg-white overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-200 rounded-2xl">
               <div>
                 {p.imageUrl ? (
-                  <div className="relative h-40 bg-slate-50 border-b border-slate-100">
+                  <div className="relative h-40 bg-surface">
                     <Image src={p.imageUrl} alt={p.title} fill className="object-cover animate-fade-in" sizes="400px" />
                   </div>
                 ) : (
-                  <div className="h-40 bg-slate-50/50 border-b border-slate-100 flex items-center justify-center">
-                    <span className="text-xs text-slate-350 tracking-wider uppercase font-bold">No Cover Image</span>
+                  <div className="h-40 bg-surface flex items-center justify-center">
+                    <span className="text-xs text-muted tracking-wider uppercase font-bold">No Cover Image</span>
                   </div>
                 )}
                 <div className="p-5 space-y-3">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="font-bold text-slate-800 leading-snug tracking-tight text-[15px]">{p.title}</p>
-                    <span className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded border shrink-0 ${
+                    <p className="font-bold text-foreground leading-snug tracking-tight text-[15px]">{p.title}</p>
+                    <span className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 ${
                       p.published
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                        : "bg-slate-50 text-slate-500 border-slate-100"
+                        ? "bg-success-bg text-success"
+                        : "bg-neutral-bg text-muted"
                     }`}>
                       {p.published ? "Live" : "Draft"}
                     </span>
                   </div>
-                  {p.slug && <p className="text-[10px] font-mono text-slate-400">/{p.slug}</p>}
-                  <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">{p.description}</p>
+                  {p.slug && <p className="text-[10px] font-mono text-muted">/{p.slug}</p>}
+                  <p className="text-sm text-muted line-clamp-2 leading-relaxed">{p.description}</p>
                   <div className="flex flex-wrap gap-1 pt-1">
                     {p.tech.slice(0, 4).map(t => (
-                      <span key={t} className="text-[10px] font-medium bg-slate-50 border border-slate-150 text-slate-500 px-2 py-0.5 rounded">{t}</span>
+                      <span key={t} className="text-[10px] font-medium bg-surface text-muted px-2 py-0.5 rounded-full">{t}</span>
                     ))}
                     {p.tech.length > 4 && (
-                      <span className="text-[10px] font-medium text-slate-400 self-center pl-1">+{p.tech.length - 4} more</span>
+                      <span className="text-[10px] font-medium text-muted self-center pl-1">+{p.tech.length - 4} more</span>
                     )}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between px-5 py-3.5 border-t border-slate-100 bg-slate-50/40">
+              <div className="flex items-center justify-between px-5 py-3.5 bg-surface shadow-[0_-1px_0_0_var(--color-border)]">
                 <div className="flex items-center gap-3">
-                  <button onClick={() => startEdit(p)} className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors">Edit</button>
-                  <button onClick={() => handleDelete(p.id)} className="text-xs font-semibold text-red-500 hover:text-red-650 transition-colors">Delete</button>
+                  <button onClick={() => startEdit(p)} className="text-xs font-semibold text-muted hover:text-foreground transition-colors">Edit</button>
+                  <button onClick={() => handleDelete(p.id)} className="text-xs font-semibold text-danger hover:text-danger transition-colors">Delete</button>
                 </div>
                 {p.liveUrl && (
                   <a
                     href={p.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-semibold text-[#7E1416] hover:text-[#601012] transition-colors"
+                    className="text-xs font-semibold text-primary hover:text-primary-hover transition-colors"
                   >
                     View site ↗
                   </a>

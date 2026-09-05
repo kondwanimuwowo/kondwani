@@ -24,14 +24,14 @@ const empty = {
 }
 
 const statusColors: Record<string, string> = {
-  active: "bg-emerald-50 text-emerald-700",
-  lead: "bg-amber-50 text-amber-700",
-  inactive: "bg-slate-100 text-slate-500",
+  active: "bg-success-bg text-success",
+  lead: "bg-warning-bg text-warning",
+  inactive: "bg-neutral-bg text-muted",
 }
 const statusTips: Record<string, string> = {
-  active: "Current client — actively working together",
-  lead: "Prospective client — in discussion or negotiation",
-  inactive: "Past client — no current active projects",
+  active: "Current client, actively working together",
+  lead: "Prospective client, in discussion or negotiation",
+  inactive: "Past client, no current active projects",
 }
 
 export default function ClientsPage() {
@@ -96,7 +96,7 @@ export default function ClientsPage() {
     load()
   }
 
-  const inputCls = "w-full px-4 py-2.5 border border-border rounded-xl text-sm focus:outline-none focus:border-primary transition-colors"
+  const inputCls = "w-full px-4 py-2.5 bg-surface rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
 
   return (
@@ -117,12 +117,12 @@ export default function ClientsPage() {
       {/* Create / Edit Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/30 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl border border-border p-6 w-full max-w-lg my-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-lg my-8">
             <h2 className="font-bold text-foreground mb-5">{editId ? "Edit" : "New"} Client</h2>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Name <span className="text-red-500">*</span></label>
+                  <label className={labelCls}>Name <span className="text-danger">*</span></label>
                   <input value={form.name} onChange={f("name")} className={inputCls} placeholder="Full name" />
                 </div>
                 <div>
@@ -148,8 +148,8 @@ export default function ClientsPage() {
                 <div>
                   <label className={labelCls}>Currency</label>
                   <select value={form.currency} onChange={f("currency")} className={inputCls}>
-                    <option value="USD">USD — US Dollar</option>
-                    <option value="ZMW">ZMW — Zambian Kwacha</option>
+                    <option value="USD">USD, US Dollar</option>
+                    <option value="ZMW">ZMW, Zambian Kwacha</option>
                   </select>
                 </div>
                 <div>
@@ -170,13 +170,13 @@ export default function ClientsPage() {
               <button
                 onClick={handleSave}
                 disabled={saving || !form.name || !form.email}
-                className="flex-1 bg-primary text-white py-2.5 rounded-xl text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
+                className="flex-1 bg-primary text-white py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
               >
-                {saving ? "Saving…" : "Save"}
+                {saving ? "Saving..." : "Save"}
               </button>
               <button
                 onClick={() => { setShowForm(false); setEditId(null) }}
-                className="flex-1 border border-border py-2.5 rounded-xl text-sm font-medium hover:bg-surface transition-colors"
+                className="flex-1 bg-surface py-2.5 rounded-full text-sm font-medium hover:bg-neutral-bg transition-colors"
               >
                 Cancel
               </button>
@@ -187,18 +187,18 @@ export default function ClientsPage() {
 
       {/* Client grid */}
       {clients.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-border p-16 text-center">
-          <Business sx={{ fontSize: 40 }} className="text-muted/30 mx-auto mb-4" />
+        <div className="bg-white rounded-2xl shadow-sm p-16 text-center">
+          <Business sx={{ fontSize: 40 }} className="text-border mx-auto mb-4" />
           <p className="text-sm text-muted mb-1">No clients yet</p>
-          <p className="text-xs text-muted/60">Add your first client to get started</p>
+          <p className="text-xs text-muted">Add your first client to get started</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {clients.map(c => (
-            <div key={c.id} className="bg-white rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-sm transition-all group">
+            <div key={c.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md p-5 transition-all group">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-primary-tint flex items-center justify-center shrink-0">
                     <span className="text-primary font-bold text-sm">{(c.company ?? c.name).charAt(0).toUpperCase()}</span>
                   </div>
                   <div>
@@ -229,13 +229,13 @@ export default function ClientsPage() {
                 )}
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-border">
+              <div className="flex items-center justify-between pt-3">
                 <span className="text-[11px] text-muted">{c.currency}</span>
                 <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={() => openEdit(c)} className="text-xs font-medium text-muted hover:text-foreground transition-colors flex items-center gap-1">
                     <Edit sx={{ fontSize: 14 }} /> Edit
                   </button>
-                  <button onClick={() => handleDelete(c.id)} className="text-xs font-medium text-red-400 hover:text-red-600 transition-colors flex items-center gap-1">
+                  <button onClick={() => handleDelete(c.id)} className="text-xs font-medium text-danger hover:text-danger transition-colors flex items-center gap-1">
                     <Delete sx={{ fontSize: 14 }} /> Delete
                   </button>
                 </div>

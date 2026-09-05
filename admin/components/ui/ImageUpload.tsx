@@ -34,14 +34,14 @@ export function ImageUpload({ value, onChange, label = "Cover image" }: Props) {
 
   return (
     <div>
-      <p className="text-xs font-semibold text-foreground/60 uppercase tracking-widest mb-2">{label}</p>
+      <p className="text-xs font-semibold text-muted uppercase tracking-widest mb-2">{label}</p>
       {value ? (
-        <div className="relative rounded-xl overflow-hidden border border-border group w-full h-48">
+        <div className="relative rounded-2xl overflow-hidden shadow-sm group w-full h-48">
           <Image src={value} alt="Upload preview" fill className="object-cover" />
           <button
             type="button"
             onClick={() => onChange("")}
-            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-foreground/70 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
+            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-foreground flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-danger"
           >
             <Close sx={{ fontSize: 14 }} />
           </button>
@@ -51,10 +51,10 @@ export function ImageUpload({ value, onChange, label = "Cover image" }: Props) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="w-full h-36 rounded-xl border-2 border-dashed border-border hover:border-primary flex flex-col items-center justify-center gap-2 text-muted hover:text-primary transition-colors disabled:opacity-60 cursor-pointer"
+          className="w-full h-36 rounded-2xl bg-surface flex flex-col items-center justify-center gap-2 text-muted hover:text-primary transition-colors disabled:opacity-60 cursor-pointer"
         >
           {uploading ? (
-            <span className="w-5 h-5 rounded-full border-2 border-border border-t-primary animate-spin" />
+            <span className="w-5 h-5 rounded-full border-2 border-primary-tint border-t-primary animate-spin" />
           ) : (
             <>
               <CloudUpload sx={{ fontSize: 28 }} />
@@ -63,7 +63,7 @@ export function ImageUpload({ value, onChange, label = "Cover image" }: Props) {
           )}
         </button>
       )}
-      {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
+      {error && <p className="mt-1.5 text-xs text-danger">{error}</p>}
       <input
         ref={inputRef}
         type="file"

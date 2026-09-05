@@ -88,13 +88,13 @@ export function AdminMobileDrawer({ isOpen, onClose }: AdminMobileDrawerProps) {
             className="fixed top-0 left-0 bottom-0 w-72 bg-foreground text-white z-50 md:hidden flex flex-col"
           >
             {/* Header */}
-            <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 border-b border-white/10">
+            <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 shadow-[0_1px_0_0_rgba(255,255,255,0.1)]">
               <span className="text-sm font-extrabold tracking-tight text-white">
                 [&lt;ondwani / admin
               </span>
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                className="p-2 rounded-full hover:bg-subtle-dark transition-colors"
                 aria-label="Close menu"
               >
                 <Close sx={{ fontSize: 20 }} />
@@ -116,7 +116,7 @@ export function AdminMobileDrawer({ isOpen, onClose }: AdminMobileDrawerProps) {
                         onClick={() => setOpenMenu(prev => prev === label ? null : label)}
                         className={cn(
                           "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
-                          isActive ? "bg-white/10 text-white" : "text-white/50 hover:text-white hover:bg-white/5"
+                          isActive ? "bg-subtle-dark text-white" : "text-muted-dark hover:text-white"
                         )}
                       >
                         <span className="flex items-center gap-3">
@@ -145,12 +145,12 @@ export function AdminMobileDrawer({ isOpen, onClose }: AdminMobileDrawerProps) {
                                     "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors",
                                     pathname === sub.href
                                       ? "text-white font-medium"
-                                      : "text-white/50 hover:text-white"
+                                      : "text-muted-dark hover:text-white"
                                   )}
                                 >
                                   <span className={cn(
                                     "w-1.5 h-1.5 rounded-full flex-shrink-0",
-                                    pathname === sub.href ? "bg-white" : "bg-white/30"
+                                    pathname === sub.href ? "bg-white" : "bg-muted-dark"
                                   )} />
                                   {sub.label}
                                 </Link>
@@ -169,7 +169,7 @@ export function AdminMobileDrawer({ isOpen, onClose }: AdminMobileDrawerProps) {
                     href={href!}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
-                      isActive ? "bg-white/10 text-white" : "text-white/50 hover:text-white hover:bg-white/5"
+                      isActive ? "bg-subtle-dark text-white" : "text-muted-dark hover:text-white"
                     )}
                   >
                     <Icon sx={{ fontSize: 18 }} />
@@ -180,10 +180,10 @@ export function AdminMobileDrawer({ isOpen, onClose }: AdminMobileDrawerProps) {
             </nav>
 
             {/* Footer */}
-            <div className="flex-shrink-0 px-5 py-4 border-t border-white/10">
+            <div className="flex-shrink-0 px-5 py-4 shadow-[0_-1px_0_0_rgba(255,255,255,0.1)]">
               <button
                 onClick={signOut}
-                className="flex items-center gap-2 text-xs text-white/50 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-xs text-muted-dark hover:text-white transition-colors"
               >
                 <Logout sx={{ fontSize: 15 }} />
                 Sign out

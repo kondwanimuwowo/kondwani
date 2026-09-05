@@ -18,16 +18,16 @@ type Document = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  draft: "bg-slate-100 text-slate-500", sent: "bg-blue-50 text-blue-700",
-  paid: "bg-emerald-50 text-emerald-700", void: "bg-slate-100 text-slate-400",
-  accepted: "bg-emerald-50 text-emerald-700", declined: "bg-red-50 text-red-400",
-  expired: "bg-slate-100 text-slate-400",
+  draft: "bg-neutral-bg text-muted", sent: "bg-info-bg text-info",
+  paid: "bg-success-bg text-success", void: "bg-neutral-bg text-muted",
+  accepted: "bg-success-bg text-success", declined: "bg-danger-bg text-danger",
+  expired: "bg-neutral-bg text-muted",
 }
 const STATUS_TIPS: Record<string, string> = {
-  draft: "Not sent — still being prepared",
+  draft: "Not sent, still being prepared",
   sent: "Delivered to client, awaiting payment/response",
   paid: "Invoice settled",
-  void: "Cancelled — no longer valid",
+  void: "Cancelled, no longer valid",
   accepted: "Quote approved by client",
   declined: "Quote rejected by client",
   expired: "Quote deadline passed without a response",
@@ -45,7 +45,7 @@ function calcSubtotal(items: DocItem[]) {
 }
 
 function fmt(date: string | null) {
-  if (!date) return "—"
+  if (!date) return "Not set"
   return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 }
 
@@ -202,7 +202,7 @@ function InvoicesContent() {
   const clientProjects = projects.filter(p => !fClientId || p.clientId === fClientId)
   const filtered = docs.filter(d => tab === "all" || d.type === tab)
 
-  const inputCls = "w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-primary transition-colors bg-white"
+  const inputCls = "w-full px-3 py-2 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors bg-surface"
   const labelCls = "block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5"
 
   return (
@@ -222,7 +222,7 @@ function InvoicesContent() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 mb-6 bg-surface border border-border rounded-full p-1 w-fit">
+      <div className="flex items-center gap-1 mb-6 bg-surface rounded-full p-1 w-fit">
         {(["all", "invoice", "quote"] as const).map(t => (
           <button
             key={t}
@@ -235,13 +235,13 @@ function InvoicesContent() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         {filtered.length === 0 ? (
           <p className="px-6 py-12 text-sm text-muted text-center">No documents yet.</p>
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border">
+              <tr className="shadow-[0_1px_0_0_var(--color-border)]">
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-6 py-3">Number</th>
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3">Client</th>
                 <th className="text-left text-xs font-semibold text-muted tracking-wider px-4 py-3 hidden md:table-cell">Project</th>
@@ -257,7 +257,7 @@ function InvoicesContent() {
                 const tax = total * (doc.taxRate / 100)
                 const grand = total + tax
                 return (
-                  <tr key={doc.id} className="hover:bg-surface/50 transition-colors">
+                  <tr key={doc.id} className="hover:bg-surface transition-colors">
                     <td className="px-6 py-4">
                       <p className="text-sm font-mono font-semibold text-foreground">{doc.number}</p>
                       <p className="text-xs text-muted capitalize">{doc.type}</p>
@@ -266,14 +266,14 @@ function InvoicesContent() {
                       <p className="text-sm text-foreground">{doc.client.company ?? doc.client.name}</p>
                     </td>
                     <td className="px-4 py-4 hidden md:table-cell">
-                      <p className="text-sm text-muted">{doc.project?.title ?? "—"}</p>
+                      <p className="text-sm text-muted">{doc.project?.title ?? "No project"}</p>
                     </td>
                     <td className="px-4 py-4">
                       <Tooltip content={STATUS_TIPS[doc.status] ?? doc.status}>
                         <select
                           value={doc.status}
                           onChange={e => updateStatus(doc.id, e.target.value)}
-                          className={`text-xs font-bold tracking-widest uppercase px-2.5 py-1 rounded-full border-0 outline-none cursor-pointer ${STATUS_COLORS[doc.status] ?? "bg-slate-100 text-slate-500"}`}
+                          className={`text-xs font-bold tracking-widest uppercase px-2.5 py-1 rounded-full border-0 outline-none cursor-pointer ${STATUS_COLORS[doc.status] ?? "bg-neutral-bg text-muted"}`}
                         >
                           {(doc.type === "invoice" ? INVOICE_STATUSES : QUOTE_STATUSES).map(s => (
                             <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
@@ -297,7 +297,7 @@ function InvoicesContent() {
                           {copied === doc.token ? "Copied" : "Link"}
                         </button>
                         <button onClick={() => openEdit(doc)} className="text-xs font-medium text-muted hover:text-foreground transition-colors">Edit</button>
-                        <button onClick={() => handleDelete(doc.id)} className="text-xs font-medium text-red-400 hover:text-red-600 transition-colors">
+                        <button onClick={() => handleDelete(doc.id)} className="text-xs font-medium text-danger hover:text-danger transition-colors">
                           <Delete sx={{ fontSize: 15 }} />
                         </button>
                       </div>
@@ -314,11 +314,11 @@ function InvoicesContent() {
       {showPanel && (
         <div className="fixed inset-0 z-50 flex">
           <div className="flex-1 bg-black/20" onClick={() => setShowPanel(false)} />
-          <div className="w-[560px] bg-white border-l border-border h-full flex flex-col overflow-hidden shadow-2xl">
+          <div className="w-[560px] bg-white h-full flex flex-col overflow-hidden shadow-2xl">
             {/* Panel header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+            <div className="flex items-center justify-between px-6 py-4 shadow-[0_1px_0_0_var(--color-border)] shrink-0">
               <div className="flex items-center gap-3">
-                <div className="flex items-center bg-surface border border-border rounded-full p-0.5">
+                <div className="flex items-center bg-surface rounded-full p-0.5">
                   {(["invoice", "quote"] as const).map(t => (
                     <button
                       key={t}
@@ -341,7 +341,7 @@ function InvoicesContent() {
               {/* Client + project */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Client <span className="text-red-500">*</span></label>
+                  <label className={labelCls}>Client <span className="text-danger">*</span></label>
                   <select value={fClientId} onChange={e => { setFClientId(e.target.value); setFProjectId(""); const c = clients.find(c => c.id === e.target.value); if (c) setFCurrency(c.currency) }} className={inputCls}>
                     <option value="">Select client…</option>
                     {clients.map(c => <option key={c.id} value={c.id}>{c.company ?? c.name}</option>)}
@@ -403,7 +403,7 @@ function InvoicesContent() {
                       <span className="text-sm text-muted text-right">
                         {(item.flat ? item.rate : item.quantity * item.rate).toFixed(2)}
                       </span>
-                      <button onClick={() => setFItems(prev => prev.filter((_, i) => i !== idx))} className="text-muted hover:text-red-500 transition-colors justify-self-center">
+                      <button onClick={() => setFItems(prev => prev.filter((_, i) => i !== idx))} className="text-muted hover:text-danger transition-colors justify-self-center">
                         <Close sx={{ fontSize: 15 }} />
                       </button>
                     </div>
@@ -420,7 +420,7 @@ function InvoicesContent() {
               </div>
 
               {/* Totals */}
-              <div className="bg-surface rounded-xl p-4 space-y-2">
+              <div className="bg-surface rounded-2xl p-4 space-y-2">
                 <div className="flex justify-between text-sm text-muted">
                   <span>Subtotal</span>
                   <span>{formatNum(subtotal, fCurrency)}</span>
@@ -432,14 +432,14 @@ function InvoicesContent() {
                       type="number"
                       value={fTaxRate}
                       onChange={e => setFTaxRate(parseFloat(e.target.value) || 0)}
-                      className="w-14 px-2 py-1 text-xs border border-border rounded-lg outline-none focus:border-primary"
+                      className="w-14 px-2 py-1 text-xs bg-white rounded-full outline-none focus:ring-2 focus:ring-primary-tint"
                       min={0} max={100}
                     />
                     <span className="text-xs text-muted">%</span>
                   </div>
                   <span className="text-sm text-muted">{formatNum(taxAmount, fCurrency)}</span>
                 </div>
-                <div className="flex justify-between text-base font-bold text-foreground pt-2 border-t border-border">
+                <div className="flex justify-between text-base font-bold text-foreground pt-2 shadow-[0_-1px_0_0_var(--color-border)]">
                   <span>Total</span>
                   <span>{formatNum(total, fCurrency)}</span>
                 </div>
@@ -453,22 +453,22 @@ function InvoicesContent() {
             </div>
 
             {/* Panel footer */}
-            <div className="shrink-0 px-6 py-4 border-t border-border space-y-3">
+            <div className="shrink-0 px-6 py-4 shadow-[0_-1px_0_0_var(--color-border)] space-y-3">
               {saveError && (
-                <p className="text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{saveError}</p>
+                <p className="text-xs text-danger bg-danger-bg rounded-2xl px-3 py-2">{saveError}</p>
               )}
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => handleSave("draft")}
                   disabled={saving || !fClientId}
-                  className="flex-1 border border-border py-2.5 rounded-xl text-sm font-medium hover:bg-surface transition-colors disabled:opacity-60"
+                  className="flex-1 bg-surface py-2.5 rounded-full text-sm font-medium hover:bg-neutral-bg transition-colors disabled:opacity-60"
                 >
                   Save draft
                 </button>
                 <button
                   onClick={() => handleSave("sent")}
                   disabled={saving || !fClientId}
-                  className="flex-1 bg-primary text-white py-2.5 rounded-xl text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
+                  className="flex-1 bg-primary text-white py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
                 >
                   {saving ? "Saving…" : "Save & mark sent"}
                 </button>

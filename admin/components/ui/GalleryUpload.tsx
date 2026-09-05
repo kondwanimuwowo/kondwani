@@ -37,15 +37,15 @@ export function GalleryUpload({ value, onChange }: Props) {
 
   return (
     <div>
-      <p className="text-xs font-semibold text-foreground/60 uppercase tracking-widest mb-2">Gallery</p>
+      <p className="text-xs font-semibold text-muted uppercase tracking-widest mb-2">Gallery</p>
       <div className="grid grid-cols-3 gap-2">
         {value.map((url, i) => (
-          <div key={i} className="relative rounded-lg overflow-hidden border border-border group aspect-video">
+          <div key={i} className="relative rounded-2xl overflow-hidden shadow-sm group aspect-video">
             <Image src={url} alt={`Gallery ${i + 1}`} fill className="object-cover" />
             <button
               type="button"
               onClick={() => remove(i)}
-              className="absolute top-1 right-1 w-6 h-6 rounded-full bg-foreground/70 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
+              className="absolute top-1 right-1 w-6 h-6 rounded-full bg-foreground flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-danger"
             >
               <Close sx={{ fontSize: 12 }} />
             </button>
@@ -55,10 +55,10 @@ export function GalleryUpload({ value, onChange }: Props) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="aspect-video rounded-lg border-2 border-dashed border-border hover:border-primary flex flex-col items-center justify-center gap-1 text-muted hover:text-primary transition-colors disabled:opacity-60 cursor-pointer"
+          className="aspect-video rounded-2xl bg-surface flex flex-col items-center justify-center gap-1 text-muted hover:text-primary transition-colors disabled:opacity-60 cursor-pointer"
         >
           {uploading ? (
-            <span className="w-4 h-4 rounded-full border-2 border-border border-t-primary animate-spin" />
+            <span className="w-4 h-4 rounded-full border-2 border-primary-tint border-t-primary animate-spin" />
           ) : (
             <>
               <AddPhotoAlternate sx={{ fontSize: 20 }} />
@@ -67,7 +67,7 @@ export function GalleryUpload({ value, onChange }: Props) {
           )}
         </button>
       </div>
-      {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
+      {error && <p className="mt-1.5 text-xs text-danger">{error}</p>}
       <input
         ref={inputRef}
         type="file"

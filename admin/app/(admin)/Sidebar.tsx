@@ -72,7 +72,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
           onClick={() => setOpenMenu(prev => !prev)}
           className={cn(
             "w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
-            isActive ? "bg-white/10 text-white" : "text-white/50 hover:text-white hover:bg-white/5"
+            isActive ? "bg-subtle-dark text-white" : "text-muted-dark hover:text-white"
           )}
         >
           <span className="flex items-center gap-3">
@@ -99,12 +99,12 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
                     href={sub.href}
                     className={cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors",
-                      pathname === sub.href ? "text-white font-medium" : "text-white/50 hover:text-white"
+                      pathname === sub.href ? "text-white font-medium" : "text-muted-dark hover:text-white"
                     )}
                   >
                     <span className={cn(
                       "w-1.5 h-1.5 rounded-full flex-shrink-0",
-                      pathname === sub.href ? "bg-white" : "bg-white/30"
+                      pathname === sub.href ? "bg-white" : "bg-muted-dark"
                     )} />
                     {sub.label}
                   </Link>
@@ -122,7 +122,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
       href={href!}
       className={cn(
         "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
-        isActive ? "bg-white/10 text-white" : "text-white/50 hover:text-white hover:bg-white/5"
+        isActive ? "bg-subtle-dark text-white" : "text-muted-dark hover:text-white"
       )}
     >
       <Icon sx={{ fontSize: 18 }} />
@@ -144,10 +144,10 @@ export function Sidebar({ userEmail }: { userEmail: string }) {
   return (
     <aside className="w-64 shrink-0 bg-foreground text-white flex flex-col h-screen">
       {/* Brand header */}
-      <div className="flex-shrink-0 px-5 py-5 border-b border-white/10">
+      <div className="flex-shrink-0 px-5 py-5 shadow-[0_1px_0_0_rgba(255,255,255,0.1)]">
         <Link
           href="/"
-          className="text-sm font-extrabold tracking-tight text-white hover:text-white/70 transition-colors"
+          className="text-sm font-extrabold tracking-tight text-white hover:text-muted-dark transition-colors"
         >
           [&lt;ondwani / admin
         </Link>
@@ -157,7 +157,7 @@ export function Sidebar({ userEmail }: { userEmail: string }) {
       <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 py-4 space-y-5">
         {navSections.map((section) => (
           <div key={section.label}>
-            <p className="text-[10px] font-bold tracking-widest uppercase text-white/25 px-3 mb-1.5">
+            <p className="text-[10px] font-bold tracking-widest uppercase text-muted-dark px-3 mb-1.5">
               {section.label}
             </p>
             <div className="space-y-0.5">
@@ -170,11 +170,11 @@ export function Sidebar({ userEmail }: { userEmail: string }) {
       </nav>
 
       {/* Footer */}
-      <div className="flex-shrink-0 px-5 py-4 border-t border-white/10">
-        <p className="text-xs text-white/30 truncate mb-3">{userEmail}</p>
+      <div className="flex-shrink-0 px-5 py-4 shadow-[0_-1px_0_0_rgba(255,255,255,0.1)]">
+        <p className="text-xs text-muted-dark truncate mb-3">{userEmail}</p>
         <button
           onClick={signOut}
-          className="flex items-center gap-2 text-xs text-white/50 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-xs text-muted-dark hover:text-white transition-colors"
         >
           <Logout sx={{ fontSize: 15 }} />
           Sign out
