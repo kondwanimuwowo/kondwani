@@ -44,38 +44,30 @@ function LoginForm() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#0a0a0a] text-white flex flex-col justify-between overflow-hidden font-sans">
-      {/* Dynamic Glowing Gradients */}
-      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-red-950/20 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-stone-900/40 blur-[180px] pointer-events-none" />
-
+    <div className="relative min-h-screen bg-background text-foreground flex flex-col justify-between font-sans">
       {/* Header */}
-      <header className="relative z-10 px-8 py-6 flex items-center justify-between border-b border-white/5 bg-black/20 backdrop-blur-md">
+      <header className="relative z-10 px-8 py-6 flex items-center justify-between bg-white shadow-sm">
         <div className="flex items-center gap-3">
-          <span className="text-xl font-black tracking-tight text-white">[&lt;ondwani</span>
-          <span className="text-white/20">·</span>
-          <span className="text-xs font-mono tracking-wider uppercase text-white/50">Client Portal</span>
+          <span className="text-xl font-black tracking-tight text-foreground">[&lt;ondwani</span>
+          <span className="text-muted">·</span>
+          <span className="text-xs font-mono tracking-wider uppercase text-muted">Client Portal</span>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[440px] bg-white/[0.02] border border-white/10 rounded-2xl p-8 backdrop-blur-xl shadow-2xl relative group hover:border-red-950/50 transition-all duration-500">
-          
-          {/* Accent Line top */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-red-600/40 to-transparent" />
-          
+        <div className="w-full max-w-[440px] bg-white rounded-2xl p-8 shadow-lg">
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-extrabold tracking-tight mb-2 text-white">
+            <h1 className="text-3xl font-extrabold tracking-tight mb-2 text-foreground">
               Welcome back
             </h1>
-            <p className="text-sm text-white/60 font-medium">
+            <p className="text-sm text-muted font-medium">
               Access your active projects, sign agreements, track milestones, and converse directly.
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-950/30 border border-red-800/40 text-xs text-red-400 font-mono">
+            <div className="mb-6 p-4 rounded-2xl bg-danger-bg text-xs text-danger font-mono">
               {error}
             </div>
           )}
@@ -83,10 +75,10 @@ function LoginForm() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-white text-black hover:bg-neutral-200 py-3.5 px-5 rounded-xl font-bold text-sm tracking-tight transition-all duration-300 shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+            className="w-full flex items-center justify-center gap-3 bg-surface text-foreground hover:bg-primary-tint py-3.5 px-5 rounded-full font-bold text-sm tracking-tight transition-all duration-300 shadow-sm active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
           >
             {loading ? (
-              <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-foreground border-t-transparent rounded-full animate-spin" />
             ) : (
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
                 <path
@@ -110,14 +102,14 @@ function LoginForm() {
             <span>{loading ? "Redirecting to Google..." : "Continue with Google"}</span>
           </button>
 
-          <div className="mt-8 text-center text-xs text-white/30 border-t border-white/5 pt-6 font-mono">
+          <div className="mt-8 text-center text-xs text-muted pt-6 font-mono">
             Secure client authentication powered by Supabase.
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 px-8 py-6 border-t border-white/5 bg-black/10 text-center text-xs text-white/40">
+      <footer className="relative z-10 px-8 py-6 bg-white shadow-[0_-1px_0_0_var(--color-border)] text-center text-xs text-muted">
         &copy; {new Date().getFullYear()} Kondwani Muwowo. All rights reserved.
       </footer>
     </div>

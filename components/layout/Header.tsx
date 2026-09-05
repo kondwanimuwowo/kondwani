@@ -2,12 +2,13 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "motion/react"
-import { Menu, X, FileDownloadOutlined } from "@mui/icons-material"
+import { Menu, X, Download, Home } from "@mui/icons-material"
 import { cn } from "@/lib/utils"
 
 const baseNavLinks = [
-  { name: "src", href: "/" },
+  { name: "Home", href: "/" },
   { name: "Projects", href: "/projects" },
   { name: "Beyond Code", href: "/beyond-code" },
   { name: "Contact", href: "/contact" },
@@ -21,6 +22,8 @@ interface HeaderProps {
 
 export function Header({ showBlog = false }: HeaderProps) {
   const navLinks = showBlog ? [...baseNavLinks.slice(0, 3), blogNavLink, baseNavLinks[3]] : baseNavLinks
+  const pathname = usePathname()
+  const isHome = pathname === "/"
   const { scrollY } = useScroll()
   const [hidden, setHidden] = React.useState(false)
   const [isScrolled, setIsScrolled] = React.useState(false)
@@ -57,17 +60,15 @@ export function Header({ showBlog = false }: HeaderProps) {
       animate={hidden ? "hidden" : "visible"}
       transition={{ duration: 0.35, ease: "easeInOut" }}
       className={cn(
-        "fixed top-0 inset-x-0 z-50 border-b transition-all duration-300",
-        isScrolled
-          ? "glass py-4 shadow-[0_1px_2px_0_rgb(0_0_0/0.033)] border-border/50"
-          : "bg-transparent py-5 border-transparent"
+        "fixed top-0 inset-x-0 z-50 transition-all duration-300",
+        isScrolled ? "glass py-4 shadow-md" : "bg-transparent py-5"
       )}
     >
       <div className="container-custom flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-extrabold tracking-tight text-foreground/70 hover:text-primary transition-colors duration-300"
+          className="text-xl font-extrabold tracking-tight text-foreground hover:text-primary transition-colors duration-300"
         >
           [&lt;ondwani
         </Link>
@@ -86,9 +87,14 @@ export function Header({ showBlog = false }: HeaderProps) {
               )}
             >
               {link.href === "/" ? (
-                <span className="inline-flex items-center bg-[#F3F4F6] text-[#7E1416] px-2.5 py-0.5 rounded text-[11px] font-mono font-extrabold border border-black/5 hover:bg-[#E5E7EB] hover:text-[#601012] transition-colors tracking-wider duration-200">
-                  src
-                </span>
+                <Home
+                  sx={{ fontSize: 20 }}
+                  className={cn(
+                    "transition-colors duration-200",
+                    isHome ? "text-primary" : "text-muted hover:text-primary"
+                  )}
+                  aria-label="Home"
+                />
               ) : (
                 link.name
               )}
@@ -101,9 +107,9 @@ export function Header({ showBlog = false }: HeaderProps) {
             href="/kondwani-resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm font-medium border border-border text-muted px-5 py-2 rounded-full hover:border-primary hover:text-foreground transition-colors duration-200"
+            className="inline-flex items-center gap-1.5 text-sm font-medium bg-surface text-muted px-5 py-2 rounded-full shadow-sm hover:text-primary transition-colors duration-200"
           >
-            <FileDownloadOutlined sx={{ fontSize: 15 }} />
+            <Download sx={{ fontSize: 15 }} />
             Resume
           </Link>
         </div>
@@ -128,7 +134,7 @@ export function Header({ showBlog = false }: HeaderProps) {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="md:hidden overflow-hidden glass border-t border-border/40"
+            className="md:hidden overflow-hidden glass shadow-md"
           >
             <nav className="container-custom flex flex-col py-4">
               {navLinks.map((link, i) => (
@@ -142,16 +148,18 @@ export function Header({ showBlog = false }: HeaderProps) {
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
-                      "block py-3.5 text-sm font-medium transition-colors border-b border-border/30 last:border-0",
+                      "block py-3.5 text-sm font-medium transition-colors",
                       link.href === "/"
                         ? "flex items-center py-2"
                         : "text-foreground hover:text-primary"
                     )}
                   >
                     {link.href === "/" ? (
-                      <span className="inline-flex items-center bg-[#F3F4F6] text-[#7E1416] px-2.5 py-0.5 rounded text-[11px] font-mono font-extrabold border border-black/5 tracking-wider">
-                        src
-                      </span>
+                      <Home
+                        sx={{ fontSize: 20 }}
+                        className={isHome ? "text-primary" : "text-muted"}
+                        aria-label="Home"
+                      />
                     ) : (
                       link.name
                     )}
@@ -169,9 +177,9 @@ export function Header({ showBlog = false }: HeaderProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-1.5 text-sm font-medium border border-border text-muted py-2.5 rounded-full hover:border-primary hover:text-foreground transition-colors"
+                  className="flex items-center justify-center gap-1.5 text-sm font-medium bg-surface text-muted py-2.5 rounded-full shadow-sm hover:text-primary transition-colors"
                 >
-                  <FileDownloadOutlined sx={{ fontSize: 15 }} />
+                  <Download sx={{ fontSize: 15 }} />
                   Resume
                 </Link>
               </motion.div>

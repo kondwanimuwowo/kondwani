@@ -59,13 +59,13 @@ export function Hero() {
               <div className="relative">
                 {/* Animated pulse rings */}
                 <motion.div
-                  className="absolute inset-0 rounded-full bg-[#7E1416] bg-opacity-10 border border-[#7E1416] border-opacity-20"
-                  animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.15, 0] }}
+                  className="absolute inset-0 rounded-full bg-primary-tint"
+                  animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.6, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                 />
                 <motion.div
-                  className="absolute inset-0 rounded-full bg-[#7E1416] bg-opacity-5 border border-[#7E1416] border-opacity-10"
-                  animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.1, 0] }}
+                  className="absolute inset-0 rounded-full bg-primary-tint"
+                  animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.4, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: 2 }}
                 />
                 <motion.div
@@ -89,15 +89,14 @@ export function Hero() {
               variants={item}
               className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05]"
             >
-              <span className="text-primary">Kondwani</span>{" "}
-              Muwowo.
+              Kondwani Muwowo.
             </motion.h1>
 
             <motion.p
               variants={item}
               className="mt-5 text-lg text-muted max-w-xl leading-relaxed"
             >
-              Software Developer, UI Designer — and a fighter against human trafficking and child exploitation.
+              Software Developer, UI Designer, and a fighter against human trafficking and child exploitation.
             </motion.p>
 
             <motion.div

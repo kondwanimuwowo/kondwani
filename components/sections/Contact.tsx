@@ -15,7 +15,7 @@ export function Contact() {
           initial={{ opacity: 0, y: 24 }}
           animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
           transition={{ duration: 0.7 }}
-          className="flex flex-col items-center text-center gap-6 bg-white border border-border rounded-2xl px-10 py-16 md:px-16 md:py-16 shadow-sm max-w-4xl mx-auto w-full"
+          className="flex flex-col items-center text-center gap-6 bg-white rounded-2xl px-10 py-16 md:px-16 md:py-16 shadow-md max-w-4xl mx-auto w-full"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
             Let&apos;s work together

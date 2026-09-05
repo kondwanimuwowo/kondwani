@@ -5,11 +5,11 @@ import { organizations, lifestyle } from "@/data/beyondCode"
 
 export const metadata: Metadata = {
   title: "Beyond Code",
-  description: "Kondwani Muwowo's purpose-driven work — fighting human trafficking with TAKUZA, supporting girls' education through GAN, and teaching forex trading to Zambian communities.",
+  description: "Kondwani Muwowo's purpose-driven work: fighting human trafficking with TAKUZA, supporting girls' education through GAN, and teaching forex trading to Zambian communities.",
   alternates: { canonical: "/beyond-code" },
   openGraph: {
-    title: "Beyond Code — Kondwani Muwowo",
-    description: "Purpose-driven work beyond development — anti-trafficking, nonprofit design, and community education.",
+    title: "Beyond Code, Kondwani Muwowo",
+    description: "Purpose-driven work beyond development: anti-trafficking, nonprofit design, and community education.",
     url: "/beyond-code",
   },
 }
@@ -22,13 +22,12 @@ export default function BeyondCodePage() {
       <div className="container-custom">
         {/* Header */}
         <div className="mb-16 text-center">
-          <p className="text-sm font-bold tracking-widest uppercase text-primary mb-4">Impact</p>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-6">
             Purpose-Driven Work
           </h1>
-          <div className="h-1 w-20 bg-gradient-to-r from-primary to-primary-hover rounded-full mx-auto mb-6" />
+          <div className="h-1 w-20 bg-primary rounded-full mx-auto mb-6" />
           <p className="text-lg text-muted max-w-2xl mx-auto">
-            Technology is a tool. The real work is building a better world — inside and outside of code.
+            Technology is a tool. The real work is building a better world, inside and outside of code.
           </p>
         </div>
 
@@ -37,15 +36,8 @@ export default function BeyondCodePage() {
           {organizations.map((org) => (
             <div
               key={org.id}
-              className="relative group overflow-hidden bg-white border border-border rounded-2xl shadow-sm grayscale hover:grayscale-0 hover:border-primary/30 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 flex flex-col min-h-[300px]"
+              className="relative group overflow-hidden bg-white rounded-2xl shadow-sm grayscale hover:grayscale-0 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 flex flex-col min-h-[300px]"
             >
-              {/* Logo watermark */}
-              {org.logo && (
-                <div className="absolute -right-6 -bottom-6 w-56 h-56 opacity-[0.07] group-hover:opacity-[0.13] transition-opacity duration-500 pointer-events-none select-none">
-                  <Image src={org.logo} alt="" fill className="object-contain" sizes="224px" />
-                </div>
-              )}
-
               {/* Content */}
               <div className="relative z-10 p-8 flex flex-col flex-1">
                 {/* Small logo */}
@@ -54,7 +46,7 @@ export default function BeyondCodePage() {
                     <Image src={org.logo} alt={org.title} fill className="object-contain" sizes="44px" />
                   </div>
                 ) : (
-                  <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 mb-5">
+                  <div className="w-11 h-11 rounded-2xl bg-primary-tint flex items-center justify-center shrink-0 mb-5">
                     <span className="text-primary font-bold text-xl">{org.title[0]}</span>
                   </div>
                 )}
@@ -66,7 +58,7 @@ export default function BeyondCodePage() {
 
                 {/* Partner */}
                 {org.partnerName && (
-                  <div className="mt-6 flex items-center gap-2 pt-5 border-t border-border">
+                  <div className="mt-6 flex items-center gap-2 pt-5">
                     {org.partnerLogo && (
                       <div className="relative w-4 h-4 rounded overflow-hidden shrink-0">
                         <Image src={org.partnerLogo} alt={org.partnerName} fill className="object-contain" sizes="16px" />
@@ -78,7 +70,7 @@ export default function BeyondCodePage() {
 
                 {/* Status + link */}
                 {(org.status || org.link) && (
-                  <div className="mt-5 flex items-center justify-between pt-5 border-t border-border">
+                  <div className="mt-5 flex items-center justify-between pt-5">
                     {org.status && (
                       <span className="flex items-center gap-1.5 text-[11px] font-medium text-muted">
                         <Circle className="text-primary animate-pulse" sx={{ fontSize: 7 }} />
@@ -99,18 +91,18 @@ export default function BeyondCodePage() {
         </div>
 
         {/* Life outside the screen */}
-        <div className="border-t border-border pt-12">
+        <div className="pt-12">
           <h2 className="text-2xl font-bold text-foreground mb-6">Life Outside the Screen</h2>
           <div className="flex flex-wrap gap-3">
             {lifestyle.map((item) => {
               const Icon = iconMap[item.icon]
               return (
                 <div key={item.label}
-                  className="flex items-center gap-3 bg-white border border-border rounded-full px-6 py-3 shadow-sm">
+                  className="flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-sm">
                   {Icon && <Icon className="text-primary" sx={{ fontSize: 20 }} />}
                   <div>
                     <span className="text-sm font-semibold text-foreground">{item.label}</span>
-                    <span className="text-sm text-muted ml-2">— {item.description}</span>
+                    <span className="text-sm text-muted ml-2">, {item.description}</span>
                   </div>
                 </div>
               )

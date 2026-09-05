@@ -36,7 +36,7 @@ export function BeyondCode() {
             Purpose-Driven Work
           </h2>
           <motion.div
-            className="h-1 w-20 bg-gradient-to-r from-primary to-primary-hover rounded-full mx-auto"
+            className="h-1 w-20 bg-primary rounded-full mx-auto"
             initial={{ scaleX: 0 }}
             animate={revealed ? { scaleX: 1 } : { scaleX: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -59,15 +59,8 @@ export function BeyondCode() {
               key={org.id}
               variants={fadeUp}
               whileHover={{ y: -6 }}
-              className="relative group overflow-hidden bg-white border border-border rounded-2xl shadow-sm grayscale hover:grayscale-0 hover:border-primary/30 hover:shadow-xl transition-all duration-500 flex flex-col min-h-[280px]"
+              className="relative group overflow-hidden bg-white rounded-2xl shadow-sm grayscale hover:grayscale-0 hover:shadow-xl transition-all duration-500 flex flex-col min-h-[280px]"
             >
-              {/* Logo watermark */}
-              {org.logo && (
-                <div className="absolute -right-6 -bottom-6 w-52 h-52 opacity-[0.07] group-hover:opacity-[0.13] transition-opacity duration-500 pointer-events-none select-none">
-                  <Image src={org.logo} alt="" fill className="object-contain" sizes="208px" />
-                </div>
-              )}
-
               {/* Content */}
               <div className="relative z-10 p-6 flex flex-col flex-1">
                 {/* Small logo */}
@@ -76,7 +69,7 @@ export function BeyondCode() {
                     <Image src={org.logo} alt={org.title} fill className="object-contain" sizes="40px" />
                   </div>
                 ) : (
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 mb-4">
+                  <div className="w-10 h-10 rounded-2xl bg-primary-tint flex items-center justify-center shrink-0 mb-4">
                     <span className="text-primary font-bold">{org.title[0]}</span>
                   </div>
                 )}
@@ -88,7 +81,7 @@ export function BeyondCode() {
 
                 {/* Partner */}
                 {org.partnerName && (
-                  <div className="mt-4 flex items-center gap-2 pt-4 border-t border-border">
+                  <div className="mt-4 flex items-center gap-2 pt-4">
                     {org.partnerLogo && (
                       <div className="relative w-4 h-4 rounded overflow-hidden shrink-0">
                         <Image src={org.partnerLogo} alt={org.partnerName} fill className="object-contain" sizes="16px" />
@@ -100,7 +93,7 @@ export function BeyondCode() {
 
                 {/* Status + link */}
                 {(org.status || org.link) && (
-                  <div className="mt-4 flex items-center justify-between pt-4 border-t border-border">
+                  <div className="mt-4 flex items-center justify-between pt-4">
                     {org.status && (
                       <span className="flex items-center gap-1.5 text-[11px] font-medium text-muted">
                         <Circle className="text-primary animate-pulse" sx={{ fontSize: 7 }} />
@@ -138,7 +131,7 @@ export function BeyondCode() {
                 key={item.label}
                 variants={fadeUp}
                 whileHover={{ scale: 1.05, y: -2 }}
-                className="flex items-center gap-2.5 bg-white border border-border rounded-full px-5 py-3 shadow-sm cursor-default"
+                className="flex items-center gap-2.5 bg-white rounded-full px-5 py-3 shadow-sm cursor-default"
               >
                 {Icon && <Icon className="text-primary" sx={{ fontSize: 18 }} />}
                 <span className="text-sm font-medium text-foreground">{item.label}</span>

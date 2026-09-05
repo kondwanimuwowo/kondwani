@@ -29,7 +29,7 @@ function ProjectCard({ project }: { project: Project }) {
     <motion.article
       variants={cardVariant}
       whileHover={{ y: -8 }}
-      className="relative group bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300"
+      className="relative group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300"
     >
       <Link href={project.slug ? `/projects/${project.slug}` : "#"} className="absolute inset-0 z-0" aria-label={project.title} />
       <div className="relative h-52 overflow-hidden bg-surface">
@@ -37,7 +37,7 @@ function ProjectCard({ project }: { project: Project }) {
           {project.imageUrl ? (
             <Image
               src={project.imageUrl}
-              alt={`${project.title} — built by Kondwani Muwowo using ${project.tech.join(", ")}`}
+              alt={`${project.title}, built by Kondwani Muwowo using ${project.tech.join(", ")}`}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -46,12 +46,11 @@ function ProjectCard({ project }: { project: Project }) {
             <div className="absolute inset-0 bg-surface" />
           )}
         </motion.div>
-        <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300" />
-        <div className="absolute bottom-3 left-3 text-[10px] font-bold tracking-widest uppercase text-white bg-foreground/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
+        <div className="absolute bottom-3 left-3 text-[10px] font-bold tracking-widest uppercase text-white bg-foreground px-3 py-1.5 rounded-full">
           {project.category}
         </div>
         {project.status && (
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-foreground/80 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm">
+          <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-foreground text-white text-[11px] font-semibold px-3 py-1.5 rounded-full">
             <Circle className="text-primary animate-pulse" sx={{ fontSize: 8 }} />
             {project.status}
           </div>
@@ -62,17 +61,17 @@ function ProjectCard({ project }: { project: Project }) {
         <p className="text-sm text-muted leading-relaxed line-clamp-2 mb-4">{project.excerpt ?? project.description}</p>
         <div className="flex items-center gap-1.5 mb-5 overflow-hidden">
           {project.tech.slice(0, 3).map((t) => (
-            <span key={t} className="text-[11px] font-medium bg-surface border border-border text-foreground/60 px-2.5 py-1 rounded-full whitespace-nowrap">
+            <span key={t} className="text-[11px] font-medium bg-surface text-muted px-2.5 py-1 rounded-full whitespace-nowrap">
               {t}
             </span>
           ))}
           {project.tech.length > 3 && (
-            <span className="text-[11px] font-medium bg-surface border border-border text-foreground/60 px-2.5 py-1 rounded-full whitespace-nowrap shrink-0">
+            <span className="text-[11px] font-medium bg-surface text-muted px-2.5 py-1 rounded-full whitespace-nowrap shrink-0">
               +{project.tech.length - 3}
             </span>
           )}
         </div>
-        <div className="relative z-10 flex items-center gap-5 pt-4 border-t border-border">
+        <div className="relative z-10 flex items-center gap-5 pt-4">
           {project.liveUrl && (
             <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-primary transition-colors">
@@ -96,7 +95,7 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
     <motion.article
       variants={cardVariant}
       whileHover={{ y: -8 }}
-      className="relative group bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300"
+      className="relative group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300"
     >
       <Link href={`/case-studies/${study.slug}`} className="absolute inset-0 z-0" aria-label={study.title} />
       <div className="relative h-52 overflow-hidden bg-surface">
@@ -113,8 +112,7 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
             <div className="absolute inset-0 bg-surface" />
           )}
         </motion.div>
-        <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300" />
-        <div className="absolute bottom-3 left-3 text-[10px] font-bold tracking-widest uppercase text-white bg-foreground/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
+        <div className="absolute bottom-3 left-3 text-[10px] font-bold tracking-widest uppercase text-white bg-foreground px-3 py-1.5 rounded-full">
           Case Study
         </div>
       </div>
@@ -126,17 +124,17 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
         <p className="text-sm text-muted leading-relaxed line-clamp-2 mb-4">{study.excerpt}</p>
         <div className="flex items-center gap-1.5 mb-5 overflow-hidden">
           {study.tech.slice(0, 3).map((t) => (
-            <span key={t} className="text-[11px] font-medium bg-surface border border-border text-foreground/60 px-2.5 py-1 rounded-full whitespace-nowrap">
+            <span key={t} className="text-[11px] font-medium bg-surface text-muted px-2.5 py-1 rounded-full whitespace-nowrap">
               {t}
             </span>
           ))}
           {study.tech.length > 3 && (
-            <span className="text-[11px] font-medium bg-surface border border-border text-foreground/60 px-2.5 py-1 rounded-full whitespace-nowrap shrink-0">
+            <span className="text-[11px] font-medium bg-surface text-muted px-2.5 py-1 rounded-full whitespace-nowrap shrink-0">
               +{study.tech.length - 3}
             </span>
           )}
         </div>
-        <div className="relative z-10 flex items-center gap-5 pt-4 border-t border-border">
+        <div className="relative z-10 flex items-center gap-5 pt-4">
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground group-hover:text-primary transition-colors">
             Read Case Study <ArrowForward sx={{ fontSize: 16 }} />
           </span>
@@ -166,14 +164,14 @@ export function ProjectsAndCaseStudies({ projects, caseStudies }: Props) {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${
+            className={`px-5 py-2 rounded-full text-sm font-medium shadow-sm transition-colors flex items-center gap-2 ${
               tab === t.id
                 ? "bg-primary text-white"
-                : "bg-white border border-border text-foreground/70 hover:border-primary hover:text-primary"
+                : "bg-white text-muted hover:text-primary"
             }`}
           >
             {t.label}
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${tab === t.id ? "bg-white/20" : "bg-surface"}`}>
+            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${tab === t.id ? "bg-primary-hover text-white" : "bg-surface text-muted"}`}>
               {t.count}
             </span>
           </button>

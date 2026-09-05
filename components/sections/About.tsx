@@ -56,7 +56,7 @@ export function About() {
             About Me
           </h2>
           <motion.div
-            className="h-1 w-20 bg-gradient-to-r from-primary to-primary-hover rounded-full mx-auto"
+            className="h-1 w-20 bg-primary rounded-full mx-auto"
             initial={{ scaleX: 0 }}
             animate={revealed ? { scaleX: 1 } : { scaleX: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -71,7 +71,7 @@ export function About() {
             <span className="font-semibold text-primary">Kondwani Muwowo</span>, a
             self-taught Software Developer and UI Designer based in Lusaka, Zambia. I started
             building websites with WordPress, discovered real coding in 2024, and instantly fell in
-            love — since then I&apos;ve been pushing myself to build digital products that are both
+            love. Since then I&apos;ve been pushing myself to build digital products that are both
             beautiful and purposeful.
           </motion.p>
 
@@ -88,23 +88,23 @@ export function About() {
                 <div className="mt-6 space-y-6 text-lg text-muted leading-relaxed">
                   <p>
                     My time in ministry leadership shaped how I think, communicate, and work with
-                    others — it taught me depth, discipline, and compassion. I still carry that same
+                    others. It taught me depth, discipline, and compassion. I still carry that same
                     heart today, both in the way I approach my craft and in the humanitarian work I do.
                   </p>
                   <p>
                     I fight human trafficking with{" "}
-                    <span className="text-foreground/70 font-medium">TAKUZA (Talitha Kum Zambia)</span>{" "}
+                    <span className="text-muted font-medium">TAKUZA (Talitha Kum Zambia)</span>{" "}
                     under the Love Justice International Project, intercepting potential victims at
                     border crossings and transit hubs before they can be exploited. It&apos;s work that
                     reminds me every day why impact matters.
                   </p>
                   <p>
                     I also volunteer as developer and designer for{" "}
-                    <span className="text-foreground/70 font-medium">The Great Achievers Network (GAN)</span>,
+                    <span className="text-muted font-medium">The Great Achievers Network (GAN)</span>,
                     a nonprofit supporting vulnerable girls in Zambia with education, mentorship, and
                     practical skills.
                   </p>
-                  <p className="font-medium text-foreground/70">
+                  <p className="font-medium text-muted">
                     Faith, technology, and impact.
                   </p>
                 </div>
@@ -129,7 +129,7 @@ export function About() {
         {/* Stats */}
         <motion.div
           variants={fadeUp}
-          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-border pt-12"
+          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 pt-12"
         >
           {stats.map((stat) => (
             <StatItem key={stat.label} {...stat} />

@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const doc = await db.query.document.findFirst({ where: (t, { eq }) => eq(t.token, token), columns: { number: true, type: true } })
   if (!doc) return {}
   return {
-    title: `${doc.number} — Kondwani Muwowo`,
+    title: `${doc.number}, Kondwani Muwowo`,
     robots: { index: false },
   }
 }
@@ -37,7 +37,7 @@ export default async function PublicDocumentPage({ params }: Props) {
   const { currency } = doc
 
   function fmt(date: Date | null) {
-    if (!date) return "—"
+    if (!date) return "N/A"
     return new Date(date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
   }
 
@@ -60,44 +60,44 @@ export default async function PublicDocumentPage({ params }: Props) {
       `}</style>
 
       {/* Toolbar — hidden on print */}
-      <div className="no-print sticky top-0 z-10 bg-white border-b border-border px-8 py-3 flex items-center justify-between">
+      <div className="no-print sticky top-0 z-10 bg-white shadow-sm px-8 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-sm font-extrabold tracking-tight text-foreground">[&lt;ondwani</span>
-          <span className="text-muted/40">·</span>
+          <span className="text-muted">·</span>
           <span className="text-sm font-mono text-muted">{doc.number}</span>
         </div>
         <PrintButton />
       </div>
 
       {/* Document */}
-      <div className="min-h-screen bg-[#f5f5f4] py-10 px-4 print:py-0 print:px-0">
+      <div className="min-h-screen bg-surface py-10 px-4 print:py-0 print:px-0">
         <div className="print-page max-w-3xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden print:rounded-none print:shadow-none">
           {/* Header band */}
           <div className="bg-foreground text-white px-10 py-8 relative overflow-hidden">
             {/* Watermark for paid/accepted */}
             {(isPaid || isAccepted) && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                <span className="text-[80px] font-black uppercase text-emerald-400/20 rotate-[-30deg] tracking-widest">
+                <span className="text-[80px] font-black uppercase text-subtle-dark rotate-[-30deg] tracking-widest">
                   {isPaid ? "PAID" : "ACCEPTED"}
                 </span>
               </div>
             )}
             {isVoid && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                <span className="text-[80px] font-black uppercase text-red-400/20 rotate-[-30deg] tracking-widest">VOID</span>
+                <span className="text-[80px] font-black uppercase text-subtle-dark rotate-[-30deg] tracking-widest">VOID</span>
               </div>
             )}
             <div className="relative flex items-start justify-between">
               <div>
-                <p className="text-4xl font-black tracking-tight opacity-10 leading-none mb-1">
+                <p className="text-sm font-bold tracking-widest uppercase text-muted-dark leading-none mb-1">
                   {doc.type.toUpperCase()}
                 </p>
                 <p className="text-2xl font-mono font-bold tracking-tight">{doc.number}</p>
               </div>
               <div className="text-right">
                 <p className="font-extrabold text-lg tracking-tight">[&lt;ondwani</p>
-                <p className="text-white/60 text-sm">kondwanimuwowo.com</p>
-                <p className="text-white/60 text-sm">kondwanimuwowo@gmail.com</p>
+                <p className="text-muted-dark text-sm">kondwanimuwowo.com</p>
+                <p className="text-muted-dark text-sm">kondwanimuwowo@gmail.com</p>
               </div>
             </div>
           </div>
@@ -128,11 +128,10 @@ export default async function PublicDocumentPage({ params }: Props) {
                 )}
                 <div className="pt-1">
                   <span className={`inline-block text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full ${
-                    isPaid || isAccepted ? "bg-emerald-50 text-emerald-700" :
-                    doc.status === "sent" ? "bg-blue-50 text-blue-700" :
-                    doc.status === "review" ? "bg-amber-50 text-amber-700" :
-                    isVoid ? "bg-slate-100 text-slate-400" :
-                    "bg-slate-100 text-slate-500"
+                    isPaid || isAccepted ? "bg-success-bg text-success" :
+                    doc.status === "sent" ? "bg-info-bg text-info" :
+                    doc.status === "review" ? "bg-warning-bg text-warning" :
+                    "bg-neutral-bg text-muted"
                   }`}>
                     {doc.status.toUpperCase()}
                   </span>
@@ -152,7 +151,7 @@ export default async function PublicDocumentPage({ params }: Props) {
               </thead>
               <tbody>
                 {doc.items.map((item: { id: string; description: string; quantity: number; rate: number; amount: number }, i: number) => (
-                  <tr key={item.id} className={i % 2 === 0 ? "" : "bg-surface/50"}>
+                  <tr key={item.id} className={i % 2 === 0 ? "" : "bg-surface"}>
                     <td className="py-3 text-sm text-foreground">{item.description}</td>
                     <td className="py-3 text-sm text-muted text-right">{item.quantity}</td>
                     <td className="py-3 text-sm text-muted text-right">{money(item.rate)}</td>
@@ -173,7 +172,7 @@ export default async function PublicDocumentPage({ params }: Props) {
                     <span>Tax ({doc.taxRate}%)</span><span>{money(taxAmount)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-lg font-bold text-foreground border-t border-foreground pt-2 mt-2">
+                <div className="flex justify-between text-lg font-bold text-foreground bg-surface rounded-2xl px-3 py-2 mt-2">
                   <span>Total</span><span>{money(total)}</span>
                 </div>
               </div>
@@ -181,7 +180,7 @@ export default async function PublicDocumentPage({ params }: Props) {
 
             {/* Notes */}
             {doc.notes && (
-              <div className="border-t border-border pt-6">
+              <div className="bg-surface rounded-2xl p-6">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2">Notes</p>
                 <p className="text-sm text-muted whitespace-pre-wrap">{doc.notes}</p>
               </div>

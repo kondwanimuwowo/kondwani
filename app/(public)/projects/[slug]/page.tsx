@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: proj.excerpt ?? proj.description,
     alternates: { canonical: `/projects/${slug}` },
     openGraph: {
-      title: `${proj.title} — Kondwani Muwowo`,
+      title: `${proj.title}, Kondwani Muwowo`,
       description: proj.excerpt ?? proj.description,
       url: `/projects/${slug}`,
       images: proj.imageUrl ? [{ url: proj.imageUrl }] : [],
@@ -66,7 +66,7 @@ export default async function ProjectDetailPage({ params }: Props) {
           {proj.imageUrl ? (
             <Image
               src={proj.imageUrl}
-              alt={`${proj.title} — built by Kondwani Muwowo using ${proj.tech.join(", ")}`}
+              alt={`${proj.title}, built by Kondwani Muwowo using ${proj.tech.join(", ")}`}
               fill
               className="object-cover"
               priority
@@ -75,7 +75,6 @@ export default async function ProjectDetailPage({ params }: Props) {
           ) : (
             <div className="absolute inset-0 bg-surface" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
         </div>
 
         <div className="container-custom max-w-4xl -mt-16 relative z-10">
@@ -89,15 +88,15 @@ export default async function ProjectDetailPage({ params }: Props) {
           </nav>
 
           {/* Header card */}
-          <div className="bg-white border border-border rounded-2xl p-8 shadow-sm mb-8">
+          <div className="bg-white rounded-2xl p-8 shadow-sm mb-8">
             <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">
-                  <span className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary/8 px-3 py-1 rounded-full">
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary-tint px-3 py-1 rounded-full">
                     {proj.category}
                   </span>
                   {proj.status && (
-                    <span className="text-[10px] font-bold tracking-widest uppercase text-muted bg-surface border border-border px-3 py-1 rounded-full">
+                    <span className="text-[10px] font-bold tracking-widest uppercase text-muted bg-surface px-3 py-1 rounded-full">
                       {proj.status}
                     </span>
                   )}
@@ -115,7 +114,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                 )}
                 {proj.githubUrl && (
                   <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 border border-border text-foreground px-5 py-2.5 rounded-full text-sm font-medium hover:border-primary hover:text-primary transition-colors">
+                    className="inline-flex items-center gap-2 bg-surface text-foreground px-5 py-2.5 rounded-full text-sm font-medium shadow-sm hover:text-primary transition-colors">
                     <GitHub sx={{ fontSize: 16 }} /> Code
                   </a>
                 )}
@@ -123,7 +122,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             </div>
 
             {/* Meta row */}
-            <div className="flex flex-wrap gap-6 text-sm text-muted border-t border-border pt-5">
+            <div className="flex flex-wrap gap-6 text-sm text-muted pt-5">
               {proj.year && <span><span className="font-medium text-foreground">Year</span> · {proj.year}</span>}
               {proj.role && <span><span className="font-medium text-foreground">Role</span> · {proj.role}</span>}
             </div>
@@ -132,7 +131,7 @@ export default async function ProjectDetailPage({ params }: Props) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main content */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white border border-border rounded-2xl p-8 shadow-sm">
+              <div className="bg-white rounded-2xl p-8 shadow-sm">
                 <h2 className="text-lg font-bold text-foreground mb-4">About This Project</h2>
                 <p className="text-muted leading-relaxed">{proj.description}</p>
               </div>
@@ -140,11 +139,11 @@ export default async function ProjectDetailPage({ params }: Props) {
 
             {/* Sidebar */}
             <div className="space-y-5">
-              <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+              <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <h3 className="text-sm font-bold text-foreground mb-4 tracking-wide uppercase">Tech Stack</h3>
                 <div className="flex flex-wrap gap-2">
                   {proj.tech.map((t) => (
-                    <span key={t} className="text-xs font-medium bg-surface border border-border text-foreground/70 px-3 py-1.5 rounded-full">
+                    <span key={t} className="text-xs font-medium bg-surface text-muted px-3 py-1.5 rounded-full">
                       {t}
                     </span>
                   ))}

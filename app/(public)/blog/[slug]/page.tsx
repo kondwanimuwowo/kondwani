@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.excerpt,
       alternates: { canonical: `/blog/${slug}` },
       openGraph: {
-        title: `${post.title} — Kondwani Muwowo`,
+        title: `${post.title}, Kondwani Muwowo`,
         description: post.excerpt,
         url: `/blog/${slug}`,
         type: "article",
@@ -62,7 +62,6 @@ export default async function BlogPostPage({ params }: Props) {
         {post.coverImage && (
           <div className="relative h-64 md:h-96 bg-surface overflow-hidden mb-0">
             <Image src={post.coverImage} alt={post.title} fill className="object-cover" priority sizes="100vw" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
           </div>
         )}
 
@@ -77,7 +76,7 @@ export default async function BlogPostPage({ params }: Props) {
 
           <div className="flex flex-wrap gap-1.5 mb-4">
             {post.tags.map((tag: string) => (
-              <span key={tag} className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary/8 px-2.5 py-0.5 rounded-full">
+              <span key={tag} className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary-tint px-2.5 py-0.5 rounded-full">
                 {tag}
               </span>
             ))}
@@ -96,7 +95,7 @@ export default async function BlogPostPage({ params }: Props) {
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
-          <div className="mt-16 pt-8 border-t border-border">
+          <div className="mt-16 pt-8">
             <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-primary transition-colors">
               <ArrowBack sx={{ fontSize: 16 }} /> Back to Blog
             </Link>

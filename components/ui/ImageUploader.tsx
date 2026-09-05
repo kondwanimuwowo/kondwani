@@ -48,13 +48,13 @@ export function ImageUploader({ value, onChange, label = "Image" }: ImageUploade
       <label className="block text-xs font-medium text-muted mb-1">{label}</label>
 
       {value ? (
-        <div className="relative rounded-xl overflow-hidden border border-border group w-full h-40">
+        <div className="relative rounded-2xl overflow-hidden shadow-sm group w-full h-40">
           <Image src={value} alt="Uploaded" fill className="object-cover" />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+          <div className="absolute inset-0 flex items-end justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               type="button"
               onClick={() => onChange("")}
-              className="opacity-0 group-hover:opacity-100 bg-white text-red-600 rounded-full p-1.5 transition-opacity"
+              className="bg-white text-danger rounded-full p-1.5 shadow-sm"
               title="Remove"
             >
               <Delete fontSize="small" />
@@ -68,10 +68,10 @@ export function ImageUploader({ value, onChange, label = "Image" }: ImageUploade
           onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
           onDragOver={(e) => e.preventDefault()}
           disabled={uploading}
-          className="w-full h-40 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center gap-2 text-muted hover:border-primary hover:text-primary transition-colors disabled:opacity-50"
+          className="w-full h-40 bg-surface rounded-2xl flex flex-col items-center justify-center gap-2 text-muted hover:text-primary transition-colors disabled:opacity-50"
         >
           {uploading ? (
-            <span className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+            <span className="w-6 h-6 border-2 border-primary-tint border-t-primary rounded-full animate-spin" />
           ) : (
             <>
               <CloudUpload />
@@ -88,10 +88,10 @@ export function ImageUploader({ value, onChange, label = "Image" }: ImageUploade
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Or paste an image URL"
-        className="mt-2 w-full border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+        className="mt-2 w-full bg-surface rounded-2xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
       />
 
-      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+      {error && <p className="text-xs text-danger mt-1">{error}</p>}
 
       <input
         ref={inputRef}

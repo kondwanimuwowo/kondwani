@@ -18,7 +18,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 const inputClass =
-  "w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-foreground placeholder:text-muted/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-colors"
+  "w-full px-4 py-3 bg-surface rounded-2xl text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
@@ -51,9 +51,7 @@ export function ContactForm() {
       {/* Info column */}
       <div className="lg:col-span-2 space-y-4">
         <a href="mailto:kondwanimuwowo@gmail.com" className="flex items-center gap-4 group">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Email className="text-primary" fontSize="small" />
-          </div>
+          <Email className="text-primary shrink-0" fontSize="medium" />
           <div>
             <p className="text-sm font-medium text-foreground mb-0.5">Email</p>
             <p className="text-sm text-muted group-hover:text-primary transition-colors">
@@ -63,9 +61,7 @@ export function ContactForm() {
         </a>
 
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <LocationOn className="text-primary" fontSize="small" />
-          </div>
+          <LocationOn className="text-primary shrink-0" fontSize="medium" />
           <div>
             <p className="text-sm font-medium text-foreground mb-0.5">Location</p>
             <p className="text-sm text-muted">Lusaka, Zambia</p>
@@ -81,7 +77,7 @@ export function ContactForm() {
             animate={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center justify-center py-20 text-center"
           >
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-5">
+            <div className="w-16 h-16 rounded-full bg-primary-tint flex items-center justify-center mb-5">
               <CheckCircle className="text-primary" sx={{ fontSize: 32 }} />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">Message sent!</h3>
@@ -103,14 +99,14 @@ export function ContactForm() {
                   Name <span className="text-primary">*</span>
                 </label>
                 <input id="name" type="text" {...register("name")} placeholder="Kondwani Muwowo" className={inputClass} />
-                {errors.name && <p className="mt-1.5 text-xs text-red-500">{errors.name.message}</p>}
+                {errors.name && <p className="mt-1.5 text-xs text-danger">{errors.name.message}</p>}
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
                   Email <span className="text-primary">*</span>
                 </label>
                 <input id="email" type="email" {...register("email")} placeholder="you@example.com" className={inputClass} />
-                {errors.email && <p className="mt-1.5 text-xs text-red-500">{errors.email.message}</p>}
+                {errors.email && <p className="mt-1.5 text-xs text-danger">{errors.email.message}</p>}
               </div>
             </div>
 
@@ -130,11 +126,11 @@ export function ContactForm() {
                 placeholder="Tell me about your project..."
                 className={`${inputClass} resize-none`}
               />
-              {errors.message && <p className="mt-1.5 text-xs text-red-500">{errors.message.message}</p>}
+              {errors.message && <p className="mt-1.5 text-xs text-danger">{errors.message.message}</p>}
             </div>
 
             {status === "error" && (
-              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <div className="flex items-center gap-2 text-sm text-danger bg-danger-bg rounded-2xl px-4 py-3">
                 <ErrorIcon fontSize="small" />
                 Something went wrong. Please try again or email me directly.
               </div>

@@ -68,6 +68,38 @@ npm run preview    # Preview production build
 - Everything in reusable, modular components
 - Content is data-driven (keep the `data/` pattern from the current portfolio)
 
+## UI Design Rules
+
+Apply these across portfolio, admin, and blog:
+
+- No emojis. Avoid borders wherever possible — separate elements with subtle shadows (medium preferred, or large/color contrast) instead.
+- Common, clean fonts. Use image backgrounds for sections and images on cards where reasonable.
+- Subtle animations only, nothing flashy or attention-grabbing.
+- On large screens, leave generous gutters on both sides — main content area should be 60-70% of total screen width.
+- Generous whitespace throughout; err toward more padding/space between sections.
+- Pure white background unless a different background is specified. Full, solid colors only on sections/cards/buttons — no transparency or reduced opacity, no gradients anywhere.
+- Sections are full-width; some (especially homepage hero) can use a full-width background image.
+- Headings/titles: monochrome (one color per line), no repeated word/phrase within a single line, large enough to stand out, no eyebrow text above them.
+- Never use em dashes.
+- Solid-style icons only (not outline/line), one consistent icon set, consistent weight/size. Never put icons inside colored circles/badges above feature cards.
+- Consistent spacing scale (4px/8px increments), no arbitrary spacing values.
+- Hero/section imagery should be real or custom photography/illustration, not generic stock-photo-style visuals.
+- Buttons fully rounded (pill-shaped) by default. One consistent corner-radius value (or small defined set) across all cards, inputs, containers.
+
+## Copy Rules
+
+- Never use em dashes or en dashes anywhere. Straight quotes only, never curly. Sentence case for headings, not Title Case.
+- No emojis in headings, buttons, or body copy.
+- Plain, direct copy — no inflated-significance phrasing ("stands as," "a testament to," "plays a vital role," "marks a pivotal moment").
+- No promotional/advertising language ("vibrant," "stunning," "boasts," "nestled," "must-see," "cutting-edge").
+- No vague attributions ("experts say," "studies show") without naming a real, specific source.
+- Don't force ideas into groups of three just to sound thorough. No "-ing" phrases tacked on for fake depth.
+- Avoid AI-cliche vocabulary: delve, crucial, pivotal, tapestry, landscape (abstract noun), testament, underscore, foster, showcase, seamless, elevate, unlock, unleash.
+- No filler phrases ("in order to," "due to the fact that," "it is important to note that").
+- No sycophantic/overly enthusiastic tone. No generic vague closing lines ("the future looks bright").
+- Avoid "not only... but also" and other negative-parallelism constructions.
+- Concise and concrete — no filler, no restating the heading in the first line beneath it.
+
 ## Cloudflare Pages Deployment Notes
 
 - The current portfolio deploys with `wrangler pages deploy dist`

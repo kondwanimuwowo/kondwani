@@ -36,7 +36,7 @@ export function NewsletterForm() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
             onSubmit={handleSubmit}
-            className="flex items-center gap-0 bg-white/[0.05] border border-white/10 rounded-full pl-5 pr-1.5 py-1.5 focus-within:border-white/25 transition-colors duration-200"
+            className="flex items-center gap-0 bg-subtle-dark rounded-full pl-5 pr-1.5 py-1.5 focus-within:ring-2 focus-within:ring-muted-dark transition-colors duration-200"
           >
             <input
               type="email"
@@ -44,7 +44,7 @@ export function NewsletterForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
-              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/25 outline-none min-w-0"
+              className="flex-1 bg-transparent text-sm text-white placeholder:text-muted-dark outline-none min-w-0"
             />
             <button
               type="submit"
@@ -69,12 +69,12 @@ export function NewsletterForm() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="flex items-center justify-center gap-2.5 border border-white/10 rounded-full py-3 px-6"
+            className="flex items-center justify-center gap-2.5 bg-subtle-dark rounded-full py-3 px-6"
           >
             <span className="w-5 h-5 rounded-full bg-primary flex items-center justify-center shrink-0">
               <Check sx={{ fontSize: 12 }} className="text-white" />
             </span>
-            <span className="text-sm text-white/50">You&apos;re in. Talk soon.</span>
+            <span className="text-sm text-muted-dark">You&apos;re in. Talk soon.</span>
           </motion.div>
         )}
       </AnimatePresence>

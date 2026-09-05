@@ -78,7 +78,7 @@ export function Skills({ techPills = defaultPills, skillCategories = defaultCate
             Tech Stack
           </h2>
           <motion.div
-            className="h-1 w-20 bg-gradient-to-r from-primary to-primary-hover rounded-full mx-auto"
+            className="h-1 w-20 bg-primary rounded-full mx-auto"
             initial={{ scaleX: 0 }}
             animate={revealed ? { scaleX: 1 } : { scaleX: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -100,7 +100,7 @@ export function Skills({ techPills = defaultPills, skillCategories = defaultCate
                 key={tech}
                 variants={fadeUp}
                 whileHover={{ scale: 1.1, y: -4 }}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white border border-border rounded-full text-sm font-medium text-foreground shadow-sm cursor-default hover:border-primary hover:bg-primary/5 transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full text-sm font-medium text-foreground shadow-sm cursor-default hover:bg-primary-tint transition-colors"
               >
                 {Icon && <Icon size={16} className="text-primary" />}
                 {tech}
@@ -123,26 +123,19 @@ export function Skills({ techPills = defaultPills, skillCategories = defaultCate
                 key={category.id}
                 variants={fadeUp}
                 whileHover={{ y: -6 }}
-                className="relative group overflow-hidden bg-white border border-border rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300"
+                className="relative group overflow-hidden bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300"
               >
-                {/* Watermark icon */}
-                <div className="absolute right-3 bottom-3 pointer-events-none select-none opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-500">
-                  {Icon && <Icon sx={{ fontSize: 140 }} className="text-foreground" />}
-                </div>
-
                 <div className="relative z-10">
                   {/* Icon + Title row */}
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                      {Icon && <Icon className="text-primary" fontSize="small" />}
-                    </div>
-                    <h3 className="font-bold text-foreground/60 text-base leading-tight">
+                    {Icon && <Icon className="text-primary shrink-0" fontSize="medium" />}
+                    <h3 className="font-bold text-muted text-base leading-tight">
                       {category.title}
                     </h3>
                   </div>
                   <ul className="space-y-2.5">
                     {category.skills.map((skill) => (
-                      <li key={skill.name} className="text-sm text-foreground/80">
+                      <li key={skill.name} className="text-sm text-muted">
                         {skill.name}
                       </li>
                     ))}

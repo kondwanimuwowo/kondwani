@@ -9,11 +9,24 @@
   --color-primary: #7E1416;
   --color-primary-hover: #601012;
   --color-primary-dark: #501010;
+  --color-primary-tint: #F2E5E5;
   --color-background: #FFFFFF;
   --color-surface: #F8F9FA;
   --color-foreground: #0A0A0A;
   --color-muted: #6B7280;
   --color-border: #E5E7EB;
+
+  --color-success: #15803D;
+  --color-success-bg: #E7F5EC;
+  --color-warning: #B45309;
+  --color-warning-bg: #FBF0DF;
+  --color-danger: #B91C1C;
+  --color-danger-bg: #FBE9E9;
+  --color-info: #1D4ED8;
+  --color-info-bg: #E7EDFB;
+  --color-neutral-bg: #F1F1F1;
+  --color-muted-dark: #8C8C8C;
+  --color-subtle-dark: #161616;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
@@ -60,12 +73,5 @@ body {
   .underline-primary {
     position: relative;
     display: inline-block;
-  }
-
-  .gradient-text {
-    background: linear-gradient(135deg, #0a0a0a 0%, #7E1416 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
 }

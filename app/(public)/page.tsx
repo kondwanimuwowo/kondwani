@@ -50,7 +50,7 @@ const faqJsonLd = {
       name: "What does Kondwani Muwowo build?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Kondwani builds purposeful web applications and digital products — from client-facing marketing sites to SaaS platforms — with a focus on clean UI, smooth interactions, and solid front-end engineering.",
+        text: "Kondwani builds purposeful web applications and digital products, from client-facing marketing sites to SaaS platforms, with a focus on clean UI, smooth interactions, and solid front-end engineering.",
       },
     },
     {
