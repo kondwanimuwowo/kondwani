@@ -1,16 +1,40 @@
 import { embed, embedMany, generateObject } from "ai"
+import { createOpenAI } from "@ai-sdk/openai"
+import { createAnthropic } from "@ai-sdk/anthropic"
 import { z } from "zod"
 import { BRAIN_CATEGORIES } from "./types"
 
-// All models are routed through the Vercel AI Gateway (AI_GATEWAY_API_KEY).
-export const EMBEDDING_MODEL = "openai/text-embedding-3-small" // 1536 dims — must match vector(1536) in schema
-export const ENRICH_MODEL = "anthropic/claude-haiku-4-5"
-export const ANSWER_MODEL = "anthropic/claude-sonnet-5"
+// All models are routed through Cloudflare AI Gateway (gateway.ai.cloudflare.com),
+// which proxies to the real provider using the provider's own API key.
+function gatewayUrl(provider: "openai" | "anthropic") {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID
+  const gatewayId = process.env.CLOUDFLARE_AI_GATEWAY_ID
+  return `https://gateway.ai.cloudflare.com/v1/${accountId}/${gatewayId}/${provider}`
+}
+
+const openai = createOpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: gatewayUrl("openai"),
+})
+
+const anthropic = createAnthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  baseURL: gatewayUrl("anthropic"),
+})
+
+export const EMBEDDING_MODEL = openai.textEmbeddingModel("text-embedding-3-small") // 1536 dims — must match vector(1536) in schema
+export const ENRICH_MODEL = anthropic("claude-haiku-4-5")
+export const ANSWER_MODEL = anthropic("claude-sonnet-5")
 
 export function assertAiConfigured() {
-  if (!process.env.AI_GATEWAY_API_KEY) {
+  if (!process.env.CLOUDFLARE_ACCOUNT_ID || !process.env.CLOUDFLARE_AI_GATEWAY_ID) {
     throw new Error(
-      "AI_GATEWAY_API_KEY is not set — embeddings and enrichment need the Vercel AI Gateway. See BRAIN-SETUP.md."
+      "CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_AI_GATEWAY_ID is not set — embeddings and enrichment need Cloudflare AI Gateway. See BRAIN-SETUP.md."
+    )
+  }
+  if (!process.env.OPENAI_API_KEY || !process.env.ANTHROPIC_API_KEY) {
+    throw new Error(
+      "OPENAI_API_KEY / ANTHROPIC_API_KEY is not set — Cloudflare AI Gateway still needs the real provider keys. See BRAIN-SETUP.md."
     )
   }
 }
