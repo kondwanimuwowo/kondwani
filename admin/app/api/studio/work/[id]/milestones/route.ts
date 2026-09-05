@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, billingMilestone, document, documentItem } from "@/lib/db"
+import { and, count, desc, eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 import { nanoid } from "nanoid"
 
@@ -9,10 +10,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const milestones = await prisma.billingMilestone.findMany({
-    where: { projectId: id },
-    include: { invoice: { select: { id: true, number: true, status: true, token: true } } },
-    orderBy: { position: "asc" },
+  const milestones = await db.query.billingMilestone.findMany({
+    where: (t, { eq }) => eq(t.projectId, id),
+    with: { invoice: { columns: { id: true, number: true, status: true, token: true } } },
+    orderBy: (t, { asc }) => asc(t.position),
   })
   return NextResponse.json(milestones)
 }
@@ -36,9 +37,9 @@ export async function POST(
       return NextResponse.json({ error: "Milestone ID is required" }, { status: 400 })
     }
 
-    const milestone = await prisma.billingMilestone.findUnique({
-      where: { id: milestoneId },
-      include: { project: true, invoice: true }
+    const milestone = await db.query.billingMilestone.findFirst({
+      where: (t, { eq }) => eq(t.id, milestoneId),
+      with: { project: true, invoice: true },
     })
 
     if (!milestone) {
@@ -54,10 +55,10 @@ export async function POST(
 
     const nextNumber = async (type: "invoice" | "quote") => {
       const prefix = type === "invoice" ? "INV" : "QUO"
-      const last = await prisma.document.findFirst({
-        where: { type },
-        orderBy: { number: "desc" },
-        select: { number: true },
+      const last = await db.query.document.findFirst({
+        where: (t, { eq }) => eq(t.type, type),
+        orderBy: (t, { desc }) => desc(t.number),
+        columns: { number: true },
       })
       if (!last) return `${prefix}-001`
       const n = parseInt(last.number.split("-")[1] ?? "0", 10)
@@ -67,50 +68,53 @@ export async function POST(
     const invoiceNumber = await nextNumber("invoice")
     const token = nanoid(10)
 
-    const invoice = await prisma.document.create({
-      data: {
+    const invoice = await db.transaction(async (tx) => {
+      const [inv] = await tx.insert(document).values({
         type: "invoice",
         number: invoiceNumber,
-        clientId: milestone.project.clientId,
+        clientId: milestone.project.clientId!,
         projectId: milestone.projectId,
         milestoneId: milestone.id,
         status: "draft",
         token,
-        items: {
-          create: [{
-            description: `Milestone: ${milestone.title}`,
-            quantity: 1,
-            rate: milestone.amount,
-            amount: milestone.amount,
-            flat: true,
-            position: 0
-          }]
-        }
-      }
-    })
+      }).returning()
 
-    await prisma.billingMilestone.update({
-      where: { id: milestone.id },
-      data: { status: "invoiced" }
+      await tx.insert(documentItem).values({
+        documentId: inv.id,
+        description: `Milestone: ${milestone.title}`,
+        quantity: 1,
+        rate: milestone.amount,
+        amount: milestone.amount,
+        flat: true,
+        position: 0,
+      })
+
+      await tx.update(billingMilestone).set({ status: "invoiced" }).where(eq(billingMilestone.id, milestone.id))
+
+      return inv
     })
 
     return NextResponse.json(invoice)
   }
 
   // Count existing milestones for position
-  const count = await prisma.billingMilestone.count({ where: { projectId: id } })
+  const [{ value: milestoneCount }] = await db
+    .select({ value: count() })
+    .from(billingMilestone)
+    .where(eq(billingMilestone.projectId, id))
 
-  const milestone = await prisma.billingMilestone.create({
-    data: {
-      projectId: id,
-      title: body.title,
-      percentage: body.percentage ?? null,
-      amount: body.amount,
-      dueDate: body.dueDate ? new Date(body.dueDate) : null,
-      status: "pending",
-      position: count,
-    },
-    include: { invoice: { select: { id: true, number: true, status: true, token: true } } },
+  const [inserted] = await db.insert(billingMilestone).values({
+    projectId: id,
+    title: body.title,
+    percentage: body.percentage ?? null,
+    amount: body.amount,
+    dueDate: body.dueDate ? new Date(body.dueDate) : null,
+    status: "pending",
+    position: milestoneCount,
+  }).returning()
+  const milestone = await db.query.billingMilestone.findFirst({
+    where: (t, { eq }) => eq(t.id, inserted.id),
+    with: { invoice: { columns: { id: true, number: true, status: true, token: true } } },
   })
   return NextResponse.json(milestone, { status: 201 })
 }
@@ -139,16 +143,13 @@ export async function PUT(
 
   await Promise.all(
     milestones.map((m) =>
-      prisma.billingMilestone.update({
-        where: { id: m.id, projectId },
-        data: {
-          ...(m.title !== undefined && { title: m.title }),
-          ...(m.percentage !== undefined && { percentage: m.percentage }),
-          ...(m.amount !== undefined && { amount: m.amount }),
-          ...(m.dueDate !== undefined && { dueDate: m.dueDate ? new Date(m.dueDate) : null }),
-          ...(m.position !== undefined && { position: m.position }),
-        },
-      })
+      db.update(billingMilestone).set({
+        ...(m.title !== undefined && { title: m.title }),
+        ...(m.percentage !== undefined && { percentage: m.percentage }),
+        ...(m.amount !== undefined && { amount: m.amount }),
+        ...(m.dueDate !== undefined && { dueDate: m.dueDate ? new Date(m.dueDate) : null }),
+        ...(m.position !== undefined && { position: m.position }),
+      }).where(and(eq(billingMilestone.id, m.id), eq(billingMilestone.projectId, projectId)))
     )
   )
   return NextResponse.json({ ok: true })
@@ -170,9 +171,9 @@ export async function DELETE(
     return NextResponse.json({ error: "Milestone ID is required" }, { status: 400 })
   }
 
-  const milestone = await prisma.billingMilestone.findUnique({
-    where: { id: milestoneId },
-    include: { invoice: true }
+  const milestone = await db.query.billingMilestone.findFirst({
+    where: (t, { eq }) => eq(t.id, milestoneId),
+    with: { invoice: true },
   })
 
   if (!milestone) {
@@ -184,14 +185,10 @@ export async function DELETE(
   }
 
   if (milestone.invoice) {
-    await prisma.document.delete({
-      where: { id: milestone.invoice.id }
-    })
+    await db.delete(document).where(eq(document.id, milestone.invoice.id))
   }
 
-  await prisma.billingMilestone.delete({
-    where: { id: milestoneId }
-  })
+  await db.delete(billingMilestone).where(eq(billingMilestone.id, milestoneId))
 
   return NextResponse.json({ ok: true })
 }

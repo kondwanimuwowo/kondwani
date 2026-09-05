@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, contract as contractTable } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 import { nanoid } from "nanoid"
 import { Resend } from "resend"
@@ -9,9 +10,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const contracts = await prisma.contract.findMany({
-    where: { projectId: id },
-    orderBy: { createdAt: "desc" },
+  const contracts = await db.query.contract.findMany({
+    where: (t, { eq }) => eq(t.projectId, id),
+    orderBy: (t, { desc }) => desc(t.createdAt),
   })
   return NextResponse.json(contracts)
 }
@@ -28,9 +29,9 @@ export async function POST(
   const body = await req.json()
 
   // Find project and its client
-  const project = await prisma.workProject.findUnique({
-    where: { id: projectId },
-    include: { client: true },
+  const project = await db.query.workProject.findFirst({
+    where: (t, { eq }) => eq(t.id, projectId),
+    with: { client: true },
   })
 
   if (!project) {
@@ -42,16 +43,14 @@ export async function POST(
 
   const token = nanoid(16)
 
-  const contract = await prisma.contract.create({
-    data: {
-      projectId,
-      clientId: project.clientId,
-      title: body.title,
-      content: body.content,
-      status: "draft",
-      token,
-    },
-  })
+  const [contract] = await db.insert(contractTable).values({
+    projectId,
+    clientId: project.clientId,
+    title: body.title,
+    content: body.content,
+    status: "draft",
+    token,
+  }).returning()
 
   return NextResponse.json(contract, { status: 201 })
 }
@@ -72,9 +71,9 @@ export async function PUT(
     return NextResponse.json({ error: "Contract ID is required" }, { status: 400 })
   }
 
-  const contract = await prisma.contract.findUnique({
-    where: { id: contractId, projectId },
-    include: { client: true, project: true },
+  const contract = await db.query.contract.findFirst({
+    where: (t, { eq, and }) => and(eq(t.id, contractId), eq(t.projectId, projectId)),
+    with: { client: true, project: true },
   })
 
   if (!contract) {
@@ -87,10 +86,7 @@ export async function PUT(
       return NextResponse.json({ error: "Contract is already signed" }, { status: 400 })
     }
 
-    const updated = await prisma.contract.update({
-      where: { id: contractId },
-      data: { status: "sent" },
-    })
+    const [updated] = await db.update(contractTable).set({ status: "sent" }).where(eq(contractTable.id, contractId)).returning()
 
     // Send email via Resend
     const portalUrl = `${process.env.NEXT_PUBLIC_PORTAL_URL ?? "https://kondwanimuwowo.com/portal"}?contract=${contract.token}`
@@ -128,14 +124,11 @@ export async function PUT(
   }
 
   // Regular field updates
-  const updated = await prisma.contract.update({
-    where: { id: contractId },
-    data: {
-      ...(fields.title !== undefined && { title: fields.title }),
-      ...(fields.content !== undefined && { content: fields.content }),
-      ...(fields.status !== undefined && { status: fields.status }),
-    },
-  })
+  const [updated] = await db.update(contractTable).set({
+    ...(fields.title !== undefined && { title: fields.title }),
+    ...(fields.content !== undefined && { content: fields.content }),
+    ...(fields.status !== undefined && { status: fields.status }),
+  }).where(eq(contractTable.id, contractId)).returning()
 
   return NextResponse.json(updated)
 }
@@ -155,8 +148,8 @@ export async function DELETE(
     return NextResponse.json({ error: "Contract ID is required" }, { status: 400 })
   }
 
-  const contract = await prisma.contract.findUnique({
-    where: { id: contractId },
+  const contract = await db.query.contract.findFirst({
+    where: (t, { eq }) => eq(t.id, contractId),
   })
 
   if (!contract) {
@@ -167,9 +160,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Cannot delete a signed contract" }, { status: 400 })
   }
 
-  await prisma.contract.delete({
-    where: { id: contractId },
-  })
+  await db.delete(contractTable).where(eq(contractTable.id, contractId))
 
   return NextResponse.json({ ok: true })
 }

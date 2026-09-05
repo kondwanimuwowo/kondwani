@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, retainerContract } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 
 // ── GET /api/studio/retainers ────────────────────────────────────────────────
@@ -11,13 +12,13 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const projectId = searchParams.get("projectId")
 
-  const retainers = await prisma.retainerContract.findMany({
-    where: projectId ? { projectId } : undefined,
-    include: {
-      client: { select: { id: true, name: true, company: true, email: true } },
-      project: { select: { id: true, title: true } },
+  const retainers = await db.query.retainerContract.findMany({
+    where: projectId ? (t, { eq }) => eq(t.projectId, projectId) : undefined,
+    with: {
+      client: { columns: { id: true, name: true, company: true, email: true } },
+      project: { columns: { id: true, title: true } },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: (t, { desc }) => desc(t.createdAt),
   })
   return NextResponse.json(retainers)
 }
@@ -35,23 +36,25 @@ export async function POST(req: Request) {
   }
 
   const startDate = new Date(body.startDate)
-  
-  const retainer = await prisma.retainerContract.create({
-    data: {
-      clientId: body.clientId,
-      projectId: body.projectId || null,
-      title: body.title,
-      amount: parseFloat(body.amount),
-      currency: body.currency || "USD",
-      frequency: body.frequency || "monthly",
-      startDate,
-      endDate: body.endDate ? new Date(body.endDate) : null,
-      status: body.status || "active",
-      nextInvoiceAt: body.nextInvoiceAt ? new Date(body.nextInvoiceAt) : startDate,
-    },
-    include: {
-      client: { select: { id: true, name: true, company: true } },
-      project: { select: { id: true, title: true } },
+
+  const [inserted] = await db.insert(retainerContract).values({
+    clientId: body.clientId,
+    projectId: body.projectId || null,
+    title: body.title,
+    amount: parseFloat(body.amount),
+    currency: body.currency || "USD",
+    frequency: body.frequency || "monthly",
+    startDate,
+    endDate: body.endDate ? new Date(body.endDate) : null,
+    status: body.status || "active",
+    nextInvoiceAt: body.nextInvoiceAt ? new Date(body.nextInvoiceAt) : startDate,
+  }).returning()
+
+  const retainer = await db.query.retainerContract.findFirst({
+    where: (t, { eq }) => eq(t.id, inserted.id),
+    with: {
+      client: { columns: { id: true, name: true, company: true } },
+      project: { columns: { id: true, title: true } },
     },
   })
 
@@ -71,23 +74,24 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Retainer ID is required" }, { status: 400 })
   }
 
-  const updated = await prisma.retainerContract.update({
-    where: { id },
-    data: {
-      ...(fields.title !== undefined && { title: fields.title }),
-      ...(fields.amount !== undefined && { amount: parseFloat(fields.amount) }),
-      ...(fields.currency !== undefined && { currency: fields.currency }),
-      ...(fields.frequency !== undefined && { frequency: fields.frequency }),
-      ...(fields.startDate !== undefined && { startDate: new Date(fields.startDate) }),
-      ...(fields.endDate !== undefined && { endDate: fields.endDate ? new Date(fields.endDate) : null }),
-      ...(fields.status !== undefined && { status: fields.status }),
-      ...(fields.nextInvoiceAt !== undefined && { nextInvoiceAt: new Date(fields.nextInvoiceAt) }),
-      ...(fields.lastInvoicedAt !== undefined && { lastInvoicedAt: fields.lastInvoicedAt ? new Date(fields.lastInvoicedAt) : null }),
-      ...(fields.projectId !== undefined && { projectId: fields.projectId || null }),
-    },
-    include: {
-      client: { select: { id: true, name: true, company: true } },
-      project: { select: { id: true, title: true } },
+  await db.update(retainerContract).set({
+    ...(fields.title !== undefined && { title: fields.title }),
+    ...(fields.amount !== undefined && { amount: parseFloat(fields.amount) }),
+    ...(fields.currency !== undefined && { currency: fields.currency }),
+    ...(fields.frequency !== undefined && { frequency: fields.frequency }),
+    ...(fields.startDate !== undefined && { startDate: new Date(fields.startDate) }),
+    ...(fields.endDate !== undefined && { endDate: fields.endDate ? new Date(fields.endDate) : null }),
+    ...(fields.status !== undefined && { status: fields.status }),
+    ...(fields.nextInvoiceAt !== undefined && { nextInvoiceAt: new Date(fields.nextInvoiceAt) }),
+    ...(fields.lastInvoicedAt !== undefined && { lastInvoicedAt: fields.lastInvoicedAt ? new Date(fields.lastInvoicedAt) : null }),
+    ...(fields.projectId !== undefined && { projectId: fields.projectId || null }),
+  }).where(eq(retainerContract.id, id))
+
+  const updated = await db.query.retainerContract.findFirst({
+    where: (t, { eq }) => eq(t.id, id),
+    with: {
+      client: { columns: { id: true, name: true, company: true } },
+      project: { columns: { id: true, title: true } },
     },
   })
 
@@ -107,9 +111,7 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Retainer ID is required" }, { status: 400 })
   }
 
-  await prisma.retainerContract.delete({
-    where: { id },
-  })
+  await db.delete(retainerContract).where(eq(retainerContract.id, id))
 
   return NextResponse.json({ ok: true })
 }

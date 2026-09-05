@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma"
+import { db, caseStudy } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
@@ -11,7 +12,7 @@ export async function PUT(request: Request, { params }: Params) {
 
   const { id } = await params
   const body = await request.json()
-  const study = await prisma.caseStudy.update({ where: { id }, data: body })
+  const [study] = await db.update(caseStudy).set(body).where(eq(caseStudy.id, id)).returning()
   return NextResponse.json(study)
 }
 
@@ -21,6 +22,6 @@ export async function DELETE(_req: Request, { params }: Params) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  await prisma.caseStudy.delete({ where: { id } })
+  await db.delete(caseStudy).where(eq(caseStudy.id, id))
   return NextResponse.json({ ok: true })
 }

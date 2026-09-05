@@ -1,9 +1,9 @@
-import { prisma } from "@/lib/prisma"
+import { db, project as projectTable } from "@/lib/db"
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
-  const projects = await prisma.project.findMany({ orderBy: { order: "asc" } })
+  const projects = await db.query.project.findMany({ orderBy: (t, { asc }) => asc(t.order) })
   return NextResponse.json(projects)
 }
 
@@ -13,6 +13,6 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await request.json()
-  const project = await prisma.project.create({ data: body })
+  const [project] = await db.insert(projectTable).values(body).returning()
   return NextResponse.json(project, { status: 201 })
 }

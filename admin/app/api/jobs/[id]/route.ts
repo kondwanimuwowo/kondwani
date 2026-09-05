@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma"
+import { db, jobApplication } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
@@ -11,10 +12,10 @@ export async function PUT(request: Request, { params }: Params) {
 
   const { id } = await params
   const body = await request.json()
-  const job = await prisma.jobApplication.update({
-    where: { id },
-    data: { ...body, appliedAt: body.appliedAt ? new Date(body.appliedAt) : undefined },
-  })
+  const [job] = await db.update(jobApplication)
+    .set({ ...body, appliedAt: body.appliedAt ? new Date(body.appliedAt) : undefined })
+    .where(eq(jobApplication.id, id))
+    .returning()
   return NextResponse.json(job)
 }
 
@@ -24,6 +25,6 @@ export async function DELETE(_req: Request, { params }: Params) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  await prisma.jobApplication.delete({ where: { id } })
+  await db.delete(jobApplication).where(eq(jobApplication.id, id))
   return NextResponse.json({ ok: true })
 }

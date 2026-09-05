@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, client as clientTable } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 
 type Params = { params: Promise<{ id: string }> }
@@ -11,8 +12,8 @@ export async function PUT(request: Request, { params }: Params) {
 
   const { id } = await params
   const body = await request.json()
-  const client = await prisma.client.update({ where: { id }, data: body })
-  return NextResponse.json(client)
+  const [row] = await db.update(clientTable).set(body).where(eq(clientTable.id, id)).returning()
+  return NextResponse.json(row)
 }
 
 export async function DELETE(_: Request, { params }: Params) {
@@ -21,6 +22,6 @@ export async function DELETE(_: Request, { params }: Params) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  await prisma.client.delete({ where: { id } })
+  await db.delete(clientTable).where(eq(clientTable.id, id))
   return NextResponse.json({ ok: true })
 }

@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, workTask } from "@/lib/db"
+import { and, eq, isNull, max } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 
 type Params = { params: Promise<{ id: string }> }
 
 export async function GET(_: Request, { params }: Params) {
   const { id } = await params
-  const tasks = await prisma.workTask.findMany({
-    where: { projectId: id, parentId: null },
-    include: { subtasks: { orderBy: { position: "asc" } } },
-    orderBy: { position: "asc" },
+  const tasks = await db.query.workTask.findMany({
+    where: (t, { eq, isNull, and }) => and(eq(t.projectId, id), isNull(t.parentId)),
+    with: { subtasks: { orderBy: (t, { asc }) => asc(t.position) } },
+    orderBy: (t, { asc }) => asc(t.position),
   })
   return NextResponse.json(tasks)
 }
@@ -22,14 +23,19 @@ export async function POST(request: Request, { params }: Params) {
   const { id: projectId } = await params
   const body = await request.json()
 
-  const maxPos = await prisma.workTask.aggregate({
-    where: { projectId, status: body.status ?? "todo", parentId: null },
-    _max: { position: true },
-  })
+  const [{ maxPosition }] = await db
+    .select({ maxPosition: max(workTask.position) })
+    .from(workTask)
+    .where(and(eq(workTask.projectId, projectId), eq(workTask.status, body.status ?? "todo"), isNull(workTask.parentId)))
 
-  const task = await prisma.workTask.create({
-    data: { ...body, projectId, position: (maxPos._max.position ?? 0) + 1 },
-    include: { subtasks: true },
+  const [inserted] = await db.insert(workTask).values({
+    ...body,
+    projectId,
+    position: (maxPosition ?? 0) + 1,
+  }).returning()
+  const task = await db.query.workTask.findFirst({
+    where: (t, { eq }) => eq(t.id, inserted.id),
+    with: { subtasks: true },
   })
   return NextResponse.json(task, { status: 201 })
 }

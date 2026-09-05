@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, client as clientTable } from "@/lib/db"
+import { asc } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
-  const clients = await prisma.client.findMany({ orderBy: { name: "asc" } })
+  const clients = await db.select().from(clientTable).orderBy(asc(clientTable.name))
   return NextResponse.json(clients)
 }
 
@@ -13,6 +14,6 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await request.json()
-  const client = await prisma.client.create({ data: body })
-  return NextResponse.json(client, { status: 201 })
+  const [row] = await db.insert(clientTable).values(body).returning()
+  return NextResponse.json(row, { status: 201 })
 }

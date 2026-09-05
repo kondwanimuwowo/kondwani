@@ -1,23 +1,24 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, workProject } from "@/lib/db"
+import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 
 type Params = { params: Promise<{ id: string }> }
 
 export async function GET(_: Request, { params }: Params) {
   const { id } = await params
-  const project = await prisma.workProject.findUnique({
-    where: { id },
-    include: {
+  const project = await db.query.workProject.findFirst({
+    where: (t, { eq }) => eq(t.id, id),
+    with: {
       client: true,
       tasks: {
-        where: { parentId: null },
-        include: { subtasks: true },
-        orderBy: { position: "asc" },
+        where: (t, { isNull }) => isNull(t.parentId),
+        with: { subtasks: true },
+        orderBy: (t, { asc }) => asc(t.position),
       },
       documents: {
-        include: { items: true },
-        orderBy: { createdAt: "desc" },
+        with: { items: true },
+        orderBy: (t, { desc }) => desc(t.createdAt),
       },
     },
   })
@@ -32,7 +33,7 @@ export async function PUT(request: Request, { params }: Params) {
 
   const { id } = await params
   const body = await request.json()
-  const project = await prisma.workProject.update({ where: { id }, data: body })
+  const [project] = await db.update(workProject).set(body).where(eq(workProject.id, id)).returning()
   return NextResponse.json(project)
 }
 
@@ -42,6 +43,6 @@ export async function DELETE(_: Request, { params }: Params) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  await prisma.workProject.delete({ where: { id } })
+  await db.delete(workProject).where(eq(workProject.id, id))
   return NextResponse.json({ ok: true })
 }

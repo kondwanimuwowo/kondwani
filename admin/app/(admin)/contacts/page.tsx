@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma"
+import { db } from "@/lib/db"
 import { MarkReadButton } from "./MarkReadButton"
 
 export const dynamic = "force-dynamic"
@@ -8,7 +8,7 @@ function formatDate(date: Date) {
 }
 
 export default async function ContactsPage() {
-  const contacts = await prisma.contactSubmission.findMany({ orderBy: { createdAt: "desc" } })
+  const contacts = await db.query.contactSubmission.findMany({ orderBy: (t, { desc }) => desc(t.createdAt) })
   const unread = contacts.filter(c => !c.read).length
 
   return (

@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { prisma } from "@/lib/prisma"
+import { db, project, contactSubmission, jobApplication, idea, workProject } from "@/lib/db"
+import { count, eq, inArray } from "drizzle-orm"
 import {
   Code, Mail, Article, Lightbulb,
   ChevronRight, Message, ViewKanban, RequestQuote,
@@ -8,15 +9,22 @@ import {
 export const dynamic = "force-dynamic"
 
 export default async function DashboardPage() {
-  const [projects, contacts, jobs, ideas, activeWork, unpaidDocs] = await Promise.all([
-    prisma.project.count(),
-    prisma.contactSubmission.count({ where: { read: false } }),
-    prisma.jobApplication.count(),
-    prisma.idea.count(),
-    prisma.workProject.count({ where: { status: { in: ["active", "review", "staged"] } } }),
-    prisma.document.findMany({
-      where: { type: "invoice", status: { in: ["sent", "draft"] } },
-      include: { items: { select: { amount: true } } },
+  const [
+    [{ count: projects }],
+    [{ count: contacts }],
+    [{ count: jobs }],
+    [{ count: ideas }],
+    [{ count: activeWork }],
+    unpaidDocs,
+  ] = await Promise.all([
+    db.select({ count: count() }).from(project),
+    db.select({ count: count() }).from(contactSubmission).where(eq(contactSubmission.read, false)),
+    db.select({ count: count() }).from(jobApplication),
+    db.select({ count: count() }).from(idea),
+    db.select({ count: count() }).from(workProject).where(inArray(workProject.status, ["active", "review", "staged"])),
+    db.query.document.findMany({
+      where: (t, { eq, and, inArray }) => and(eq(t.type, "invoice"), inArray(t.status, ["sent", "draft"])),
+      with: { items: { columns: { amount: true } } },
     }),
   ])
 
@@ -25,9 +33,9 @@ export default async function DashboardPage() {
     return sum + sub
   }, 0)
 
-  const recentContacts = await prisma.contactSubmission.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 5,
+  const recentContacts = await db.query.contactSubmission.findMany({
+    orderBy: (t, { desc }) => desc(t.createdAt),
+    limit: 5,
   })
 
   const portfolioStats = [

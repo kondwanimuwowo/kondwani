@@ -1,23 +1,25 @@
-import { prisma } from "@/lib/prisma"
+import { db, pageView } from "@/lib/db"
+import { count, desc } from "drizzle-orm"
 
 export const dynamic = "force-dynamic"
 
 export default async function AnalyticsPage() {
-  const [total, byPath] = await Promise.all([
-    prisma.pageView.count(),
-    prisma.pageView.groupBy({
-      by: ["path"],
-      _count: { path: true },
-      orderBy: { _count: { path: "desc" } },
-      take: 20,
-    }),
+  const [[{ total }], byPathRaw] = await Promise.all([
+    db.select({ total: count() }).from(pageView),
+    db
+      .select({ path: pageView.path, count: count() })
+      .from(pageView)
+      .groupBy(pageView.path)
+      .orderBy(desc(count()))
+      .limit(20),
   ])
+  const byPath = byPathRaw.map((r) => ({ path: r.path, _count: { path: r.count } }))
 
-  const recent = await prisma.pageView.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 50,
-    select: { path: true, referrer: true, createdAt: true },
-  })
+  const recent = await db
+    .select({ path: pageView.path, referrer: pageView.referrer, createdAt: pageView.createdAt })
+    .from(pageView)
+    .orderBy(desc(pageView.createdAt))
+    .limit(50)
 
   return (
     <div className="p-8">

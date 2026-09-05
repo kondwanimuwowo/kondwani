@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, projectMessage } from "@/lib/db"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET(
@@ -7,9 +7,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const messages = await prisma.projectMessage.findMany({
-    where: { projectId: id },
-    orderBy: { createdAt: "asc" },
+  const messages = await db.query.projectMessage.findMany({
+    where: (t, { eq }) => eq(t.projectId, id),
+    orderBy: (t, { asc }) => asc(t.createdAt),
   })
   return NextResponse.json(messages)
 }
@@ -31,24 +31,22 @@ export async function POST(
 
   const name = user.user_metadata?.full_name ?? "Kondwani Muwowo"
 
-  const message = await prisma.projectMessage.create({
-    data: {
-      projectId,
-      senderId: user.id,
-      senderName: name,
-      senderRole: "developer",
-      content: body.content,
-      attachments: body.attachments ?? [],
-    },
-  })
+  const [message] = await db.insert(projectMessage).values({
+    projectId,
+    senderId: user.id,
+    senderName: name,
+    senderRole: "developer",
+    content: body.content,
+    attachments: body.attachments ?? [],
+  }).returning()
 
   // Optional: Trigger notification to the client if they have an email (non-blocking)
   try {
-    const project = await prisma.workProject.findUnique({
-      where: { id: projectId },
-      include: { client: true },
+    const project = await db.query.workProject.findFirst({
+      where: (t, { eq }) => eq(t.id, projectId),
+      with: { client: true },
     })
-    
+
     if (project?.client?.email && process.env.RESEND_API_KEY) {
       const { Resend } = require("resend")
       const resend = new Resend(process.env.RESEND_API_KEY)

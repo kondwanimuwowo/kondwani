@@ -1,24 +1,24 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { db, workProject } from "@/lib/db"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
-  const projects = await prisma.workProject.findMany({
-    include: {
-      client: { select: { id: true, name: true, company: true } },
-      _count: { select: { tasks: true } },
+  const projects = await db.query.workProject.findMany({
+    with: {
+      client: { columns: { id: true, name: true, company: true } },
+      tasks: { columns: { id: true, status: true } },
     },
-    orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+    orderBy: (t, { asc, desc }) => [asc(t.order), desc(t.createdAt)],
   })
 
-  const projectsWithDone = await Promise.all(
-    projects.map(async (p) => {
-      const doneCount = await prisma.workTask.count({
-        where: { projectId: p.id, status: "done" },
-      })
-      return { ...p, doneTaskCount: doneCount }
-    })
-  )
+  const projectsWithDone = projects.map((p) => {
+    const { tasks, ...rest } = p
+    return {
+      ...rest,
+      _count: { tasks: tasks.length },
+      doneTaskCount: tasks.filter((t) => t.status === "done").length,
+    }
+  })
 
   return NextResponse.json(projectsWithDone)
 }
@@ -29,9 +29,10 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await request.json()
-  const project = await prisma.workProject.create({
-    data: body,
-    include: { client: { select: { id: true, name: true, company: true } } },
+  const [inserted] = await db.insert(workProject).values(body).returning()
+  const project = await db.query.workProject.findFirst({
+    where: (t, { eq }) => eq(t.id, inserted.id),
+    with: { client: { columns: { id: true, name: true, company: true } } },
   })
   return NextResponse.json(project, { status: 201 })
 }
