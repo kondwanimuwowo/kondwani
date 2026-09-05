@@ -310,6 +310,93 @@ model Contract {
   updatedAt      DateTime     @updatedAt
 }
 
+// ── Second Brain ──────────────────────────────────────────────────────────────
+
+/// A connected knowledge source: notion | microsoft | google | local
+model BrainSource {
+  id           String    @id @default(cuid())
+  provider     String    @unique
+  displayName  String
+  /// OAuth refresh token + account info (never exposed via API)
+  credentials  Json?
+  /// Provider-specific incremental sync state (delta links, page tokens, timestamps)
+  cursor       Json?
+  /// "disconnected" | "connected" | "error"
+  status       String    @default("disconnected")
+  lastSyncedAt DateTime?
+  lastError    String?   @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  documents BrainDocument[]
+  syncRuns  BrainSyncRun[]
+}
+
+/// One normalized piece of knowledge from any source (note, doc, sheet, pdf…)
+model BrainDocument {
+  id               String      @id @default(cuid())
+  sourceId         String
+  source           BrainSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  /// Stable id in the origin system (Notion page id, Drive file id, relative path for local)
+  externalId       String
+  title            String
+  /// "note" | "document" | "spreadsheet" | "pdf" | "presentation" | "text" | "other"
+  kind             String      @default("other")
+  mimeType         String?
+  /// Deep link back to the item in its origin app
+  sourceUrl        String?
+  /// Breadcrumb in the origin system, e.g. "Work Notebook / Projects / Lenco"
+  path             String?
+  /// Full extracted plain-text / markdown content
+  content          String      @db.Text
+  contentHash      String
+  /// AI enrichment — generated on ingest
+  summary          String?     @db.Text
+  tags             String[]    @default([])
+  category         String?
+  metadata         Json?
+  sourceModifiedAt DateTime?
+  syncedAt         DateTime    @default(now())
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  chunks BrainChunk[]
+
+  @@unique([sourceId, externalId])
+  @@index([category])
+  @@index([kind])
+}
+
+/// An embedded slice of a document, unit of semantic search
+model BrainChunk {
+  id         String                       @id @default(cuid())
+  documentId String
+  document   BrainDocument                @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  index      Int
+  text       String                       @db.Text
+  tokenCount Int                          @default(0)
+  embedding  Unsupported("vector(1536)")?
+
+  @@unique([documentId, index])
+}
+
+/// Audit log of sync executions
+model BrainSyncRun {
+  id         String      @id @default(cuid())
+  sourceId   String
+  source     BrainSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  /// "running" | "success" | "error"
+  status     String      @default("running")
+  added      Int         @default(0)
+  updated    Int         @default(0)
+  removed    Int         @default(0)
+  error      String?     @db.Text
+  startedAt  DateTime    @default(now())
+  finishedAt DateTime?
+
+  @@index([sourceId, startedAt])
+}
+
 // ── Project Messaging ─────────────────────────────────────────────────────────
 
 /// A message in a per-project threaded chat between developer and client.
