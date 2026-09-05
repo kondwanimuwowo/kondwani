@@ -129,7 +129,7 @@ export function About() {
         {/* Stats */}
         <motion.div
           variants={fadeUp}
-          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 pt-12"
+          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 pt-12 border-t border-border"
         >
           {stats.map((stat) => (
             <StatItem key={stat.label} {...stat} />

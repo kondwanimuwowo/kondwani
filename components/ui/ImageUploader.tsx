@@ -88,7 +88,7 @@ export function ImageUploader({ value, onChange, label = "Image" }: ImageUploade
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Or paste an image URL"
-        className="mt-2 w-full bg-surface rounded-3xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
+        className="mt-2 w-full bg-surface border border-border rounded-3xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
       />
 
       {error && <p className="text-xs text-danger mt-1">{error}</p>}

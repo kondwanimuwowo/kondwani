@@ -306,7 +306,7 @@ export default function ClientPortalDashboard() {
                         setSelectedProjectId(e.target.value)
                         setActiveTab("overview")
                       }}
-                      className="bg-surface rounded-full text-xs font-semibold px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-tint"
+                      className="bg-surface border border-border rounded-full text-xs font-semibold px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-tint"
                     >
                       {projects?.map((p: any) => (
                         <option key={p.id} value={p.id}>{p.title}</option>
@@ -806,7 +806,7 @@ export default function ClientPortalDashboard() {
             {/* Document Viewer Box */}
             <div className="flex-1 overflow-y-auto p-6 text-sm text-muted font-serif leading-relaxed select-text bg-white">
               <div className="max-w-xl mx-auto space-y-4">
-                <h2 className="text-center font-sans font-black text-lg tracking-tight uppercase pb-4 text-foreground mb-6 shadow-[0_1px_0_0_var(--color-border)]">
+                <h2 className="text-center font-sans font-black text-lg tracking-tight uppercase pb-4 text-foreground mb-6 border-b border-border">
                   {signingContract.title}
                 </h2>
                 <div className="whitespace-pre-wrap">{signingContract.content}</div>

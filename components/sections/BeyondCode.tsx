@@ -81,7 +81,7 @@ export function BeyondCode() {
 
                 {/* Partner */}
                 {org.partnerName && (
-                  <div className="mt-4 flex items-center gap-2 pt-4">
+                  <div className="mt-4 flex items-center gap-2 pt-4 border-t border-border">
                     {org.partnerLogo && (
                       <div className="relative w-4 h-4 rounded overflow-hidden shrink-0">
                         <Image src={org.partnerLogo} alt={org.partnerName} fill className="object-contain" sizes="16px" />
@@ -93,7 +93,7 @@ export function BeyondCode() {
 
                 {/* Status + link */}
                 {(org.status || org.link) && (
-                  <div className="mt-4 flex items-center justify-between pt-4">
+                  <div className="mt-4 flex items-center justify-between pt-4 border-t border-border">
                     {org.status && (
                       <span className="flex items-center gap-1.5 text-[11px] font-medium text-muted">
                         <Circle className="text-primary animate-pulse" sx={{ fontSize: 7 }} />

@@ -18,7 +18,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 const inputClass =
-  "w-full px-4 py-3 bg-surface rounded-3xl text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
+  "w-full px-4 py-3 bg-surface border border-border rounded-3xl text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")

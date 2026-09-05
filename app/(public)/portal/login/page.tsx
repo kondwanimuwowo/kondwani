@@ -109,7 +109,7 @@ function LoginForm() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 px-8 py-6 bg-white shadow-[0_-1px_0_0_var(--color-border)] text-center text-xs text-muted">
+      <footer className="relative z-10 px-8 py-6 bg-white border-t border-border text-center text-xs text-muted">
         &copy; {new Date().getFullYear()} Kondwani Muwowo. All rights reserved.
       </footer>
     </div>

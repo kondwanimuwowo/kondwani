@@ -156,7 +156,7 @@ export function PaymentWidget({ token, currency, total }: Props) {
                 <select
                   value={network}
                   onChange={(e) => setNetwork(e.target.value)}
-                  className="w-full bg-surface rounded-3xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
+                  className="w-full bg-surface border border-border rounded-3xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
                 >
                   <option value="airtel">Airtel Money</option>
                   <option value="mtn">MTN Mobile Money</option>
@@ -174,7 +174,7 @@ export function PaymentWidget({ token, currency, total }: Props) {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="e.g. 0977123456"
-                  className="w-full bg-surface rounded-3xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
+                  className="w-full bg-surface border border-border rounded-3xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-tint"
                 />
               </div>
             </div>
