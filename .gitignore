@@ -33,6 +33,7 @@ yarn-error.log*
 
 # env files
 .env*
+.dev.vars
 
 # vercel
 .vercel
@@ -48,8 +49,18 @@ next-env.d.ts
 LENCO-V2-DOCS/
 implementation_plan.md
 
-# personal files
-bumara-cv-*.tex
+# personal files (job-application CVs/letters at repo root — not /public assets)
+/*-cv-*.tex
+/*-cv-*.pdf
+/*-cover-letter*.tex
+/*-cover-letter*.pdf
+/*.aux
+/*.log
+/*.out
+
+# second brain — personal knowledge files never belong in git
+brain-inbox/
+brain-vault/
 
 # ide
 .idea/
@@ -61,3 +72,8 @@ inspo-elta-creatives/
 inspo-roan/
 inspo-accomozed/
 kondwani-current-portfolio/
+relay/
+submission-workflow/
+/dist/
+.vinext/
+.wrangler/
