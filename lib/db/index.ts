@@ -12,6 +12,12 @@ function createDb() {
     max: 5,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
+    // Bounds how long an individual query can run once connected — unlike
+    // connectionTimeoutMillis, which only covers the initial handshake.
+    // Without this, a stalled query hangs the request indefinitely, which
+    // Workers eventually kills as "your Worker's code had hung".
+    query_timeout: 8000,
+    statement_timeout: 8000,
   })
   // An unhandled error on an idle pooled connection otherwise hangs the whole
   // isolate instead of surfacing as a catchable query error.
