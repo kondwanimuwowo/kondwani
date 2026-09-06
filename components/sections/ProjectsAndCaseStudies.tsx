@@ -6,7 +6,6 @@ import Link from "next/link"
 import { motion, AnimatePresence, type Variants } from "motion/react"
 import { OpenInNew, GitHub, Circle, ArrowForward } from "@mui/icons-material"
 import type { Project, CaseStudy } from "@/lib/db"
-import { Tooltip } from "@/components/ui/Tooltip"
 import { getCategoryIcon } from "@/lib/categoryIcon"
 
 const container: Variants = {
@@ -48,17 +47,13 @@ function ProjectCard({ project }: { project: Project }) {
             <div className="absolute inset-0 bg-surface" />
           )}
         </motion.div>
-        <Tooltip content={project.category} side="right">
-          <div className="absolute bottom-3 left-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground text-white rounded-full">
-            {(() => { const Icon = getCategoryIcon(project.category); return <Icon sx={{ fontSize: 18 }} /> })()}
-          </div>
-        </Tooltip>
+        <div title={project.category} className="absolute bottom-3 left-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground text-white rounded-full">
+          {(() => { const Icon = getCategoryIcon(project.category); return <Icon sx={{ fontSize: 18 }} /> })()}
+        </div>
         {project.status && (
-          <Tooltip content={project.status} side="left">
-            <div className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground rounded-full">
-              <Circle className="text-primary animate-pulse" sx={{ fontSize: 10 }} />
-            </div>
-          </Tooltip>
+          <div title={project.status} className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground rounded-full">
+            <Circle className="text-primary animate-pulse" sx={{ fontSize: 10 }} />
+          </div>
         )}
       </div>
       <div className="p-6">
@@ -117,11 +112,9 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
             <div className="absolute inset-0 bg-surface" />
           )}
         </motion.div>
-        <Tooltip content="Case Study" side="right">
-          <div className="absolute bottom-3 left-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground text-white rounded-full">
-            {(() => { const Icon = getCategoryIcon("case study"); return <Icon sx={{ fontSize: 18 }} /> })()}
-          </div>
-        </Tooltip>
+        <div title="Case Study" className="absolute bottom-3 left-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground text-white rounded-full">
+          {(() => { const Icon = getCategoryIcon("case study"); return <Icon sx={{ fontSize: 18 }} /> })()}
+        </div>
       </div>
       <div className="p-6">
         {study.client && (
