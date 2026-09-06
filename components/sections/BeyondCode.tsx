@@ -63,19 +63,22 @@ export function BeyondCode() {
             >
               {/* Content */}
               <div className="relative z-10 p-6 flex flex-col flex-1">
-                {/* Small logo */}
-                {org.logo ? (
-                  <div className="relative w-10 h-10 mb-4 shrink-0">
-                    <Image src={org.logo} alt={org.title} fill className="object-contain" sizes="40px" />
+                {/* Logo + title/subtitle */}
+                <div className="flex items-center gap-3 mb-4">
+                  {org.logo ? (
+                    <div className="relative w-10 h-10 rounded-2xl overflow-hidden shrink-0 bg-white">
+                      <Image src={org.logo} alt={org.title} fill className="object-contain" sizes="40px" />
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-2xl bg-primary-tint flex items-center justify-center shrink-0">
+                      <span className="text-primary font-bold">{org.title[0]}</span>
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="font-bold text-foreground text-base leading-tight">{org.title}</h3>
+                    <p className="text-xs text-muted">{org.subtitle}</p>
                   </div>
-                ) : (
-                  <div className="w-10 h-10 rounded-3xl bg-primary-tint flex items-center justify-center shrink-0 mb-4">
-                    <span className="text-primary font-bold">{org.title[0]}</span>
-                  </div>
-                )}
-
-                <h3 className="font-bold text-foreground text-base leading-tight mb-0.5">{org.title}</h3>
-                <p className="text-xs text-muted mb-4">{org.subtitle}</p>
+                </div>
 
                 <p className="text-sm text-muted leading-relaxed flex-1">{org.description}</p>
 

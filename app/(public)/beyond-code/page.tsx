@@ -40,19 +40,22 @@ export default function BeyondCodePage() {
             >
               {/* Content */}
               <div className="relative z-10 p-8 flex flex-col flex-1">
-                {/* Small logo */}
-                {org.logo ? (
-                  <div className="relative w-11 h-11 mb-5 shrink-0">
-                    <Image src={org.logo} alt={org.title} fill className="object-contain" sizes="44px" />
+                {/* Logo + title/subtitle */}
+                <div className="flex items-center gap-4 mb-5">
+                  {org.logo ? (
+                    <div className="relative w-11 h-11 rounded-2xl overflow-hidden shrink-0 bg-white">
+                      <Image src={org.logo} alt={org.title} fill className="object-contain" sizes="44px" />
+                    </div>
+                  ) : (
+                    <div className="w-11 h-11 rounded-2xl bg-primary-tint flex items-center justify-center shrink-0">
+                      <span className="text-primary font-bold text-xl">{org.title[0]}</span>
+                    </div>
+                  )}
+                  <div>
+                    <h2 className="font-bold text-foreground text-xl leading-tight">{org.title}</h2>
+                    <p className="text-sm text-muted">{org.subtitle}</p>
                   </div>
-                ) : (
-                  <div className="w-11 h-11 rounded-3xl bg-primary-tint flex items-center justify-center shrink-0 mb-5">
-                    <span className="text-primary font-bold text-xl">{org.title[0]}</span>
-                  </div>
-                )}
-
-                <h2 className="font-bold text-foreground text-xl leading-tight mb-1">{org.title}</h2>
-                <p className="text-sm text-muted mb-5">{org.subtitle}</p>
+                </div>
 
                 <p className="text-sm text-muted leading-relaxed flex-1">{org.description}</p>
 

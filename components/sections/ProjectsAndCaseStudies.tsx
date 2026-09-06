@@ -32,7 +32,6 @@ function ProjectCard({ project }: { project: Project }) {
       whileHover={{ y: -8 }}
       className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl border-2 border-white hover:border-primary transition-all duration-300"
     >
-      <Link href={project.slug ? `/projects/${project.slug}` : "#"} className="absolute inset-0 z-0" aria-label={project.title} />
       <div className="relative h-52 overflow-hidden bg-surface">
         <motion.div className="absolute inset-0" whileHover={{ scale: 1.04 }} transition={{ duration: 0.6, ease: "easeOut" }}>
           {project.imageUrl ? (
@@ -86,6 +85,7 @@ function ProjectCard({ project }: { project: Project }) {
           )}
         </div>
       </div>
+      <Link href={project.slug ? `/projects/${project.slug}` : "#"} className="absolute inset-0 z-0 cursor-pointer" aria-label={project.title} />
     </motion.article>
   )
 }
@@ -97,7 +97,6 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
       whileHover={{ y: -8 }}
       className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl border-2 border-white hover:border-primary transition-all duration-300"
     >
-      <Link href={`/case-studies/${study.slug}`} className="absolute inset-0 z-0" aria-label={study.title} />
       <div className="relative h-52 overflow-hidden bg-surface">
         <motion.div className="absolute inset-0" whileHover={{ scale: 1.04 }} transition={{ duration: 0.6, ease: "easeOut" }}>
           {study.coverImage ? (
@@ -143,6 +142,7 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
           )}
         </div>
       </div>
+      <Link href={`/case-studies/${study.slug}`} className="absolute inset-0 z-0 cursor-pointer" aria-label={study.title} />
     </motion.article>
   )
 }

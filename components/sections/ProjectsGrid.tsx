@@ -57,9 +57,6 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
             whileHover={{ y: -8 }}
             className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl border-2 border-white hover:border-primary transition-all duration-300"
           >
-            {/* Stretched link covers the whole card */}
-            <Link href={project.slug ? `/projects/${project.slug}` : "#"} className="absolute inset-0 z-0" aria-label={project.title} />
-
             {/* Image */}
             <div className="relative h-52 overflow-hidden bg-surface">
               <motion.div
@@ -125,6 +122,9 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
                 )}
               </div>
             </div>
+
+            {/* Stretched link covers the whole card, including the image */}
+            <Link href={project.slug ? `/projects/${project.slug}` : "#"} className="absolute inset-0 z-0 cursor-pointer" aria-label={project.title} />
           </motion.article>
         ))}
       </motion.div>

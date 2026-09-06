@@ -53,7 +53,7 @@ export function Footer() {
       <div className="shadow-[0_-1px_0_0_rgba(255,255,255,0.06)]">
         <div className="container-custom py-4 flex items-center justify-between">
           <p className="text-xs text-muted-dark">
-            &copy; {year} Kondwani Muwowo. Built with Next.js and Tailwind CSS.
+            &copy; {year} Kondwani Muwowo.
           </p>
           <div className="flex items-center gap-5">
             {socialLinks.map(({ name, href, icon: Icon }) => (
