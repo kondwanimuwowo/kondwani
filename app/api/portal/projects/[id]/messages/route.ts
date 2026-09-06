@@ -102,7 +102,7 @@ export async function POST(
         const fromEmail = process.env.RESEND_FROM_EMAIL ?? "billing@kondwanimuwowo.com"
         // Developer email defaults to kondwanimuwowo@gmail.com
         const devEmail = "kondwanimuwowo@gmail.com"
-        const adminUrl = `${process.env.NEXT_PUBLIC_ADMIN_URL ?? "https://admin.kondwanimuwowo.com"}/work/${projectId}`
+        const adminUrl = `${process.env.NEXT_PUBLIC_ADMIN_URL ?? "https://hub.kondwanimuwowo.com"}/work/${projectId}`
 
         await resend.emails.send({
           from: `Kondwani Muwowo Studio <${fromEmail}>`,

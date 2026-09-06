@@ -103,7 +103,7 @@ export async function POST(
 
               <div style="text-align: center; margin: 25px 0;">
                 <a href="${fileUrl}" target="_blank" style="background-color: #990000; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 13px; margin-right: 10px;">View Uploaded Receipt</a>
-                <a href="${process.env.NEXT_PUBLIC_ADMIN_URL ?? "https://admin.kondwanimuwowo.com"}/work/${doc.projectId ?? ""}" style="background-color: #0A0A0A; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 13px;">Open Admin Studio</a>
+                <a href="${process.env.NEXT_PUBLIC_ADMIN_URL ?? "https://hub.kondwanimuwowo.com"}/work/${doc.projectId ?? ""}" style="background-color: #0A0A0A; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 13px;">Open Admin Studio</a>
               </div>
               
               <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 20px 0;" />
