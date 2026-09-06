@@ -47,12 +47,12 @@ function ProjectCard({ project }: { project: Project }) {
             <div className="absolute inset-0 bg-surface" />
           )}
         </motion.div>
-        <div title={project.category} className="absolute bottom-3 left-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground text-white rounded-full">
-          {(() => { const Icon = getCategoryIcon(project.category); return <Icon sx={{ fontSize: 18 }} /> })()}
+        <div title={project.category} className="absolute bottom-3 left-3 z-10 text-white drop-shadow-md">
+          {(() => { const Icon = getCategoryIcon(project.category); return <Icon sx={{ fontSize: 22 }} /> })()}
         </div>
         {project.status && (
-          <div title={project.status} className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground rounded-full">
-            <Circle className="text-primary animate-pulse" sx={{ fontSize: 10 }} />
+          <div title={project.status} className="absolute top-3 right-3 z-10 drop-shadow-md">
+            <Circle className="text-primary animate-pulse" sx={{ fontSize: 8 }} />
           </div>
         )}
       </div>
@@ -112,8 +112,8 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
             <div className="absolute inset-0 bg-surface" />
           )}
         </motion.div>
-        <div title="Case Study" className="absolute bottom-3 left-3 z-10 w-9 h-9 flex items-center justify-center bg-foreground text-white rounded-full">
-          {(() => { const Icon = getCategoryIcon("case study"); return <Icon sx={{ fontSize: 18 }} /> })()}
+        <div title="Case Study" className="absolute bottom-3 left-3 z-10 text-white drop-shadow-md">
+          {(() => { const Icon = getCategoryIcon("case study"); return <Icon sx={{ fontSize: 22 }} /> })()}
         </div>
       </div>
       <div className="p-6">
