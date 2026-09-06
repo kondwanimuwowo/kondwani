@@ -10,10 +10,19 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [showForm, setShowForm] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   async function load() {
-    const res = await fetch("/api/projects")
-    setProjects(await res.json())
+    setLoadError(false)
+    try {
+      const res = await fetchWithRetry("/api/projects", {})
+      if (!res.ok) throw new Error()
+      setProjects(await res.json())
+      setLoaded(true)
+    } catch {
+      setLoadError(true)
+    }
   }
 
   useEffect(() => { load() }, [])
@@ -70,7 +79,21 @@ export default function ProjectsPage() {
 
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.length === 0 ? (
+        {loadError ? (
+          <div className="col-span-full bg-white px-6 py-16 text-center shadow-md rounded-3xl space-y-3">
+            <p className="text-danger font-medium">Couldn&apos;t load projects. This is a display error, not data loss.</p>
+            <button
+              onClick={load}
+              className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        ) : !loaded ? (
+          <div className="col-span-full bg-white px-6 py-16 text-center shadow-md rounded-3xl">
+            <p className="text-muted">Loading…</p>
+          </div>
+        ) : projects.length === 0 ? (
           <div className="col-span-full bg-white px-6 py-16 text-center shadow-md rounded-3xl">
             <p className="text-muted">No projects yet.</p>
           </div>
