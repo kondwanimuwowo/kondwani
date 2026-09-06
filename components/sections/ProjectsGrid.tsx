@@ -55,7 +55,7 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
             key={project.id}
             variants={cardVariant}
             whileHover={{ y: -8 }}
-            className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300"
+            className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl border-2 border-white hover:border-primary transition-all duration-300"
           >
             {/* Stretched link covers the whole card */}
             <Link href={project.slug ? `/projects/${project.slug}` : "#"} className="absolute inset-0 z-0" aria-label={project.title} />
@@ -79,7 +79,7 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
                   <div className="absolute inset-0 bg-surface" />
                 )}
               </motion.div>
-              <div title={project.category} className="absolute bottom-3 left-3 z-10 text-white drop-shadow-md">
+              <div title={project.category} className="absolute bottom-3 left-3 z-10 text-primary drop-shadow-md">
                 {(() => { const Icon = getCategoryIcon(project.category); return <Icon sx={{ fontSize: 22 }} /> })()}
               </div>
               {project.status && (
