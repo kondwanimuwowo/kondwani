@@ -59,8 +59,8 @@ export function Projects({ projects }: { projects: Project[] }) {
             <motion.article
               key={project.id}
               variants={cardVariant}
-              whileHover={{ y: -8 }}
-              className="relative group bg-surface rounded-3xl overflow-hidden shadow-md hover:shadow-2xl border-2 border-surface hover:border-primary transition-all duration-300"
+              whileHover={{ y: -6 }}
+              className="relative group bg-surface rounded-3xl overflow-hidden shadow-md grayscale hover:grayscale-0 hover:shadow-xl border-2 border-surface hover:border-primary transition-all duration-500"
             >
               {/* Image */}
               <div className="relative h-52 overflow-hidden bg-background">

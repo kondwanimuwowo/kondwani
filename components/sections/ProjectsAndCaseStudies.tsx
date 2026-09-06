@@ -29,8 +29,8 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <motion.article
       variants={cardVariant}
-      whileHover={{ y: -8 }}
-      className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl border-2 border-white hover:border-primary transition-all duration-300"
+      whileHover={{ y: -6 }}
+      className="relative group bg-white rounded-3xl overflow-hidden shadow-md grayscale hover:grayscale-0 hover:shadow-xl border-2 border-white hover:border-primary transition-all duration-500"
     >
       <div className="relative h-52 overflow-hidden bg-surface">
         <motion.div className="absolute inset-0" whileHover={{ scale: 1.04 }} transition={{ duration: 0.6, ease: "easeOut" }}>
@@ -94,8 +94,8 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
   return (
     <motion.article
       variants={cardVariant}
-      whileHover={{ y: -8 }}
-      className="relative group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl border-2 border-white hover:border-primary transition-all duration-300"
+      whileHover={{ y: -6 }}
+      className="relative group bg-white rounded-3xl overflow-hidden shadow-md grayscale hover:grayscale-0 hover:shadow-xl border-2 border-white hover:border-primary transition-all duration-500"
     >
       <div className="relative h-52 overflow-hidden bg-surface">
         <motion.div className="absolute inset-0" whileHover={{ scale: 1.04 }} transition={{ duration: 0.6, ease: "easeOut" }}>
