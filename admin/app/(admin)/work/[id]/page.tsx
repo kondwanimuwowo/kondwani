@@ -1522,13 +1522,13 @@ export default function WorkDetailPage() {
           {/* Quick actions */}
           <div className="pt-2 space-y-2">
             <Link
-              href={`/invoices?new=invoice&project=${project.id}&client=${project.clientId ?? ""}`}
+              href={`/invoices/new?new=invoice&project=${project.id}&client=${project.clientId ?? ""}`}
               className="flex items-center gap-2 w-full px-4 py-2.5 bg-primary-tint text-primary text-sm font-medium rounded-full transition-colors"
             >
               <RequestQuote sx={{ fontSize: 18 }} /> New Invoice
             </Link>
             <Link
-              href={`/invoices?new=quote&project=${project.id}&client=${project.clientId ?? ""}`}
+              href={`/invoices/new?new=quote&project=${project.id}&client=${project.clientId ?? ""}`}
               className="flex items-center gap-2 w-full px-4 py-2.5 bg-surface text-foreground text-sm font-medium rounded-full transition-colors"
             >
               <RequestQuote sx={{ fontSize: 18 }} /> New Quote

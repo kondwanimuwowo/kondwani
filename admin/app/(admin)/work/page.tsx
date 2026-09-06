@@ -52,11 +52,6 @@ const BILLING_TIPS: Record<string, string> = {
   pro_bono: "No charge, volunteer or personal project",
 }
 
-const empty = {
-  title: "", clientId: "", status: "backlog", billingType: "fixed",
-  rate: "", budget: "", currency: "USD", startDate: "", dueDate: "", description: "",
-}
-
 function statusStyle(s: string) {
   return STATUSES.find(x => x.key === s)?.color ?? "bg-neutral-bg text-muted"
 }
@@ -113,68 +108,27 @@ function KanbanCard({ project }: { project: WorkProject }) {
 
 export default function WorkPage() {
   const [projects, setProjects] = useState<WorkProject[]>([])
-  const [clients, setClients] = useState<Client[]>([])
   const [view, setView] = useState<"list" | "board">("board")
-  const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState(empty)
-  const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
   const [quickAdd, setQuickAdd] = useState<Record<string, string>>({})
+  const [loadError, setLoadError] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
   async function load() {
-    const [pRes, cRes] = await Promise.all([
-      fetch("/api/studio/work"),
-      fetch("/api/studio/clients"),
-    ])
-    setProjects(await pRes.json())
-    setClients(await cRes.json())
+    setLoadError(false)
+    try {
+      const res = await fetch("/api/studio/work")
+      if (!res.ok) throw new Error()
+      setProjects(await res.json())
+      setLoaded(true)
+    } catch {
+      setLoadError(true)
+    }
   }
 
   useEffect(() => { load() }, [])
-
-  function f(field: keyof typeof form) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-      setForm(v => ({ ...v, [field]: e.target.value }))
-  }
-
-  async function handleSave() {
-    if (!form.title.trim()) return
-    setSaving(true)
-    setSaveError(null)
-    try {
-      const res = await fetch("/api/studio/work", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: form.title.trim(),
-          clientId: form.clientId || null,
-          status: form.status,
-          billingType: form.billingType,
-          rate: form.rate ? parseFloat(form.rate) : null,
-          budget: form.budget ? parseFloat(form.budget) : null,
-          currency: form.currency,
-          startDate: form.startDate || null,
-          dueDate: form.dueDate || null,
-          description: form.description || null,
-        }),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        setSaveError(err.error ?? `Error ${res.status}, project was not saved`)
-        return
-      }
-      setShowForm(false)
-      setForm(empty)
-      await load()
-    } catch {
-      setSaveError("Network error, please try again")
-    } finally {
-      setSaving(false)
-    }
-  }
 
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -208,8 +162,6 @@ export default function WorkPage() {
   }
 
   const activeProject = projects.find(p => p.id === activeId)
-  const inputCls = "w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
-  const labelCls = "block text-sm font-medium text-foreground mb-1.5"
 
   return (
     <div className="p-8 h-full flex flex-col">
@@ -235,108 +187,31 @@ export default function WorkPage() {
               <ViewKanban sx={{ fontSize: 15 }} /> Board
             </button>
           </div>
-          <button
-            onClick={() => setShowForm(true)}
+          <Link
+            href="/work/new"
             className="flex items-center gap-2 text-sm font-medium bg-primary text-white px-5 py-2 rounded-full hover:bg-primary-hover transition-colors"
           >
             <Add sx={{ fontSize: 18 }} /> New project
-          </button>
+          </Link>
         </div>
       </div>
-
-      {/* Create Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/30 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-lg p-6 w-full max-w-lg my-8">
-            <h2 className="font-bold text-foreground mb-5">New Project</h2>
-            <div className="space-y-4">
-              <div>
-                <label className={labelCls}>Title <span className="text-danger">*</span></label>
-                <input value={form.title} onChange={f("title")} className={inputCls} placeholder="Project name" autoFocus />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Client</label>
-                  <select value={form.clientId} onChange={f("clientId")} className={inputCls}>
-                    <option value="">No client</option>
-                    {clients.map(c => (
-                      <option key={c.id} value={c.id}>{c.company ?? c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelCls}>Status</label>
-                  <select value={form.status} onChange={f("status")} className={inputCls}>
-                    {STATUSES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Billing type</label>
-                  <select value={form.billingType} onChange={f("billingType")} className={inputCls}>
-                    <option value="fixed">Fixed price</option>
-                    <option value="hourly">Hourly rate</option>
-                    <option value="retainer">Retainer</option>
-                    <option value="pro_bono">Pro Bono</option>
-                  </select>
-                </div>
-                <div>
-                  <label className={labelCls}>Currency</label>
-                  <select value={form.currency} onChange={f("currency")} className={inputCls}>
-                    <option value="USD">USD</option>
-                    <option value="ZMW">ZMW</option>
-                  </select>
-                </div>
-              </div>
-              {(form.billingType === "fixed") && (
-                <div>
-                  <label className={labelCls}>Budget</label>
-                  <input type="number" value={form.budget} onChange={f("budget")} className={inputCls} placeholder="0.00" />
-                </div>
-              )}
-              {(form.billingType === "hourly" || form.billingType === "retainer") && (
-                <div>
-                  <label className={labelCls}>{form.billingType === "retainer" ? "Monthly rate" : "Hourly rate"}</label>
-                  <input type="number" value={form.rate} onChange={f("rate")} className={inputCls} placeholder="0.00" />
-                </div>
-              )}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Start date</label>
-                  <input type="date" value={form.startDate} onChange={f("startDate")} className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>Due date</label>
-                  <input type="date" value={form.dueDate} onChange={f("dueDate")} className={inputCls} />
-                </div>
-              </div>
-              <div>
-                <label className={labelCls}>Description</label>
-                <textarea value={form.description} onChange={f("description")} rows={3} className={`${inputCls} resize-none`} />
-              </div>
-            </div>
-            {saveError && (
-              <p className="mt-4 text-xs text-danger bg-danger-bg rounded-3xl px-3 py-2">{saveError}</p>
-            )}
-            <div className="flex items-center gap-3 mt-4">
-              <button onClick={handleSave} disabled={saving || !form.title.trim()}
-                className="flex-1 bg-primary text-white py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60">
-                {saving ? "Saving..." : "Create project"}
-              </button>
-              <button onClick={() => { setShowForm(false); setForm(empty); setSaveError(null) }}
-                className="flex-1 bg-surface py-2.5 rounded-full text-sm font-medium hover:bg-neutral-bg transition-colors">
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── List view ─────────────────────────────────────────────────────── */}
       {view === "list" && (
         <div className="bg-white rounded-3xl shadow-md overflow-hidden">
-          {projects.length === 0 ? (
+          {loadError ? (
+            <div className="px-6 py-12 text-center space-y-3">
+              <p className="text-danger font-medium text-sm">Couldn&apos;t load projects. This is a display error, not data loss.</p>
+              <button
+                onClick={load}
+                className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : !loaded ? (
+            <p className="px-6 py-12 text-sm text-muted text-center">Loading…</p>
+          ) : projects.length === 0 ? (
             <p className="px-6 py-12 text-sm text-muted text-center">No projects yet.</p>
           ) : (
             <table className="w-full">

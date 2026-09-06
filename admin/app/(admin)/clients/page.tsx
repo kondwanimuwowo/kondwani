@@ -1,27 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Business, Email, Phone, Language, Add, Edit, Delete } from "@mui/icons-material"
+import Link from "next/link"
+import { Business, Email, Phone, Language, Add, Edit, Delete, Close } from "@mui/icons-material"
 import { Tooltip } from "@/components/ui/Tooltip"
-
-type Client = {
-  id: string
-  name: string
-  company: string | null
-  email: string
-  phone: string | null
-  website: string | null
-  currency: string
-  notes: string | null
-  status: string
-  createdAt: string
-  _count?: { workProjects: number }
-}
-
-const empty = {
-  name: "", company: "", email: "", phone: "", website: "",
-  currency: "USD", notes: "", status: "active",
-}
+import { ClientForm, fetchWithRetry, type Client } from "./ClientForm"
 
 const statusColors: Record<string, string> = {
   active: "bg-success-bg text-success",
@@ -37,67 +20,37 @@ const statusTips: Record<string, string> = {
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([])
   const [showForm, setShowForm] = useState(false)
-  const [editId, setEditId] = useState<string | null>(null)
-  const [form, setForm] = useState(empty)
-  const [saving, setSaving] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   async function load() {
-    const res = await fetch("/api/studio/clients")
-    setClients(await res.json())
+    setLoadError(false)
+    try {
+      const res = await fetchWithRetry("/api/studio/clients", {})
+      if (!res.ok) throw new Error()
+      setClients(await res.json())
+      setLoaded(true)
+    } catch {
+      setLoadError(true)
+    }
   }
 
   useEffect(() => { load() }, [])
 
-  function f(field: keyof typeof form) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-      setForm(v => ({ ...v, [field]: e.target.value }))
-  }
-
-  function openCreate() {
-    setForm(empty)
-    setEditId(null)
-    setShowForm(true)
-  }
-
-  function openEdit(c: Client) {
-    setForm({
-      name: c.name, company: c.company ?? "", email: c.email,
-      phone: c.phone ?? "", website: c.website ?? "",
-      currency: c.currency, notes: c.notes ?? "", status: c.status,
-    })
-    setEditId(c.id)
-    setShowForm(true)
-  }
-
-  async function handleSave() {
-    setSaving(true)
-    const method = editId ? "PUT" : "POST"
-    const url = editId ? `/api/studio/clients/${editId}` : "/api/studio/clients"
-    await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        company: form.company || null,
-        phone: form.phone || null,
-        website: form.website || null,
-        notes: form.notes || null,
-      }),
-    })
-    setSaving(false)
-    setShowForm(false)
-    setEditId(null)
-    load()
-  }
-
   async function handleDelete(id: string) {
     if (!confirm("Delete this client? All linked projects and documents will also be deleted.")) return
-    await fetch(`/api/studio/clients/${id}`, { method: "DELETE" })
-    load()
+    setDeletingId(id)
+    try {
+      const res = await fetchWithRetry(`/api/studio/clients/${id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error()
+      load()
+    } catch {
+      alert("Something went wrong deleting this client. Please try again.")
+    } finally {
+      setDeletingId(null)
+    }
   }
-
-  const inputCls = "w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
-  const labelCls = "block text-sm font-medium text-foreground mb-1.5"
 
   return (
     <div className="p-8">
@@ -107,86 +60,47 @@ export default function ClientsPage() {
           <p className="text-sm text-muted">{clients.length} client{clients.length !== 1 ? "s" : ""}</p>
         </div>
         <button
-          onClick={openCreate}
+          onClick={() => setShowForm(true)}
           className="flex items-center gap-2 text-sm font-medium bg-primary text-white px-5 py-2 rounded-full hover:bg-primary-hover transition-colors"
         >
           <Add sx={{ fontSize: 18 }} /> New client
         </button>
       </div>
 
-      {/* Create / Edit Modal */}
+      {/* New client modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/30 flex items-start justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl shadow-lg p-6 w-full max-w-lg my-8">
-            <h2 className="font-bold text-foreground mb-5">{editId ? "Edit" : "New"} Client</h2>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Name <span className="text-danger">*</span></label>
-                  <input value={form.name} onChange={f("name")} className={inputCls} placeholder="Full name" />
-                </div>
-                <div>
-                  <label className={labelCls}>Company</label>
-                  <input value={form.company} onChange={f("company")} className={inputCls} placeholder="Company Ltd" />
-                </div>
-              </div>
-              <div>
-                <label className={labelCls}>Email <span className="text-red-500">*</span></label>
-                <input type="email" value={form.email} onChange={f("email")} className={inputCls} placeholder="client@company.com" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Phone</label>
-                  <input value={form.phone} onChange={f("phone")} className={inputCls} placeholder="+260 97..." />
-                </div>
-                <div>
-                  <label className={labelCls}>Website</label>
-                  <input value={form.website} onChange={f("website")} className={inputCls} placeholder="https://..." />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Currency</label>
-                  <select value={form.currency} onChange={f("currency")} className={inputCls}>
-                    <option value="USD">USD, US Dollar</option>
-                    <option value="ZMW">ZMW, Zambian Kwacha</option>
-                  </select>
-                </div>
-                <div>
-                  <label className={labelCls}>Status</label>
-                  <select value={form.status} onChange={f("status")} className={inputCls}>
-                    <option value="active">Active</option>
-                    <option value="lead">Lead</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className={labelCls}>Notes</label>
-                <textarea value={form.notes} onChange={f("notes")} rows={3} className={`${inputCls} resize-none`} placeholder="Any notes about this client..." />
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mt-6">
-              <button
-                onClick={handleSave}
-                disabled={saving || !form.name || !form.email}
-                className="flex-1 bg-primary text-white py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
-              >
-                {saving ? "Saving..." : "Save"}
-              </button>
-              <button
-                onClick={() => { setShowForm(false); setEditId(null) }}
-                className="flex-1 bg-surface py-2.5 rounded-full text-sm font-medium hover:bg-neutral-bg transition-colors"
-              >
-                Cancel
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-bold text-foreground">New Client</h2>
+              <button onClick={() => setShowForm(false)} className="text-muted hover:text-foreground transition-colors">
+                <Close sx={{ fontSize: 20 }} />
               </button>
             </div>
+            <ClientForm
+              onSaved={() => { setShowForm(false); load() }}
+              onCancel={() => setShowForm(false)}
+            />
           </div>
         </div>
       )}
 
       {/* Client grid */}
-      {clients.length === 0 ? (
+      {loadError ? (
+        <div className="bg-white rounded-3xl shadow-md p-16 text-center space-y-3">
+          <p className="text-danger font-medium text-sm">Couldn&apos;t load clients. This is a display error, not data loss.</p>
+          <button
+            onClick={load}
+            className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      ) : !loaded ? (
+        <div className="bg-white rounded-3xl shadow-md p-16 text-center">
+          <p className="text-sm text-muted">Loading…</p>
+        </div>
+      ) : clients.length === 0 ? (
         <div className="bg-white rounded-3xl shadow-md p-16 text-center">
           <Business sx={{ fontSize: 40 }} className="text-border mx-auto mb-4" />
           <p className="text-sm text-muted mb-1">No clients yet</p>
@@ -232,11 +146,15 @@ export default function ClientsPage() {
               <div className="flex items-center justify-between pt-3 border-t border-border">
                 <span className="text-[11px] text-muted">{c.currency}</span>
                 <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => openEdit(c)} className="text-xs font-medium text-muted hover:text-foreground transition-colors flex items-center gap-1">
+                  <Link href={`/clients/${c.id}`} className="text-xs font-medium text-muted hover:text-foreground transition-colors flex items-center gap-1">
                     <Edit sx={{ fontSize: 14 }} /> Edit
-                  </button>
-                  <button onClick={() => handleDelete(c.id)} className="text-xs font-medium text-danger hover:text-danger transition-colors flex items-center gap-1">
-                    <Delete sx={{ fontSize: 14 }} /> Delete
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(c.id)}
+                    disabled={deletingId === c.id}
+                    className="text-xs font-medium text-danger hover:text-danger transition-colors flex items-center gap-1 disabled:opacity-50"
+                  >
+                    <Delete sx={{ fontSize: 14 }} /> {deletingId === c.id ? "Deleting…" : "Delete"}
                   </button>
                 </div>
               </div>

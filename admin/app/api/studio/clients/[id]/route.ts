@@ -5,6 +5,13 @@ import { createClient } from "@/lib/supabase/server"
 
 type Params = { params: Promise<{ id: string }> }
 
+export async function GET(_req: Request, { params }: Params) {
+  const { id } = await params
+  const row = await db.query.client.findFirst({ where: (t, { eq }) => eq(t.id, id) })
+  if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 })
+  return NextResponse.json(row)
+}
+
 export async function PUT(request: Request, { params }: Params) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

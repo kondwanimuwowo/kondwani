@@ -1,16 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-
-type Job = {
-  id: string
-  company: string
-  role: string
-  status: string
-  appliedAt: string
-  notes?: string | null
-  url?: string | null
-}
+import Link from "next/link"
+import { JobForm, fetchWithRetry, type Job } from "./JobForm"
 
 const STATUS_COLORS: Record<string, string> = {
   applied: "bg-info-bg text-info",
@@ -25,40 +17,36 @@ const STATUSES = ["applied", "interview", "offer", "rejected", "withdrawn"]
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ company: "", role: "", status: "applied", appliedAt: new Date().toISOString().split("T")[0], notes: "", url: "" })
-  const [editId, setEditId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   async function load() {
-    const res = await fetch("/api/jobs")
-    setJobs(await res.json())
+    setLoadError(false)
+    try {
+      const res = await fetchWithRetry("/api/jobs", {})
+      if (!res.ok) throw new Error()
+      setJobs(await res.json())
+      setLoaded(true)
+    } catch {
+      setLoadError(true)
+    }
   }
 
   useEffect(() => { load() }, [])
 
-  async function handleSave() {
-    const method = editId ? "PUT" : "POST"
-    const url = editId ? `/api/jobs/${editId}` : "/api/jobs"
-    await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, appliedAt: new Date(form.appliedAt).toISOString() }),
-    })
-    setShowForm(false)
-    setEditId(null)
-    setForm({ company: "", role: "", status: "applied", appliedAt: new Date().toISOString().split("T")[0], notes: "", url: "" })
-    load()
-  }
-
   async function handleDelete(id: string) {
     if (!confirm("Delete this application?")) return
-    await fetch(`/api/jobs/${id}`, { method: "DELETE" })
-    load()
-  }
-
-  function startEdit(job: Job) {
-    setForm({ company: job.company, role: job.role, status: job.status, appliedAt: job.appliedAt.split("T")[0], notes: job.notes ?? "", url: job.url ?? "" })
-    setEditId(job.id)
-    setShowForm(true)
+    setDeletingId(id)
+    try {
+      const res = await fetchWithRetry(`/api/jobs/${id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error()
+      load()
+    } catch {
+      alert("Something went wrong deleting this application. Please try again.")
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   const statusCounts = STATUSES.reduce((acc, s) => ({ ...acc, [s]: jobs.filter(j => j.status === s).length }), {} as Record<string, number>)
@@ -94,82 +82,21 @@ export default function JobsPage() {
         })}
       </div>
 
-      {/* Modal */}
+      {/* Add Application modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white shadow-2xl w-full max-w-md flex flex-col max-h-[90vh] sm:max-h-[85vh] rounded-3xl overflow-hidden my-auto">
-            {/* Modal Header */}
             <div className="px-6 py-4 shadow-md flex items-center justify-between flex-shrink-0">
-              <h2 className="font-bold text-foreground text-base">{editId ? "Edit" : "Add"} Application</h2>
-              <button
-                onClick={() => { setShowForm(false); setEditId(null); setForm({ company: "", role: "", status: "applied", appliedAt: new Date().toISOString().split("T")[0], notes: "", url: "" }) }}
-                className="text-muted hover:text-foreground transition-colors text-xl leading-none"
-              >
+              <h2 className="font-bold text-foreground text-base">Add Application</h2>
+              <button onClick={() => setShowForm(false)} className="text-muted hover:text-foreground transition-colors text-xl leading-none">
                 &times;
               </button>
             </div>
-
-            {/* Scrollable Modal Body */}
-            <div className="flex-1 overflow-y-auto scrollbar-thin px-6 py-5 space-y-4">
-              {(["company", "role", "url"] as const).map(field => (
-                <div key={field}>
-                  <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">
-                    {field === "url" ? "Listing URL" : field}
-                  </label>
-                  <input
-                    value={form[field]}
-                    onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
-                    placeholder={field === "url" ? "https://" : ""}
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
-                  />
-                </div>
-              ))}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Status</label>
-                  <select
-                    value={form.status}
-                    onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all capitalize"
-                  >
-                    {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Applied date</label>
-                  <input
-                    type="date"
-                    value={form.appliedAt}
-                    onChange={e => setForm(f => ({ ...f, appliedAt: e.target.value }))}
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Notes</label>
-                <textarea
-                  value={form.notes}
-                  onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-                  rows={3}
-                  className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all resize-none"
-                />
-              </div>
-            </div>
-
-            {/* Sticky Modal Footer */}
-            <div className="px-6 py-4 border-t border-border flex items-center gap-3 bg-surface flex-shrink-0">
-              <button
-                onClick={() => { setShowForm(false); setEditId(null); setForm({ company: "", role: "", status: "applied", appliedAt: new Date().toISOString().split("T")[0], notes: "", url: "" }) }}
-                className="flex-1 bg-white py-2 rounded-full text-sm font-semibold text-muted hover:bg-neutral-bg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="flex-1 bg-primary text-white py-2 rounded-full text-sm font-semibold hover:bg-primary-hover transition-colors"
-              >
-                Save Application
-              </button>
+            <div className="flex-1 overflow-y-auto scrollbar-thin px-6 py-5">
+              <JobForm
+                onSaved={() => { setShowForm(false); load() }}
+                onCancel={() => setShowForm(false)}
+              />
             </div>
           </div>
         </div>
@@ -177,7 +104,19 @@ export default function JobsPage() {
 
       {/* Table */}
       <div className="bg-white rounded-3xl shadow-md overflow-hidden">
-        {jobs.length === 0 ? (
+        {loadError ? (
+          <div className="px-6 py-16 text-center space-y-3">
+            <p className="text-danger font-medium text-sm">Couldn&apos;t load applications. This is a display error, not data loss.</p>
+            <button
+              onClick={load}
+              className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        ) : !loaded ? (
+          <p className="px-6 py-16 text-sm text-muted text-center">Loading…</p>
+        ) : jobs.length === 0 ? (
           <p className="px-6 py-16 text-sm text-muted text-center">No applications tracked yet.</p>
         ) : (
           <div className="overflow-x-auto scrollbar-thin">
@@ -222,8 +161,14 @@ export default function JobsPage() {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3 justify-end">
-                        <button onClick={() => startEdit(job)} className="text-xs font-semibold text-muted hover:text-foreground transition-colors">Edit</button>
-                        <button onClick={() => handleDelete(job.id)} className="text-xs font-semibold text-danger hover:text-danger transition-colors">Delete</button>
+                        <Link href={`/jobs/${job.id}`} className="text-xs font-semibold text-muted hover:text-foreground transition-colors">Edit</Link>
+                        <button
+                          onClick={() => handleDelete(job.id)}
+                          disabled={deletingId === job.id}
+                          className="text-xs font-semibold text-danger hover:text-danger transition-colors disabled:opacity-50"
+                        >
+                          {deletingId === job.id ? "Deleting…" : "Delete"}
+                        </button>
                       </div>
                     </td>
                   </tr>
