@@ -1,15 +1,20 @@
 import { defineConfig } from "vite";
 import vinext from "vinext";
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { kvDataAdapter } from "@vinext/cloudflare/cache/kv-data-adapter";
+import { cdnAdapter } from "@vinext/cloudflare/cache/cdn-adapter";
 
-// The KV-backed data cache adapter was implicated in intermittent 500s on
-// mutation routes (crashes inside vinext's own cacheComponents/
-// queryWithCache internals) -- admin is mutation-heavy and doesn't
-// benefit much from cached reads, so drop the adapter and let vinext
-// fall back to its uncached default instead of routing through KV.
+// Note: intermittent 500s on mutation routes (crashes inside vinext's own
+// cacheComponents/queryWithCache internals, file db-*.js) were confirmed via
+// A/B test to happen identically with or without this adapter configured --
+// it's baked into vinext@1.0.0-beta.9's request dispatch, not caused by our
+// cache config. Restored since removing it had no effect and only cost us
+// caching. See ProjectForm.tsx's fetchWithRetry for the actual mitigation.
 export default defineConfig({
   plugins: [
-    vinext(),
+    vinext({
+      cache: { data: kvDataAdapter(), cdn: cdnAdapter() },
+    }),
     cloudflare({
       viteEnvironment: {
         name: "rsc",
