@@ -5,12 +5,14 @@ import { motion } from "motion/react"
 import { Sidebar } from "./Sidebar"
 import { MobileHeader } from "./MobileHeader"
 import { AdminMobileDrawer } from "./AdminMobileDrawer"
+import { QueryProvider } from "./QueryProvider"
 
 export function AdminShellClient({ children, userEmail }: { children: React.ReactNode; userEmail: string }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const closeDrawer = useCallback(() => setDrawerOpen(false), [])
 
   return (
+    <QueryProvider>
     <div className="flex flex-col md:flex-row h-screen bg-surface overflow-hidden">
       {/* Sidebar for Desktop */}
       <div className="hidden md:block sticky top-0 h-screen shrink-0">
@@ -33,5 +35,6 @@ export function AdminShellClient({ children, userEmail }: { children: React.Reac
       {/* Mobile Drawer */}
       <AdminMobileDrawer isOpen={drawerOpen} onClose={closeDrawer} />
     </div>
+    </QueryProvider>
   )
 }

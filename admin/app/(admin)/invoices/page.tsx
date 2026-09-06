@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Add, ContentCopy, Check, Delete } from "@mui/icons-material"
 import { Tooltip } from "@/components/ui/Tooltip"
-import { fetchWithRetry, type Document } from "./InvoiceForm"
+import { type Document } from "./InvoiceForm"
 
 const STATUS_COLORS: Record<string, string> = {
   draft: "bg-neutral-bg text-muted", sent: "bg-info-bg text-info",
@@ -34,50 +35,51 @@ function formatNum(n: number, currency: string) {
   return `${currency} ${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
+async function fetchInvoices(): Promise<Document[]> {
+  const res = await fetch("/api/studio/invoices")
+  if (!res.ok) throw new Error()
+  return res.json()
+}
+
 export default function InvoicesPage() {
-  const [docs, setDocs] = useState<Document[]>([])
   const [tab, setTab] = useState<"all" | "invoice" | "quote">("all")
   const [copied, setCopied] = useState<string | null>(null)
-  const [loadError, setLoadError] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const queryClient = useQueryClient()
 
-  async function load() {
-    setLoadError(false)
-    try {
-      const res = await fetchWithRetry("/api/studio/invoices", {})
+  const { data: docs = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ["invoices"],
+    queryFn: fetchInvoices,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/studio/invoices/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
-      setDocs(await res.json())
-      setLoaded(true)
-    } catch {
-      setLoadError(true)
-    }
-  }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["invoices"] }),
+    onError: () => alert("Failed to delete. Please try again."),
+  })
 
-  useEffect(() => { load() }, [])
-
-  async function handleDelete(id: string) {
-    if (!confirm("Delete this document?")) return
-    try {
-      const res = await fetchWithRetry(`/api/studio/invoices/${id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error()
-      load()
-    } catch {
-      alert("Failed to delete. Please try again.")
-    }
-  }
-
-  async function updateStatus(id: string, status: string) {
-    try {
-      const res = await fetchWithRetry(`/api/studio/invoices/${id}`, {
+  const statusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const res = await fetch(`/api/studio/invoices/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       })
       if (!res.ok) throw new Error()
-      load()
-    } catch {
-      alert("Failed to update status. Please try again.")
-    }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["invoices"] }),
+    onError: () => alert("Failed to update status. Please try again."),
+  })
+
+  function handleDelete(id: string) {
+    if (!confirm("Delete this document?")) return
+    deleteMutation.mutate(id)
+  }
+
+  function updateStatus(id: string, status: string) {
+    statusMutation.mutate({ id, status })
   }
 
   async function copyLink(token: string) {
@@ -120,17 +122,17 @@ export default function InvoicesPage() {
 
       {/* Table */}
       <div className="bg-white rounded-3xl shadow-md overflow-hidden">
-        {loadError ? (
+        {isError ? (
           <div className="px-6 py-12 text-center space-y-3">
             <p className="text-danger font-medium text-sm">Couldn&apos;t load documents. This is a display error, not data loss.</p>
             <button
-              onClick={load}
+              onClick={() => refetch()}
               className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
             >
               Retry
             </button>
           </div>
-        ) : !loaded ? (
+        ) : isLoading ? (
           <p className="px-6 py-12 text-sm text-muted text-center">Loading…</p>
         ) : filtered.length === 0 ? (
           <p className="px-6 py-12 text-sm text-muted text-center">No documents yet.</p>

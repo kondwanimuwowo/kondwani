@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 export type Client = {
   id: string
@@ -30,14 +31,6 @@ function toFormState(c?: Client) {
   }
 }
 
-// A transient vinext/Workers request can 500 with no body; one silent retry
-// papers over that without making the user re-click.
-export async function fetchWithRetry(url: string, init: RequestInit, retries = 1): Promise<Response> {
-  const res = await fetch(url, init)
-  if (!res.ok && retries > 0) return fetchWithRetry(url, init, retries - 1)
-  return res
-}
-
 interface Props {
   client?: Client
   onSaved: () => void
@@ -47,23 +40,19 @@ interface Props {
 
 export function ClientForm({ client, onSaved, onCancel, onDeleted }: Props) {
   const [form, setForm] = useState(toFormState(client))
-  const [saving, setSaving] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const editId = client?.id
+  const queryClient = useQueryClient()
 
   function f(field: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm(v => ({ ...v, [field]: e.target.value }))
   }
 
-  async function handleSave() {
-    setSaving(true)
-    setError(null)
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async () => {
       const method = editId ? "PUT" : "POST"
       const url = editId ? `/api/studio/clients/${editId}` : "/api/studio/clients"
-      const res = await fetchWithRetry(url, {
+      const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -75,28 +64,39 @@ export function ClientForm({ client, onSaved, onCancel, onDeleted }: Props) {
         }),
       })
       if (!res.ok) throw new Error(`Save failed (${res.status})`)
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clients"] })
+      if (editId) queryClient.invalidateQueries({ queryKey: ["client", editId] })
       onSaved()
-    } catch {
-      setError("Something went wrong saving this client. Please try again.")
-    } finally {
-      setSaving(false)
-    }
-  }
+    },
+  })
 
-  async function handleDelete() {
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/studio/clients/${editId}`, { method: "DELETE" })
+      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clients"] })
+      onDeleted?.()
+    },
+  })
+
+  function handleDelete() {
     if (!editId) return
     if (!confirm("Delete this client? All linked projects and documents will also be deleted.")) return
-    setDeleting(true)
-    setError(null)
-    try {
-      const res = await fetchWithRetry(`/api/studio/clients/${editId}`, { method: "DELETE" })
-      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
-      onDeleted?.()
-    } catch {
-      setError("Something went wrong deleting this client. Please try again.")
-      setDeleting(false)
-    }
+    deleteMutation.mutate()
   }
+
+  const saving = saveMutation.isPending
+  const deleting = deleteMutation.isPending
+  const error = saveMutation.isError
+    ? "Something went wrong saving this client. Please try again."
+    : deleteMutation.isError
+    ? "Something went wrong deleting this client. Please try again."
+    : null
 
   const inputCls = "w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
@@ -171,7 +171,7 @@ export function ClientForm({ client, onSaved, onCancel, onDeleted }: Props) {
           Cancel
         </button>
         <button
-          onClick={handleSave}
+          onClick={() => saveMutation.mutate()}
           disabled={saving || deleting || !form.name || !form.email}
           className="bg-primary text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
         >

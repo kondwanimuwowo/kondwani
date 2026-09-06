@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
+import { useQuery } from "@tanstack/react-query"
 import { ArrowBack } from "@mui/icons-material"
 import Link from "next/link"
 import { JobForm, type Job } from "../JobForm"
@@ -9,18 +9,15 @@ import { JobForm, type Job } from "../JobForm"
 export default function EditJobPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
-  const [job, setJob] = useState<Job | null>(null)
-  const [notFound, setNotFound] = useState(false)
 
-  useEffect(() => {
-    fetch(`/api/jobs/${params.id}`)
-      .then(res => {
-        if (!res.ok) throw new Error()
-        return res.json() as Promise<Job>
-      })
-      .then(setJob)
-      .catch(() => setNotFound(true))
-  }, [params.id])
+  const { data: job, isLoading, isError } = useQuery({
+    queryKey: ["job", params.id],
+    queryFn: async (): Promise<Job> => {
+      const res = await fetch(`/api/jobs/${params.id}`)
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+  })
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -32,9 +29,9 @@ export default function EditJobPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-3xl p-6">
-        {notFound ? (
+        {isError ? (
           <p className="text-muted text-sm">Application not found.</p>
-        ) : !job ? (
+        ) : isLoading || !job ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <JobForm

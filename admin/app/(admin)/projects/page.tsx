@@ -1,44 +1,39 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Close } from "@mui/icons-material"
-import { ProjectForm, fetchWithRetry, type Project } from "./ProjectForm"
+import { ProjectForm, type Project } from "./ProjectForm"
+
+async function fetchProjects(): Promise<Project[]> {
+  const res = await fetch("/api/projects")
+  if (!res.ok) throw new Error()
+  return res.json()
+}
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>([])
   const [showForm, setShowForm] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [loadError, setLoadError] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const queryClient = useQueryClient()
 
-  async function load() {
-    setLoadError(false)
-    try {
-      const res = await fetchWithRetry("/api/projects", {})
+  const { data: projects = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ["projects"],
+    queryFn: fetchProjects,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/projects/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
-      setProjects(await res.json())
-      setLoaded(true)
-    } catch {
-      setLoadError(true)
-    }
-  }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["projects"] }),
+    onError: () => alert("Something went wrong deleting this project. Please try again."),
+  })
 
-  useEffect(() => { load() }, [])
-
-  async function handleDelete(id: string) {
+  function handleDelete(id: string) {
     if (!confirm("Delete this project?")) return
-    setDeletingId(id)
-    try {
-      const res = await fetchWithRetry(`/api/projects/${id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error()
-      load()
-    } catch {
-      alert("Something went wrong deleting this project. Please try again.")
-    } finally {
-      setDeletingId(null)
-    }
+    deleteMutation.mutate(id)
   }
 
   return (
@@ -69,7 +64,7 @@ export default function ProjectsPage() {
             </div>
             <div className="flex-1 overflow-y-auto scrollbar-thin px-6 py-5">
               <ProjectForm
-                onSaved={() => { setShowForm(false); load() }}
+                onSaved={() => setShowForm(false)}
                 onCancel={() => setShowForm(false)}
               />
             </div>
@@ -79,17 +74,17 @@ export default function ProjectsPage() {
 
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loadError ? (
+        {isError ? (
           <div className="col-span-full bg-white px-6 py-16 text-center shadow-md rounded-3xl space-y-3">
             <p className="text-danger font-medium">Couldn&apos;t load projects. This is a display error, not data loss.</p>
             <button
-              onClick={load}
+              onClick={() => refetch()}
               className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
             >
               Retry
             </button>
           </div>
-        ) : !loaded ? (
+        ) : isLoading ? (
           <div className="col-span-full bg-white px-6 py-16 text-center shadow-md rounded-3xl">
             <p className="text-muted">Loading…</p>
           </div>
@@ -138,10 +133,10 @@ export default function ProjectsPage() {
                   <Link href={`/projects/${p.id}`} className="text-xs font-semibold text-muted hover:text-foreground transition-colors">Edit</Link>
                   <button
                     onClick={() => handleDelete(p.id)}
-                    disabled={deletingId === p.id}
+                    disabled={deleteMutation.isPending && deleteMutation.variables === p.id}
                     className="text-xs font-semibold text-danger hover:text-danger transition-colors disabled:opacity-50"
                   >
-                    {deletingId === p.id ? "Deleting…" : "Delete"}
+                    {deleteMutation.isPending && deleteMutation.variables === p.id ? "Deleting…" : "Delete"}
                   </button>
                 </div>
                 {p.liveUrl && (

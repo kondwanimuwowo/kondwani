@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
+import { useQuery } from "@tanstack/react-query"
 import { ArrowBack } from "@mui/icons-material"
 import Link from "next/link"
 import { ClientForm, type Client } from "../ClientForm"
@@ -9,18 +9,15 @@ import { ClientForm, type Client } from "../ClientForm"
 export default function EditClientPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
-  const [client, setClient] = useState<Client | null>(null)
-  const [notFound, setNotFound] = useState(false)
 
-  useEffect(() => {
-    fetch(`/api/studio/clients/${params.id}`)
-      .then(res => {
-        if (!res.ok) throw new Error()
-        return res.json() as Promise<Client>
-      })
-      .then(setClient)
-      .catch(() => setNotFound(true))
-  }, [params.id])
+  const { data: client, isLoading, isError } = useQuery({
+    queryKey: ["client", params.id],
+    queryFn: async (): Promise<Client> => {
+      const res = await fetch(`/api/studio/clients/${params.id}`)
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+  })
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 p-8">
@@ -32,9 +29,9 @@ export default function EditClientPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-3xl p-6">
-        {notFound ? (
+        {isError ? (
           <p className="text-muted text-sm">Client not found.</p>
-        ) : !client ? (
+        ) : isLoading || !client ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <ClientForm

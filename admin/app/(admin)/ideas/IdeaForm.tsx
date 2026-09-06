@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 export type Idea = { id: string; title: string; body?: string | null; tags: string[]; createdAt: string }
 
@@ -9,14 +10,6 @@ const empty = { title: "", body: "", tags: "" }
 function toFormState(idea?: Idea) {
   if (!idea) return empty
   return { title: idea.title, body: idea.body ?? "", tags: idea.tags.join(", ") }
-}
-
-// A transient vinext/Workers request can 500 with no body; one silent retry
-// papers over that without making the user re-click.
-export async function fetchWithRetry(url: string, init: RequestInit, retries = 1): Promise<Response> {
-  const res = await fetch(url, init)
-  if (!res.ok && retries > 0) return fetchWithRetry(url, init, retries - 1)
-  return res
 }
 
 interface Props {
@@ -28,45 +21,52 @@ interface Props {
 
 export function IdeaForm({ idea, onSaved, onCancel, onDeleted }: Props) {
   const [form, setForm] = useState(toFormState(idea))
-  const [saving, setSaving] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const editId = idea?.id
+  const queryClient = useQueryClient()
 
-  async function handleSave() {
-    setSaving(true)
-    setError(null)
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async () => {
       const method = editId ? "PUT" : "POST"
       const url = editId ? `/api/ideas/${editId}` : "/api/ideas"
-      const res = await fetchWithRetry(url, {
+      const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: form.title, body: form.body || null, tags: form.tags.split(",").map(t => t.trim()).filter(Boolean) }),
       })
       if (!res.ok) throw new Error(`Save failed (${res.status})`)
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ideas"] })
+      if (editId) queryClient.invalidateQueries({ queryKey: ["idea", editId] })
       onSaved()
-    } catch {
-      setError("Something went wrong saving this idea. Please try again.")
-    } finally {
-      setSaving(false)
-    }
-  }
+    },
+  })
 
-  async function handleDelete() {
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/ideas/${editId}`, { method: "DELETE" })
+      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ideas"] })
+      onDeleted?.()
+    },
+  })
+
+  function handleDelete() {
     if (!editId) return
     if (!confirm("Delete this idea?")) return
-    setDeleting(true)
-    setError(null)
-    try {
-      const res = await fetchWithRetry(`/api/ideas/${editId}`, { method: "DELETE" })
-      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
-      onDeleted?.()
-    } catch {
-      setError("Something went wrong deleting this idea. Please try again.")
-      setDeleting(false)
-    }
+    deleteMutation.mutate()
   }
+
+  const saving = saveMutation.isPending
+  const deleting = deleteMutation.isPending
+  const error = saveMutation.isError
+    ? "Something went wrong saving this idea. Please try again."
+    : deleteMutation.isError
+    ? "Something went wrong deleting this idea. Please try again."
+    : null
 
   return (
     <div className="space-y-4">
@@ -121,7 +121,7 @@ export function IdeaForm({ idea, onSaved, onCancel, onDeleted }: Props) {
           Cancel
         </button>
         <button
-          onClick={handleSave}
+          onClick={() => saveMutation.mutate()}
           disabled={saving || deleting}
           className="bg-primary text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-primary-hover transition-colors disabled:opacity-50"
         >

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
+import { useQuery } from "@tanstack/react-query"
 import { ArrowBack } from "@mui/icons-material"
 import Link from "next/link"
 import { CaseStudyForm, type CaseStudy } from "../CaseStudyForm"
@@ -9,18 +9,15 @@ import { CaseStudyForm, type CaseStudy } from "../CaseStudyForm"
 export default function EditCaseStudyPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
-  const [study, setStudy] = useState<CaseStudy | null>(null)
-  const [notFound, setNotFound] = useState(false)
 
-  useEffect(() => {
-    fetch(`/api/case-studies/${params.id}`)
-      .then(res => {
-        if (!res.ok) throw new Error()
-        return res.json() as Promise<CaseStudy>
-      })
-      .then(setStudy)
-      .catch(() => setNotFound(true))
-  }, [params.id])
+  const { data: study, isLoading, isError } = useQuery({
+    queryKey: ["case-study", params.id],
+    queryFn: async (): Promise<CaseStudy> => {
+      const res = await fetch(`/api/case-studies/${params.id}`)
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+  })
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 p-8">
@@ -32,9 +29,9 @@ export default function EditCaseStudyPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-3xl p-6">
-        {notFound ? (
+        {isError ? (
           <p className="text-muted text-sm">Case study not found.</p>
-        ) : !study ? (
+        ) : isLoading || !study ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <CaseStudyForm

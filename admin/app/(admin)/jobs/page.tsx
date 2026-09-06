@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
-import { JobForm, fetchWithRetry, type Job } from "./JobForm"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { JobForm, type Job } from "./JobForm"
 
 const STATUS_COLORS: Record<string, string> = {
   applied: "bg-info-bg text-info",
@@ -14,39 +15,33 @@ const STATUS_COLORS: Record<string, string> = {
 
 const STATUSES = ["applied", "interview", "offer", "rejected", "withdrawn"]
 
+async function fetchJobs(): Promise<Job[]> {
+  const res = await fetch("/api/jobs")
+  if (!res.ok) throw new Error()
+  return res.json()
+}
+
 export default function JobsPage() {
-  const [jobs, setJobs] = useState<Job[]>([])
   const [showForm, setShowForm] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [loadError, setLoadError] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const queryClient = useQueryClient()
 
-  async function load() {
-    setLoadError(false)
-    try {
-      const res = await fetchWithRetry("/api/jobs", {})
+  const { data: jobs = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ["jobs"],
+    queryFn: fetchJobs,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/jobs/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
-      setJobs(await res.json())
-      setLoaded(true)
-    } catch {
-      setLoadError(true)
-    }
-  }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["jobs"] }),
+    onError: () => alert("Something went wrong deleting this application. Please try again."),
+  })
 
-  useEffect(() => { load() }, [])
-
-  async function handleDelete(id: string) {
+  function handleDelete(id: string) {
     if (!confirm("Delete this application?")) return
-    setDeletingId(id)
-    try {
-      const res = await fetchWithRetry(`/api/jobs/${id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error()
-      load()
-    } catch {
-      alert("Something went wrong deleting this application. Please try again.")
-    } finally {
-      setDeletingId(null)
-    }
+    deleteMutation.mutate(id)
   }
 
   const statusCounts = STATUSES.reduce((acc, s) => ({ ...acc, [s]: jobs.filter(j => j.status === s).length }), {} as Record<string, number>)
@@ -94,7 +89,7 @@ export default function JobsPage() {
             </div>
             <div className="flex-1 overflow-y-auto scrollbar-thin px-6 py-5">
               <JobForm
-                onSaved={() => { setShowForm(false); load() }}
+                onSaved={() => setShowForm(false)}
                 onCancel={() => setShowForm(false)}
               />
             </div>
@@ -104,17 +99,17 @@ export default function JobsPage() {
 
       {/* Table */}
       <div className="bg-white rounded-3xl shadow-md overflow-hidden">
-        {loadError ? (
+        {isError ? (
           <div className="px-6 py-16 text-center space-y-3">
             <p className="text-danger font-medium text-sm">Couldn&apos;t load applications. This is a display error, not data loss.</p>
             <button
-              onClick={load}
+              onClick={() => refetch()}
               className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
             >
               Retry
             </button>
           </div>
-        ) : !loaded ? (
+        ) : isLoading ? (
           <p className="px-6 py-16 text-sm text-muted text-center">Loading…</p>
         ) : jobs.length === 0 ? (
           <p className="px-6 py-16 text-sm text-muted text-center">No applications tracked yet.</p>
@@ -164,10 +159,10 @@ export default function JobsPage() {
                         <Link href={`/jobs/${job.id}`} className="text-xs font-semibold text-muted hover:text-foreground transition-colors">Edit</Link>
                         <button
                           onClick={() => handleDelete(job.id)}
-                          disabled={deletingId === job.id}
+                          disabled={deleteMutation.isPending && deleteMutation.variables === job.id}
                           className="text-xs font-semibold text-danger hover:text-danger transition-colors disabled:opacity-50"
                         >
-                          {deletingId === job.id ? "Deleting…" : "Delete"}
+                          {deleteMutation.isPending && deleteMutation.variables === job.id ? "Deleting…" : "Delete"}
                         </button>
                       </div>
                     </td>

@@ -1,43 +1,38 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Close } from "@mui/icons-material"
-import { CaseStudyForm, fetchWithRetry, type CaseStudy } from "./CaseStudyForm"
+import { CaseStudyForm, type CaseStudy } from "./CaseStudyForm"
+
+async function fetchCaseStudies(): Promise<CaseStudy[]> {
+  const res = await fetch("/api/case-studies")
+  if (!res.ok) throw new Error()
+  return res.json()
+}
 
 export default function CaseStudiesPage() {
-  const [studies, setStudies] = useState<CaseStudy[]>([])
   const [showForm, setShowForm] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [loadError, setLoadError] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const queryClient = useQueryClient()
 
-  async function load() {
-    setLoadError(false)
-    try {
-      const res = await fetchWithRetry("/api/case-studies", {})
+  const { data: studies = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ["case-studies"],
+    queryFn: fetchCaseStudies,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/case-studies/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
-      setStudies(await res.json())
-      setLoaded(true)
-    } catch {
-      setLoadError(true)
-    }
-  }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["case-studies"] }),
+    onError: () => alert("Something went wrong deleting this case study. Please try again."),
+  })
 
-  useEffect(() => { load() }, [])
-
-  async function handleDelete(id: string) {
+  function handleDelete(id: string) {
     if (!confirm("Delete this case study?")) return
-    setDeletingId(id)
-    try {
-      const res = await fetchWithRetry(`/api/case-studies/${id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error()
-      load()
-    } catch {
-      alert("Something went wrong deleting this case study. Please try again.")
-    } finally {
-      setDeletingId(null)
-    }
+    deleteMutation.mutate(id)
   }
 
   return (
@@ -64,7 +59,7 @@ export default function CaseStudiesPage() {
               </button>
             </div>
             <CaseStudyForm
-              onSaved={() => { setShowForm(false); load() }}
+              onSaved={() => setShowForm(false)}
               onCancel={() => setShowForm(false)}
             />
           </div>
@@ -72,17 +67,17 @@ export default function CaseStudiesPage() {
       )}
 
       <div className="bg-white rounded-3xl shadow-md overflow-hidden">
-        {loadError ? (
+        {isError ? (
           <div className="px-6 py-12 text-center space-y-3">
             <p className="text-danger font-medium text-sm">Couldn&apos;t load case studies. This is a display error, not data loss.</p>
             <button
-              onClick={load}
+              onClick={() => refetch()}
               className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
             >
               Retry
             </button>
           </div>
-        ) : !loaded ? (
+        ) : isLoading ? (
           <p className="px-6 py-12 text-sm text-muted text-center">Loading…</p>
         ) : studies.length === 0 ? (
           <p className="px-6 py-12 text-sm text-muted text-center">No case studies yet.</p>
@@ -120,10 +115,10 @@ export default function CaseStudiesPage() {
                       <Link href={`/case-studies/${s.id}`} className="text-xs font-medium text-muted hover:text-foreground transition-colors">Edit</Link>
                       <button
                         onClick={() => handleDelete(s.id)}
-                        disabled={deletingId === s.id}
+                        disabled={deleteMutation.isPending && deleteMutation.variables === s.id}
                         className="text-xs font-medium text-danger hover:text-danger transition-colors disabled:opacity-50"
                       >
-                        {deletingId === s.id ? "Deleting…" : "Delete"}
+                        {deleteMutation.isPending && deleteMutation.variables === s.id ? "Deleting…" : "Delete"}
                       </button>
                     </div>
                   </td>

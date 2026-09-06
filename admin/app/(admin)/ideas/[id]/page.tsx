@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
+import { useQuery } from "@tanstack/react-query"
 import { ArrowBack } from "@mui/icons-material"
 import Link from "next/link"
 import { IdeaForm, type Idea } from "../IdeaForm"
@@ -9,18 +9,15 @@ import { IdeaForm, type Idea } from "../IdeaForm"
 export default function EditIdeaPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
-  const [idea, setIdea] = useState<Idea | null>(null)
-  const [notFound, setNotFound] = useState(false)
 
-  useEffect(() => {
-    fetch(`/api/ideas/${params.id}`)
-      .then(res => {
-        if (!res.ok) throw new Error()
-        return res.json() as Promise<Idea>
-      })
-      .then(setIdea)
-      .catch(() => setNotFound(true))
-  }, [params.id])
+  const { data: idea, isLoading, isError } = useQuery({
+    queryKey: ["idea", params.id],
+    queryFn: async (): Promise<Idea> => {
+      const res = await fetch(`/api/ideas/${params.id}`)
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+  })
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -32,9 +29,9 @@ export default function EditIdeaPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-3xl p-6">
-        {notFound ? (
+        {isError ? (
           <p className="text-muted text-sm">Idea not found.</p>
-        ) : !idea ? (
+        ) : isLoading || !idea ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <IdeaForm

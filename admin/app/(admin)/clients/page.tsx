@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Business, Email, Phone, Language, Add, Edit, Delete, Close } from "@mui/icons-material"
 import { Tooltip } from "@/components/ui/Tooltip"
-import { ClientForm, fetchWithRetry, type Client } from "./ClientForm"
+import { ClientForm, type Client } from "./ClientForm"
 
 const statusColors: Record<string, string> = {
   active: "bg-success-bg text-success",
@@ -17,39 +18,33 @@ const statusTips: Record<string, string> = {
   inactive: "Past client, no current active projects",
 }
 
+async function fetchClients(): Promise<Client[]> {
+  const res = await fetch("/api/studio/clients")
+  if (!res.ok) throw new Error()
+  return res.json()
+}
+
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>([])
   const [showForm, setShowForm] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [loadError, setLoadError] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const queryClient = useQueryClient()
 
-  async function load() {
-    setLoadError(false)
-    try {
-      const res = await fetchWithRetry("/api/studio/clients", {})
+  const { data: clients = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ["clients"],
+    queryFn: fetchClients,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/studio/clients/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
-      setClients(await res.json())
-      setLoaded(true)
-    } catch {
-      setLoadError(true)
-    }
-  }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["clients"] }),
+    onError: () => alert("Something went wrong deleting this client. Please try again."),
+  })
 
-  useEffect(() => { load() }, [])
-
-  async function handleDelete(id: string) {
+  function handleDelete(id: string) {
     if (!confirm("Delete this client? All linked projects and documents will also be deleted.")) return
-    setDeletingId(id)
-    try {
-      const res = await fetchWithRetry(`/api/studio/clients/${id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error()
-      load()
-    } catch {
-      alert("Something went wrong deleting this client. Please try again.")
-    } finally {
-      setDeletingId(null)
-    }
+    deleteMutation.mutate(id)
   }
 
   return (
@@ -78,7 +73,7 @@ export default function ClientsPage() {
               </button>
             </div>
             <ClientForm
-              onSaved={() => { setShowForm(false); load() }}
+              onSaved={() => setShowForm(false)}
               onCancel={() => setShowForm(false)}
             />
           </div>
@@ -86,17 +81,17 @@ export default function ClientsPage() {
       )}
 
       {/* Client grid */}
-      {loadError ? (
+      {isError ? (
         <div className="bg-white rounded-3xl shadow-md p-16 text-center space-y-3">
           <p className="text-danger font-medium text-sm">Couldn&apos;t load clients. This is a display error, not data loss.</p>
           <button
-            onClick={load}
+            onClick={() => refetch()}
             className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
           >
             Retry
           </button>
         </div>
-      ) : !loaded ? (
+      ) : isLoading ? (
         <div className="bg-white rounded-3xl shadow-md p-16 text-center">
           <p className="text-sm text-muted">Loading…</p>
         </div>
@@ -151,10 +146,10 @@ export default function ClientsPage() {
                   </Link>
                   <button
                     onClick={() => handleDelete(c.id)}
-                    disabled={deletingId === c.id}
+                    disabled={deleteMutation.isPending && deleteMutation.variables === c.id}
                     className="text-xs font-medium text-danger hover:text-danger transition-colors flex items-center gap-1 disabled:opacity-50"
                   >
-                    <Delete sx={{ fontSize: 14 }} /> {deletingId === c.id ? "Deleting…" : "Delete"}
+                    <Delete sx={{ fontSize: 14 }} /> {deleteMutation.isPending && deleteMutation.variables === c.id ? "Deleting…" : "Delete"}
                   </button>
                 </div>
               </div>

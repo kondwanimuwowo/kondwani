@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ImageUpload } from "@/components/ui/ImageUpload"
 import { GalleryUpload } from "@/components/ui/GalleryUpload"
 
@@ -37,14 +38,6 @@ function toFormState(p?: Project) {
   }
 }
 
-// A transient vinext/Workers request can 500 with no body; one silent retry
-// papers over that without making the user re-click.
-export async function fetchWithRetry(url: string, init: RequestInit, retries = 1): Promise<Response> {
-  const res = await fetch(url, init)
-  if (!res.ok && retries > 0) return fetchWithRetry(url, init, retries - 1)
-  return res
-}
-
 interface Props {
   project?: Project
   onSaved: () => void
@@ -54,23 +47,19 @@ interface Props {
 
 export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
   const [form, setForm] = useState(toFormState(project))
-  const [saving, setSaving] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const editId = project?.id
+  const queryClient = useQueryClient()
 
   function f(field: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm(v => ({ ...v, [field]: e.target.value }))
   }
 
-  async function handleSave() {
-    setSaving(true)
-    setError(null)
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async () => {
       const method = editId ? "PUT" : "POST"
       const url = editId ? `/api/projects/${editId}` : "/api/projects"
-      const res = await fetchWithRetry(url, {
+      const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -89,28 +78,39 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
         }),
       })
       if (!res.ok) throw new Error(`Save failed (${res.status})`)
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] })
+      if (editId) queryClient.invalidateQueries({ queryKey: ["project", editId] })
       onSaved()
-    } catch {
-      setError("Something went wrong saving this project. Please try again.")
-    } finally {
-      setSaving(false)
-    }
-  }
+    },
+  })
 
-  async function handleDelete() {
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/projects/${editId}`, { method: "DELETE" })
+      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] })
+      onDeleted?.()
+    },
+  })
+
+  function handleDelete() {
     if (!editId) return
     if (!confirm("Delete this project?")) return
-    setDeleting(true)
-    setError(null)
-    try {
-      const res = await fetchWithRetry(`/api/projects/${editId}`, { method: "DELETE" })
-      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
-      onDeleted?.()
-    } catch {
-      setError("Something went wrong deleting this project. Please try again.")
-      setDeleting(false)
-    }
+    deleteMutation.mutate()
   }
+
+  const saving = saveMutation.isPending
+  const deleting = deleteMutation.isPending
+  const error = saveMutation.isError
+    ? "Something went wrong saving this project. Please try again."
+    : deleteMutation.isError
+    ? "Something went wrong deleting this project. Please try again."
+    : null
 
   return (
     <div className="space-y-4">
@@ -281,7 +281,7 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
           Cancel
         </button>
         <button
-          onClick={handleSave}
+          onClick={() => saveMutation.mutate()}
           disabled={saving || deleting}
           className="bg-primary text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-primary-hover transition-colors disabled:opacity-50"
         >

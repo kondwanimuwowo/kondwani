@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
+import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { ArrowBack } from "@mui/icons-material"
 import { InvoiceForm, type Document } from "../InvoiceForm"
@@ -9,18 +9,15 @@ import { InvoiceForm, type Document } from "../InvoiceForm"
 export default function EditInvoicePage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
-  const [doc, setDoc] = useState<Document | null>(null)
-  const [notFound, setNotFound] = useState(false)
 
-  useEffect(() => {
-    fetch(`/api/studio/invoices/${params.id}`)
-      .then(res => {
-        if (!res.ok) throw new Error()
-        return res.json() as Promise<Document>
-      })
-      .then(setDoc)
-      .catch(() => setNotFound(true))
-  }, [params.id])
+  const { data: doc, isLoading, isError } = useQuery({
+    queryKey: ["invoice", params.id],
+    queryFn: async (): Promise<Document> => {
+      const res = await fetch(`/api/studio/invoices/${params.id}`)
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+  })
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 p-8">
@@ -32,9 +29,9 @@ export default function EditInvoicePage() {
       </div>
 
       <div className="bg-white shadow-md rounded-3xl p-6">
-        {notFound ? (
+        {isError ? (
           <p className="text-muted text-sm">Document not found.</p>
-        ) : !doc ? (
+        ) : isLoading || !doc ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <InvoiceForm

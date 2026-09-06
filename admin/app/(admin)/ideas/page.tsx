@@ -1,42 +1,37 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
-import { IdeaForm, fetchWithRetry, type Idea } from "./IdeaForm"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { IdeaForm, type Idea } from "./IdeaForm"
+
+async function fetchIdeas(): Promise<Idea[]> {
+  const res = await fetch("/api/ideas")
+  if (!res.ok) throw new Error()
+  return res.json()
+}
 
 export default function IdeasPage() {
-  const [ideas, setIdeas] = useState<Idea[]>([])
   const [showForm, setShowForm] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [loadError, setLoadError] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const queryClient = useQueryClient()
 
-  async function load() {
-    setLoadError(false)
-    try {
-      const res = await fetchWithRetry("/api/ideas", {})
+  const { data: ideas = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ["ideas"],
+    queryFn: fetchIdeas,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/ideas/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
-      setIdeas(await res.json())
-      setLoaded(true)
-    } catch {
-      setLoadError(true)
-    }
-  }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ideas"] }),
+    onError: () => alert("Something went wrong deleting this idea. Please try again."),
+  })
 
-  useEffect(() => { load() }, [])
-
-  async function handleDelete(id: string) {
+  function handleDelete(id: string) {
     if (!confirm("Delete this idea?")) return
-    setDeletingId(id)
-    try {
-      const res = await fetchWithRetry(`/api/ideas/${id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error()
-      load()
-    } catch {
-      alert("Something went wrong deleting this idea. Please try again.")
-    } finally {
-      setDeletingId(null)
-    }
+    deleteMutation.mutate(id)
   }
 
   return (
@@ -67,7 +62,7 @@ export default function IdeasPage() {
             </div>
             <div className="flex-1 overflow-y-auto scrollbar-thin px-6 py-5">
               <IdeaForm
-                onSaved={() => { setShowForm(false); load() }}
+                onSaved={() => setShowForm(false)}
                 onCancel={() => setShowForm(false)}
               />
             </div>
@@ -77,17 +72,17 @@ export default function IdeasPage() {
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loadError ? (
+        {isError ? (
           <div className="col-span-full bg-white px-6 py-16 text-center shadow-md rounded-3xl space-y-3">
             <p className="text-danger font-medium">Couldn&apos;t load ideas. This is a display error, not data loss.</p>
             <button
-              onClick={load}
+              onClick={() => refetch()}
               className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
             >
               Retry
             </button>
           </div>
-        ) : !loaded ? (
+        ) : isLoading ? (
           <div className="col-span-full bg-white px-6 py-16 text-center shadow-md rounded-3xl">
             <p className="text-muted">Loading…</p>
           </div>
@@ -115,10 +110,10 @@ export default function IdeasPage() {
                 <Link href={`/ideas/${idea.id}`} className="text-xs font-semibold text-muted hover:text-foreground transition-colors">Edit</Link>
                 <button
                   onClick={() => handleDelete(idea.id)}
-                  disabled={deletingId === idea.id}
+                  disabled={deleteMutation.isPending && deleteMutation.variables === idea.id}
                   className="text-xs font-semibold text-danger hover:text-primary-hover transition-colors disabled:opacity-50"
                 >
-                  {deletingId === idea.id ? "Deleting…" : "Delete"}
+                  {deleteMutation.isPending && deleteMutation.variables === idea.id ? "Deleting…" : "Delete"}
                 </button>
               </div>
             </div>

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Add, Close } from "@mui/icons-material"
 
 type Client = { id: string; name: string; company: string | null; currency: string }
@@ -30,14 +31,6 @@ function formatNum(n: number, currency: string) {
   return `${currency} ${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-// A transient vinext/Workers request can 500 with no body; one silent retry
-// papers over that without making the user re-click.
-export async function fetchWithRetry(url: string, init: RequestInit, retries = 1): Promise<Response> {
-  const res = await fetch(url, init)
-  if (!res.ok && retries > 0) return fetchWithRetry(url, init, retries - 1)
-  return res
-}
-
 interface Props {
   document?: Document
   initialType?: "invoice" | "quote"
@@ -50,8 +43,24 @@ interface Props {
 
 export function InvoiceForm({ document: doc, initialType, initialProjectId, initialClientId, onSaved, onCancel, onDeleted }: Props) {
   const editId = doc?.id
-  const [clients, setClients] = useState<Client[]>([])
-  const [projects, setProjects] = useState<Project[]>([])
+  const queryClient = useQueryClient()
+
+  const { data: clients = [] } = useQuery({
+    queryKey: ["clients-lite"],
+    queryFn: async (): Promise<Client[]> => {
+      const res = await fetch("/api/studio/clients")
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+  })
+  const { data: projects = [] } = useQuery({
+    queryKey: ["work-projects"],
+    queryFn: async (): Promise<Project[]> => {
+      const res = await fetch("/api/studio/work")
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+  })
 
   const [fType, setFType] = useState<"invoice" | "quote">((doc?.type as "invoice" | "quote") ?? initialType ?? "invoice")
   const [fClientId, setFClientId] = useState(doc?.clientId ?? initialClientId ?? "")
@@ -66,28 +75,15 @@ export function InvoiceForm({ document: doc, initialType, initialProjectId, init
   )
   const [fStatus, setFStatus] = useState(doc?.status ?? "draft")
 
-  const [saving, setSaving] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
-
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/studio/clients").then(res => res.json()),
-      fetch("/api/studio/work").then(res => res.json()),
-    ]).then(([c, p]) => { setClients(c); setProjects(p) }).catch(() => {})
-  }, [])
-
   function updateItem(idx: number, field: keyof DocItem, value: string | number | boolean) {
     setFItems(prev => prev.map((item, i) => i === idx ? { ...item, [field]: value } : item))
   }
 
-  async function handleSave(status?: string) {
-    setSaving(true)
-    setSaveError(null)
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async (status?: string) => {
       const method = editId ? "PUT" : "POST"
       const url = editId ? `/api/studio/invoices/${editId}` : "/api/studio/invoices"
-      const res = await fetchWithRetry(url, {
+      const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -104,28 +100,39 @@ export function InvoiceForm({ document: doc, initialType, initialProjectId, init
         }),
       })
       if (!res.ok) throw new Error("Save failed")
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invoices"] })
+      if (editId) queryClient.invalidateQueries({ queryKey: ["invoice", editId] })
       onSaved()
-    } catch {
-      setSaveError("Something went wrong. Please try again.")
-    } finally {
-      setSaving(false)
-    }
-  }
+    },
+  })
 
-  async function handleDelete() {
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/studio/invoices/${editId}`, { method: "DELETE" })
+      if (!res.ok) throw new Error()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invoices"] })
+      onDeleted?.()
+    },
+  })
+
+  function handleDelete() {
     if (!editId) return
     if (!confirm("Delete this document?")) return
-    setDeleting(true)
-    setSaveError(null)
-    try {
-      const res = await fetchWithRetry(`/api/studio/invoices/${editId}`, { method: "DELETE" })
-      if (!res.ok) throw new Error()
-      onDeleted?.()
-    } catch {
-      setSaveError("Failed to delete. Please try again.")
-      setDeleting(false)
-    }
+    deleteMutation.mutate()
   }
+
+  const saving = saveMutation.isPending
+  const deleting = deleteMutation.isPending
+  const saveError = saveMutation.isError
+    ? "Something went wrong. Please try again."
+    : deleteMutation.isError
+    ? "Failed to delete. Please try again."
+    : null
 
   const subtotal = calcSubtotal(fItems)
   const taxAmount = subtotal * (fTaxRate / 100)
@@ -301,7 +308,7 @@ export function InvoiceForm({ document: doc, initialType, initialProjectId, init
         </button>
         {editId ? (
           <button
-            onClick={() => handleSave()}
+            onClick={() => saveMutation.mutate(undefined)}
             disabled={saving || deleting || !fClientId}
             className="bg-primary text-white py-2.5 px-5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
           >
@@ -310,14 +317,14 @@ export function InvoiceForm({ document: doc, initialType, initialProjectId, init
         ) : (
           <>
             <button
-              onClick={() => handleSave("draft")}
+              onClick={() => saveMutation.mutate("draft")}
               disabled={saving || !fClientId}
               className="bg-surface py-2.5 px-5 rounded-full text-sm font-medium hover:bg-neutral-bg transition-colors disabled:opacity-60"
             >
               Save draft
             </button>
             <button
-              onClick={() => handleSave("sent")}
+              onClick={() => saveMutation.mutate("sent")}
               disabled={saving || !fClientId}
               className="bg-primary text-white py-2.5 px-5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
             >

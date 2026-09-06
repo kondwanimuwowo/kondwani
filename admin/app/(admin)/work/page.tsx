@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   DndContext, DragOverlay, closestCorners,
   useSensor, useSensors, PointerSensor,
@@ -106,29 +107,56 @@ function KanbanCard({ project }: { project: WorkProject }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
+async function fetchWorkProjects(): Promise<WorkProject[]> {
+  const res = await fetch("/api/studio/work")
+  if (!res.ok) throw new Error()
+  return res.json()
+}
+
 export default function WorkPage() {
-  const [projects, setProjects] = useState<WorkProject[]>([])
   const [view, setView] = useState<"list" | "board">("board")
   const [activeId, setActiveId] = useState<string | null>(null)
   const [quickAdd, setQuickAdd] = useState<Record<string, string>>({})
-  const [loadError, setLoadError] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const queryClient = useQueryClient()
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
-  async function load() {
-    setLoadError(false)
-    try {
-      const res = await fetch("/api/studio/work")
-      if (!res.ok) throw new Error()
-      setProjects(await res.json())
-      setLoaded(true)
-    } catch {
-      setLoadError(true)
-    }
-  }
+  const { data: projects = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ["work-projects"],
+    queryFn: fetchWorkProjects,
+  })
 
-  useEffect(() => { load() }, [])
+  const statusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      await fetch(`/api/studio/work/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      })
+    },
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ["work-projects"] })
+      const previous = queryClient.getQueryData<WorkProject[]>(["work-projects"])
+      queryClient.setQueryData<WorkProject[]>(["work-projects"], old =>
+        old?.map(p => p.id === id ? { ...p, status } : p))
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["work-projects"], context.previous)
+    },
+  })
+
+  const quickAddMutation = useMutation({
+    mutationFn: async ({ title, status }: { title: string; status: string }) => {
+      const res = await fetch("/api/studio/work", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, status, billingType: "fixed", currency: "USD" }),
+      })
+      if (!res.ok) throw new Error()
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["work-projects"] }),
+  })
 
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -141,24 +169,14 @@ export default function WorkPage() {
     const project = projects.find(p => p.id === active.id)
     if (!project || project.status === targetStatus) return
 
-    setProjects(prev => prev.map(p => p.id === active.id ? { ...p, status: targetStatus } : p))
-    await fetch(`/api/studio/work/${active.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: targetStatus }),
-    })
+    statusMutation.mutate({ id: active.id as string, status: targetStatus })
   }
 
-  async function handleQuickAdd(status: string) {
+  function handleQuickAdd(status: string) {
     const title = (quickAdd[status] ?? "").trim()
     if (!title) return
-    await fetch("/api/studio/work", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, status, billingType: "fixed", currency: "USD" }),
-    })
+    quickAddMutation.mutate({ title, status })
     setQuickAdd(prev => ({ ...prev, [status]: "" }))
-    load()
   }
 
   const activeProject = projects.find(p => p.id === activeId)
@@ -199,17 +217,17 @@ export default function WorkPage() {
       {/* ── List view ─────────────────────────────────────────────────────── */}
       {view === "list" && (
         <div className="bg-white rounded-3xl shadow-md overflow-hidden">
-          {loadError ? (
+          {isError ? (
             <div className="px-6 py-12 text-center space-y-3">
               <p className="text-danger font-medium text-sm">Couldn&apos;t load projects. This is a display error, not data loss.</p>
               <button
-                onClick={load}
+                onClick={() => refetch()}
                 className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
               >
                 Retry
               </button>
             </div>
-          ) : !loaded ? (
+          ) : isLoading ? (
             <p className="px-6 py-12 text-sm text-muted text-center">Loading…</p>
           ) : projects.length === 0 ? (
             <p className="px-6 py-12 text-sm text-muted text-center">No projects yet.</p>
@@ -295,16 +313,11 @@ export default function WorkPage() {
                       data-droppable-id={col.key}
                       className="space-y-2 min-h-[60px] rounded-3xl p-2 bg-surface"
                       onDragOver={e => e.preventDefault()}
-                      onDrop={async () => {
+                      onDrop={() => {
                         if (activeId) {
                           const project = projects.find(p => p.id === activeId)
                           if (project && project.status !== col.key) {
-                            setProjects(prev => prev.map(p => p.id === activeId ? { ...p, status: col.key } : p))
-                            await fetch(`/api/studio/work/${activeId}`, {
-                              method: "PUT",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ status: col.key }),
-                            })
+                            statusMutation.mutate({ id: activeId, status: col.key })
                           }
                         }
                       }}

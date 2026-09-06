@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import Link from "next/link"
 import { ArrowBack } from "@mui/icons-material"
 
@@ -22,36 +23,23 @@ const empty = {
   rate: "", budget: "", currency: "USD", startDate: "", dueDate: "", description: "",
 }
 
-// A transient vinext/Workers request can 500 with no body; one silent retry
-// papers over that without making the user re-click.
-async function fetchWithRetry(url: string, init: RequestInit, retries = 1): Promise<Response> {
-  const res = await fetch(url, init)
-  if (!res.ok && retries > 0) return fetchWithRetry(url, init, retries - 1)
-  return res
-}
-
 export default function NewWorkProjectPage() {
   const router = useRouter()
-  const [clients, setClients] = useState<Client[]>([])
+  const queryClient = useQueryClient()
   const [form, setForm] = useState(empty)
-  const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetch("/api/studio/clients").then(res => res.json() as Promise<Client[]>).then(setClients).catch(() => {})
-  }, [])
+  const { data: clients = [] } = useQuery({
+    queryKey: ["clients-lite"],
+    queryFn: async (): Promise<Client[]> => {
+      const res = await fetch("/api/studio/clients")
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+  })
 
-  function f(field: keyof typeof form) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-      setForm(v => ({ ...v, [field]: e.target.value }))
-  }
-
-  async function handleSave() {
-    if (!form.title.trim()) return
-    setSaving(true)
-    setSaveError(null)
-    try {
-      const res = await fetchWithRetry("/api/studio/work", {
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/studio/work", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -67,18 +55,22 @@ export default function NewWorkProjectPage() {
           description: form.description || null,
         }),
       })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        setSaveError(err.error ?? `Error ${res.status}, project was not saved`)
-        return
-      }
+      if (!res.ok) throw new Error(`Error ${res.status}, project was not saved`)
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["work-projects"] })
       router.push("/work")
-    } catch {
-      setSaveError("Network error, please try again")
-    } finally {
-      setSaving(false)
-    }
+    },
+  })
+
+  function f(field: keyof typeof form) {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      setForm(v => ({ ...v, [field]: e.target.value }))
   }
+
+  const saving = saveMutation.isPending
+  const saveError = saveMutation.isError ? "Something went wrong, project was not saved. Please try again." : null
 
   const inputCls = "w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
   const labelCls = "block text-sm font-medium text-foreground mb-1.5"
@@ -163,7 +155,7 @@ export default function NewWorkProjectPage() {
           <p className="text-xs text-danger bg-danger-bg rounded-3xl px-3 py-2">{saveError}</p>
         )}
         <div className="flex items-center gap-3 pt-2">
-          <button onClick={handleSave} disabled={saving || !form.title.trim()}
+          <button onClick={() => saveMutation.mutate()} disabled={saving || !form.title.trim()}
             className="flex-1 bg-primary text-white py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-60">
             {saving ? "Saving..." : "Create project"}
           </button>
