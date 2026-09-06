@@ -7,16 +7,14 @@ const globalForDb = globalThis as unknown as { db?: NodePgDatabase<typeof schema
 
 function createDb() {
   const connectionString = env.HYPERDRIVE?.connectionString ?? process.env.DATABASE_URL!
-  // max: 1, matching Cloudflare Hyperdrive's own documented recommendation
-  // for ORMs/pooling clients that aren't Hyperdrive-aware. See lib/db/index.ts
-  // (root) for the full explanation, including why this alone doesn't
-  // guarantee a fresh connection (verified against pg-pool's source: no
-  // health check happens on client checkout regardless of pool size).
+  // Tried max: 1 (down from 5) as a proposed fix for intermittent 500s; reverted
+  // after empirical testing showed it made no improvement (see root lib/db/index.ts
+  // for the full writeup and pg-pool source verification).
   const pool = new Pool({
     connectionString,
-    max: 1,
+    max: 5,
     connectionTimeoutMillis: 5000,
-    idleTimeoutMillis: 10000,
+    idleTimeoutMillis: 30000,
     // Bounds how long an individual query can run once connected — unlike
     // connectionTimeoutMillis, which only covers the initial handshake.
     // Without this, a stalled query hangs the request indefinitely, which
