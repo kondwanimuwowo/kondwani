@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { r2, R2_BUCKET, R2_PUBLIC_URL } from "@/lib/r2"
+import { r2, getR2Bucket, getR2PublicUrl } from "@/lib/r2"
 import { PutObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
@@ -18,9 +18,9 @@ export async function GET(request: Request) {
 
   const url = await getSignedUrl(
     r2,
-    new PutObjectCommand({ Bucket: R2_BUCKET, Key: key, ContentType: type }),
+    new PutObjectCommand({ Bucket: getR2Bucket(), Key: key, ContentType: type }),
     { expiresIn: 300 }
   )
 
-  return NextResponse.json({ url, publicUrl: `${R2_PUBLIC_URL}/${key}` })
+  return NextResponse.json({ url, publicUrl: `${getR2PublicUrl()}/${key}` })
 }
