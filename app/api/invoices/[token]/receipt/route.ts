@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { db, document } from "@/lib/db"
 import { eq } from "drizzle-orm"
-import { r2, R2_BUCKET, R2_PUBLIC_URL } from "@/lib/r2"
+import { r2, getR2Bucket, getR2PublicUrl } from "@/lib/r2"
 import { PutObjectCommand } from "@aws-sdk/client-s3"
 
 export async function POST(
@@ -38,13 +38,13 @@ export async function POST(
         // Upload to Cloudflare R2
         await r2.send(
           new PutObjectCommand({
-            Bucket: R2_BUCKET,
+            Bucket: getR2Bucket(),
             Key: key,
             Body: fileBuffer,
             ContentType: file.type,
           })
         )
-        fileUrl = `${R2_PUBLIC_URL}/${key}`
+        fileUrl = `${getR2PublicUrl()}/${key}`
       } else {
         // Fallback for local development without keys
         console.log(`[R2 Upload Simulation] File uploaded to: ${key} (Buffer size: ${fileBuffer.length} bytes)`)
