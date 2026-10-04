@@ -6,52 +6,8 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "motion/react"
-import {
-  Dashboard, Code, Work, Build, Contacts,
-  BarChart, Article, Lightbulb, ExpandMore,
-  Logout, People, ViewKanban, RequestQuote,
-} from "@mui/icons-material"
-
-type NavItem = {
-  label: string
-  href?: string
-  icon: React.ElementType
-  subItems?: { label: string; href: string }[]
-}
-
-type NavSection = {
-  label: string
-  items: NavItem[]
-}
-
-const navSections: NavSection[] = [
-  {
-    label: "Portfolio",
-    items: [
-      { label: "Dashboard", href: "/", icon: Dashboard },
-      { label: "Projects", href: "/projects", icon: Code },
-      { label: "Case Studies", href: "/case-studies", icon: Work },
-      { label: "Skills", href: "/skills", icon: Build },
-    ],
-  },
-  {
-    label: "Studio",
-    items: [
-      { label: "Clients", href: "/clients", icon: People },
-      { label: "Work", href: "/work", icon: ViewKanban },
-      { label: "Invoices", href: "/invoices", icon: RequestQuote },
-    ],
-  },
-  {
-    label: "Me",
-    items: [
-      { label: "Job Tracker", href: "/jobs", icon: Article },
-      { label: "Ideas", href: "/ideas", icon: Lightbulb },
-      { label: "Contacts", href: "/contacts", icon: Contacts },
-      { label: "Analytics", href: "/analytics", icon: BarChart },
-    ],
-  },
-]
+import { ExpandMore, Logout } from "@mui/icons-material"
+import { navSections, type NavItem } from "@/data/navigation"
 
 function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   const [openMenu, setOpenMenu] = useState(false)

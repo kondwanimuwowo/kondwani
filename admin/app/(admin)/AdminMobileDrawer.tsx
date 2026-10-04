@@ -7,29 +7,8 @@ import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "motion/react"
-import {
-  Dashboard, Code, Work, Build, Contacts,
-  BarChart, Article, Lightbulb, ExpandMore,
-  Logout, Close,
-} from "@mui/icons-material"
-
-type NavItem = {
-  label: string
-  href?: string
-  icon: React.ElementType
-  subItems?: { label: string; href: string }[]
-}
-
-const navItems: NavItem[] = [
-  { label: "Dashboard", href: "/", icon: Dashboard },
-  { label: "Projects", href: "/projects", icon: Code },
-  { label: "Case Studies", href: "/case-studies", icon: Work },
-  { label: "Skills", href: "/skills", icon: Build },
-  { label: "Contacts", href: "/contacts", icon: Contacts },
-  { label: "Analytics", href: "/analytics", icon: BarChart },
-  { label: "Job Tracker", href: "/jobs", icon: Article },
-  { label: "Ideas", href: "/ideas", icon: Lightbulb },
-]
+import { ExpandMore, Logout, Close } from "@mui/icons-material"
+import { navItems } from "@/data/navigation"
 
 interface AdminMobileDrawerProps {
   isOpen: boolean
