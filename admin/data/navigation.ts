@@ -1,6 +1,6 @@
 import {
   Dashboard, Code, Work, Build, Contacts, BarChart, Article,
-  Lightbulb, People, ViewKanban, RequestQuote, EditNote,
+  Lightbulb, People, ViewKanban, RequestQuote, EditNote, PostAdd, MarkEmailRead,
 } from "@mui/icons-material"
 
 export type NavItem = {
@@ -22,8 +22,15 @@ export const navSections: NavSection[] = [
       { label: "Dashboard", href: "/", icon: Dashboard },
       { label: "Projects", href: "/projects", icon: Code },
       { label: "Case Studies", href: "/case-studies", icon: Work },
-      { label: "Blog", href: "/blog", icon: EditNote },
       { label: "Skills", href: "/skills", icon: Build },
+    ],
+  },
+  {
+    label: "Blog",
+    items: [
+      { label: "Posts", href: "/blog", icon: EditNote },
+      { label: "New post", href: "/blog/new", icon: PostAdd },
+      { label: "Subscribers", href: "/blog/subscribers", icon: MarkEmailRead },
     ],
   },
   {
@@ -46,3 +53,12 @@ export const navSections: NavSection[] = [
 ]
 
 export const navItems: NavItem[] = navSections.flatMap(s => s.items)
+
+const navHrefs = navItems.flatMap(i => i.href ?? i.subItems?.map(s => s.href) ?? [])
+
+// The most specific matching link wins, so /blog stays inactive on /blog/new.
+export function isNavActive(href: string, pathname: string) {
+  const matches = (h: string) => h === "/" ? pathname === "/" : pathname === h || pathname.startsWith(h + "/")
+  if (!matches(href)) return false
+  return !navHrefs.some(h => h.length > href.length && h.startsWith(href) && matches(h))
+}

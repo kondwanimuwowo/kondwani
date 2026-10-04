@@ -1,0 +1,16 @@
+import { db, newsletterSubscriber } from "@/lib/db"
+import { eq } from "drizzle-orm"
+import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
+
+type Params = { params: Promise<{ id: string }> }
+
+export async function DELETE(_req: Request, { params }: Params) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { id } = await params
+  await db.delete(newsletterSubscriber).where(eq(newsletterSubscriber.id, id))
+  return NextResponse.json({ ok: true })
+}

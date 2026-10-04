@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "motion/react"
 import { ExpandMore, Logout, Close } from "@mui/icons-material"
-import { navItems } from "@/data/navigation"
+import { navItems, isNavActive } from "@/data/navigation"
 
 interface AdminMobileDrawerProps {
   isOpen: boolean
@@ -84,8 +84,8 @@ export function AdminMobileDrawer({ isOpen, onClose }: AdminMobileDrawerProps) {
             <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 py-4 space-y-0.5">
               {navItems.map(({ label, href, icon: Icon, subItems }) => {
                 const isActive = href
-                  ? href === "/" ? pathname === "/" : pathname.startsWith(href)
-                  : subItems?.some(s => pathname.startsWith(s.href))
+                  ? isNavActive(href, pathname)
+                  : subItems?.some(s => isNavActive(s.href, pathname))
 
                 if (subItems) {
                   const open = openMenu === label

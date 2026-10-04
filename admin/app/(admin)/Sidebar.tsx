@@ -7,15 +7,15 @@ import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "motion/react"
 import { ExpandMore, Logout } from "@mui/icons-material"
-import { navSections, type NavItem } from "@/data/navigation"
+import { navSections, isNavActive, type NavItem } from "@/data/navigation"
 
 function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   const [openMenu, setOpenMenu] = useState(false)
   const { label, href, icon: Icon, subItems } = item
 
   const isActive = href
-    ? href === "/" ? pathname === "/" : pathname.startsWith(href)
-    : subItems?.some(s => pathname.startsWith(s.href))
+    ? isNavActive(href, pathname)
+    : subItems?.some(s => isNavActive(s.href, pathname))
 
   useEffect(() => {
     if (subItems?.some(s => pathname.startsWith(s.href))) setOpenMenu(true)
