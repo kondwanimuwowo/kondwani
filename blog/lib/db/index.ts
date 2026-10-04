@@ -7,12 +7,15 @@ const globalForDb = globalThis as unknown as { db?: NodePgDatabase<typeof schema
 
 function createDb() {
   const connectionString = env.HYPERDRIVE?.connectionString ?? process.env.DATABASE_URL!
-  // Tried max: 1 (down from 5) as a proposed fix for intermittent 500s; reverted
-  // after empirical testing showed it made no improvement (see root lib/db/index.ts
-  // for the full writeup and pg-pool source verification).
+  // Workers can't reuse a socket opened during another request: the query
+  // stalls until query_timeout. The pool outlives requests (cached on
+  // globalThis), so an idle connection handed to the next request made every
+  // other request 500 after ~8s. maxUses: 1 closes each connection on release
+  // so none survive their request; Hyperdrive does the real pooling.
   const pool = new Pool({
     connectionString,
     max: 5,
+    maxUses: 1,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
     // Bounds how long an individual query can run once connected — unlike
