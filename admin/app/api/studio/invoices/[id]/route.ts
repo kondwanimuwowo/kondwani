@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { db, document, documentItem } from "@/lib/db"
+import { writable } from "@/lib/db/writable"
 import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 
@@ -30,7 +31,7 @@ export async function PUT(request: Request, { params }: Params) {
   await db.transaction(async (tx) => {
     await tx.delete(documentItem).where(eq(documentItem.documentId, id))
 
-    await tx.update(document).set(body).where(eq(document.id, id))
+    await tx.update(document).set(writable(document, body)).where(eq(document.id, id))
 
     const rows = (items ?? []).map((item: { description: string; quantity: number; rate: number; flat?: boolean; position?: number }) => ({
       documentId: id,

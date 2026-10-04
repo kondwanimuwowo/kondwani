@@ -1,4 +1,5 @@
 import { db, project as projectTable } from "@/lib/db"
+import { writable, dbErrorMessage } from "@/lib/db/writable"
 import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
@@ -19,8 +20,14 @@ export async function PUT(request: Request, { params }: Params) {
 
   const { id } = await params
   const body = await request.json()
-  const [project] = await db.update(projectTable).set(body).where(eq(projectTable.id, id)).returning()
-  return NextResponse.json(project)
+  try {
+    const [project] = await db.update(projectTable).set(writable(projectTable, body)).where(eq(projectTable.id, id)).returning()
+    if (!project) return NextResponse.json({ error: "Not found" }, { status: 404 })
+    return NextResponse.json(project)
+  } catch (e) {
+    console.error("Project update failed", e)
+    return NextResponse.json({ error: dbErrorMessage(e) }, { status: 500 })
+  }
 }
 
 export async function DELETE(_req: Request, { params }: Params) {

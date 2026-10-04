@@ -1,4 +1,5 @@
 import { db, jobApplication } from "@/lib/db"
+import { writable } from "@/lib/db/writable"
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
@@ -13,6 +14,6 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await request.json()
-  const [job] = await db.insert(jobApplication).values({ ...body, appliedAt: new Date(body.appliedAt) }).returning()
+  const [job] = await db.insert(jobApplication).values(writable(jobApplication, body)).returning()
   return NextResponse.json(job, { status: 201 })
 }

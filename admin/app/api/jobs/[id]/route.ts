@@ -1,4 +1,5 @@
 import { db, jobApplication } from "@/lib/db"
+import { writable } from "@/lib/db/writable"
 import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
@@ -20,7 +21,7 @@ export async function PUT(request: Request, { params }: Params) {
   const { id } = await params
   const body = await request.json()
   const [job] = await db.update(jobApplication)
-    .set({ ...body, appliedAt: body.appliedAt ? new Date(body.appliedAt) : undefined })
+    .set(writable(jobApplication, body))
     .where(eq(jobApplication.id, id))
     .returning()
   return NextResponse.json(job)

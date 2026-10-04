@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { db, client as clientTable } from "@/lib/db"
+import { writable } from "@/lib/db/writable"
 import { asc } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 
@@ -14,6 +15,6 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await request.json()
-  const [row] = await db.insert(clientTable).values(body).returning()
+  const [row] = await db.insert(clientTable).values(writable(clientTable, body)).returning()
   return NextResponse.json(row, { status: 201 })
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { db, workTask } from "@/lib/db"
+import { writable } from "@/lib/db/writable"
 import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 
@@ -12,7 +13,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
   const { id } = await params
   const body = await request.json()
-  const [task] = await db.update(workTask).set(body).where(eq(workTask.id, id)).returning()
+  const [task] = await db.update(workTask).set(writable(workTask, body)).where(eq(workTask.id, id)).returning()
   return NextResponse.json(task)
 }
 

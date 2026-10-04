@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { db, workProject } from "@/lib/db"
+import { writable } from "@/lib/db/writable"
 import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 
@@ -33,7 +34,7 @@ export async function PUT(request: Request, { params }: Params) {
 
   const { id } = await params
   const body = await request.json()
-  const [project] = await db.update(workProject).set(body).where(eq(workProject.id, id)).returning()
+  const [project] = await db.update(workProject).set(writable(workProject, body)).where(eq(workProject.id, id)).returning()
   return NextResponse.json(project)
 }
 

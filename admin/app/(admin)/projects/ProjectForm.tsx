@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ImageUpload } from "@/components/ui/ImageUpload"
 import { GalleryUpload } from "@/components/ui/GalleryUpload"
+import { responseError } from "@/lib/upload"
 
 export type Project = {
   id: string; title: string; slug?: string | null; description: string; excerpt?: string | null
@@ -24,7 +25,12 @@ function toSlug(title: string) {
 function toFormState(p?: Project) {
   if (!p) return empty
   return {
-    ...p,
+    title: p.title,
+    description: p.description,
+    category: p.category,
+    featured: p.featured,
+    published: p.published,
+    order: p.order,
     slug: p.slug ?? "",
     excerpt: p.excerpt ?? "",
     tech: p.tech.join(", "),
@@ -77,7 +83,7 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
           order: Number(form.order),
         }),
       })
-      if (!res.ok) throw new Error(`Save failed (${res.status})`)
+      if (!res.ok) throw await responseError(res, "Save")
       return res.json()
     },
     onSuccess: () => {
@@ -90,7 +96,7 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/projects/${editId}`, { method: "DELETE" })
-      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
+      if (!res.ok) throw await responseError(res, "Delete")
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] })
@@ -106,11 +112,7 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
 
   const saving = saveMutation.isPending
   const deleting = deleteMutation.isPending
-  const error = saveMutation.isError
-    ? "Something went wrong saving this project. Please try again."
-    : deleteMutation.isError
-    ? "Something went wrong deleting this project. Please try again."
-    : null
+  const error = saveMutation.error?.message ?? deleteMutation.error?.message ?? null
 
   return (
     <div className="space-y-4">
@@ -215,10 +217,12 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
       </div>
       <ImageUpload
         value={form.imageUrl as string}
+        folder="project-cover"
         onChange={url => setForm(v => ({ ...v, imageUrl: url }))}
       />
       <GalleryUpload
         value={form.gallery as string[]}
+        folder="project-gallery"
         onChange={urls => setForm(v => ({ ...v, gallery: urls }))}
       />
       <div className="grid grid-cols-2 gap-4">

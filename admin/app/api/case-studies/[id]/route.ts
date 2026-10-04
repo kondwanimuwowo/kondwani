@@ -1,4 +1,5 @@
 import { db, caseStudy } from "@/lib/db"
+import { writable } from "@/lib/db/writable"
 import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
@@ -19,7 +20,7 @@ export async function PUT(request: Request, { params }: Params) {
 
   const { id } = await params
   const body = await request.json()
-  const [study] = await db.update(caseStudy).set(body).where(eq(caseStudy.id, id)).returning()
+  const [study] = await db.update(caseStudy).set(writable(caseStudy, body)).where(eq(caseStudy.id, id)).returning()
   return NextResponse.json(study)
 }
 

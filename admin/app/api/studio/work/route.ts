@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { db, workProject } from "@/lib/db"
+import { writable } from "@/lib/db/writable"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await request.json()
-  const [inserted] = await db.insert(workProject).values(body).returning()
+  const [inserted] = await db.insert(workProject).values(writable(workProject, body)).returning()
   const project = await db.query.workProject.findFirst({
     where: (t, { eq }) => eq(t.id, inserted.id),
     with: { client: { columns: { id: true, name: true, company: true } } },

@@ -2,15 +2,17 @@
 
 import { useRef, useState } from "react"
 import Image from "next/image"
+import { uploadImage, type UploadFolder } from "@/lib/upload"
 import { CloudUpload, Close } from "@mui/icons-material"
 
 interface Props {
   value: string
   onChange: (url: string) => void
+  folder: UploadFolder
   label?: string
 }
 
-export function ImageUpload({ value, onChange, label = "Cover image" }: Props) {
+export function ImageUpload({ value, onChange, folder, label = "Cover image" }: Props) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
@@ -19,12 +21,7 @@ export function ImageUpload({ value, onChange, label = "Cover image" }: Props) {
     setError("")
     setUploading(true)
     try {
-      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}&type=${encodeURIComponent(file.type)}`)
-      if (!res.ok) throw new Error("Failed to get upload URL")
-      const { url, publicUrl } = await res.json()
-      const put = await fetch(url, { method: "PUT", body: file, headers: { "Content-Type": file.type } })
-      if (!put.ok) throw new Error("Upload failed")
-      onChange(publicUrl)
+      onChange(await uploadImage(file, folder))
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed")
     } finally {
@@ -69,7 +66,7 @@ export function ImageUpload({ value, onChange, label = "Cover image" }: Props) {
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
+        onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) handleFile(f) }}
       />
     </div>
   )

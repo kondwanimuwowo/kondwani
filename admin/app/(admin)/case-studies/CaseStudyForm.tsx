@@ -194,11 +194,13 @@ export function CaseStudyForm({ caseStudy, onSaved, onCancel, onDeleted }: Props
       <p className={sectionTitle}>Media</p>
       <ImageUpload
         value={form.coverImage}
+        folder="case-study-cover"
         onChange={url => setForm(v => ({ ...v, coverImage: url }))}
         label="Cover image"
       />
       <GalleryUpload
         value={form.gallery as string[]}
+        folder="case-study-gallery"
         onChange={urls => setForm(v => ({ ...v, gallery: urls }))}
       />
 
