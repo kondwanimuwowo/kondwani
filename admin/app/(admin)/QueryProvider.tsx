@@ -3,9 +3,7 @@
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
-// The vinext/Cloudflare stack intermittently 500s on route handlers (a
-// confirmed bug in vinext's own request dispatch, not our code -- see
-// ProjectForm.tsx history). A short retry with backoff papers over that
+// A short retry with backoff absorbs transient network or database blips
 // without the user needing to notice or re-click.
 function createQueryClient() {
   return new QueryClient({

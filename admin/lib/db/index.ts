@@ -7,19 +7,15 @@ const globalForDb = globalThis as unknown as { db?: NodePgDatabase<typeof schema
 
 function createDb() {
   const connectionString = env.HYPERDRIVE?.connectionString ?? process.env.DATABASE_URL!
-  // Tried max: 1 (down from 5) as a proposed fix for intermittent 500s,
-  // theorized to make node-postgres reconnect stale connections on checkout.
-  // Verified that claim false against pg-pool's own source (_pulseQueue/
-  // _acquireClient: no health check on checkout regardless of pool size), and
-  // confirmed empirically after deploying it: 8/8 requests failed with max: 1,
-  // worse than the ~50% baseline with max: 5. Reverted. The real bug is a
-  // crash in vinext's own cacheComponents/queryWithCache response-generation
-  // path, unrelated to pool size -- still unresolved. Retrying at the call
-  // site (TanStack Query's built-in mutation retry, see
-  // admin/app/(admin)/QueryProvider.tsx) remains the actual mitigation.
+  // Workers can't reuse a socket opened during another request: the query
+  // stalls until query_timeout. The pool outlives requests (cached on
+  // globalThis), so an idle connection handed to the next request made every
+  // other request 500 after ~8s. maxUses: 1 closes each connection on release
+  // so none survive their request; Hyperdrive does the real pooling.
   const pool = new Pool({
     connectionString,
     max: 5,
+    maxUses: 1,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
     // Bounds how long an individual query can run once connected — unlike
