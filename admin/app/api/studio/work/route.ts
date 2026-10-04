@@ -4,6 +4,9 @@ import { writable } from "@/lib/db/writable"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const projects = await db.query.workProject.findMany({
     with: {
       client: { columns: { id: true, name: true, company: true } },

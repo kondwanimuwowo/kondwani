@@ -7,6 +7,9 @@ import { createClient } from "@/lib/supabase/server"
 type Params = { params: Promise<{ id: string }> }
 
 export async function GET(_: Request, { params }: Params) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const { id } = await params
   const doc = await db.query.document.findFirst({
     where: (t, { eq }) => eq(t.id, id),

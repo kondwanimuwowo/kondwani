@@ -7,6 +7,9 @@ import { createClient } from "@/lib/supabase/server"
 type Params = { params: Promise<{ id: string }> }
 
 export async function GET(_req: Request, { params }: Params) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const { id } = await params
   const job = await db.query.jobApplication.findFirst({ where: (t, { eq }) => eq(t.id, id) })
   if (!job) return NextResponse.json({ error: "Not found" }, { status: 404 })

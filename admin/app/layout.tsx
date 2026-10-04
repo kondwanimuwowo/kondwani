@@ -5,7 +5,7 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://admin.kondwanimuwowo.com"),
+  metadataBase: new URL("https://hub.kondwanimuwowo.com"),
   title: "Admin — Kondwani Muwowo",
   robots: { index: false, follow: false },
 }

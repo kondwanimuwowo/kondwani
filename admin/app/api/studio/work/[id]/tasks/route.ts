@@ -6,6 +6,9 @@ import { createClient } from "@/lib/supabase/server"
 type Params = { params: Promise<{ id: string }> }
 
 export async function GET(_: Request, { params }: Params) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const { id } = await params
   const tasks = await db.query.workTask.findMany({
     where: (t, { eq, isNull, and }) => and(eq(t.projectId, id), isNull(t.parentId)),
