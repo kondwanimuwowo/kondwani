@@ -10,8 +10,10 @@ export default function EditInvoicePage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
 
-  const { data: doc, isLoading, isError } = useQuery({
+  const { data: doc, isFetchedAfterMount, isError } = useQuery({
     queryKey: ["invoice", params.id],
+    // Forms seed state once, so never render them from a cached copy.
+    refetchOnMount: "always",
     queryFn: async (): Promise<Document> => {
       const res = await fetch(`/api/studio/invoices/${params.id}`)
       if (!res.ok) throw new Error()
@@ -31,7 +33,7 @@ export default function EditInvoicePage() {
       <div className="bg-white shadow-md rounded-3xl p-6">
         {isError ? (
           <p className="text-muted text-sm">Document not found.</p>
-        ) : isLoading || !doc ? (
+        ) : !isFetchedAfterMount || !doc ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <InvoiceForm

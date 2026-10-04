@@ -10,8 +10,10 @@ export default function EditClientPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
 
-  const { data: client, isLoading, isError } = useQuery({
+  const { data: client, isFetchedAfterMount, isError } = useQuery({
     queryKey: ["client", params.id],
+    // Forms seed state once, so never render them from a cached copy.
+    refetchOnMount: "always",
     queryFn: async (): Promise<Client> => {
       const res = await fetch(`/api/studio/clients/${params.id}`)
       if (!res.ok) throw new Error()
@@ -31,7 +33,7 @@ export default function EditClientPage() {
       <div className="bg-white shadow-md rounded-3xl p-6">
         {isError ? (
           <p className="text-muted text-sm">Client not found.</p>
-        ) : isLoading || !client ? (
+        ) : !isFetchedAfterMount || !client ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <ClientForm

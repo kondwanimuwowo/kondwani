@@ -10,8 +10,10 @@ export default function EditIdeaPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
 
-  const { data: idea, isLoading, isError } = useQuery({
+  const { data: idea, isFetchedAfterMount, isError } = useQuery({
     queryKey: ["idea", params.id],
+    // Forms seed state once, so never render them from a cached copy.
+    refetchOnMount: "always",
     queryFn: async (): Promise<Idea> => {
       const res = await fetch(`/api/ideas/${params.id}`)
       if (!res.ok) throw new Error()
@@ -31,7 +33,7 @@ export default function EditIdeaPage() {
       <div className="bg-white shadow-md rounded-3xl p-6">
         {isError ? (
           <p className="text-muted text-sm">Idea not found.</p>
-        ) : isLoading || !idea ? (
+        ) : !isFetchedAfterMount || !idea ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <IdeaForm

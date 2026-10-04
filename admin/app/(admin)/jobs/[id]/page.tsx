@@ -10,8 +10,10 @@ export default function EditJobPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
 
-  const { data: job, isLoading, isError } = useQuery({
+  const { data: job, isFetchedAfterMount, isError } = useQuery({
     queryKey: ["job", params.id],
+    // Forms seed state once, so never render them from a cached copy.
+    refetchOnMount: "always",
     queryFn: async (): Promise<Job> => {
       const res = await fetch(`/api/jobs/${params.id}`)
       if (!res.ok) throw new Error()
@@ -31,7 +33,7 @@ export default function EditJobPage() {
       <div className="bg-white shadow-md rounded-3xl p-6">
         {isError ? (
           <p className="text-muted text-sm">Application not found.</p>
-        ) : isLoading || !job ? (
+        ) : !isFetchedAfterMount || !job ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <JobForm

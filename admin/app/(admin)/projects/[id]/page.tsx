@@ -10,8 +10,10 @@ export default function EditProjectPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
 
-  const { data: project, isLoading, isError } = useQuery({
+  const { data: project, isFetchedAfterMount, isError } = useQuery({
     queryKey: ["project", params.id],
+    // Forms seed state once, so never render them from a cached copy.
+    refetchOnMount: "always",
     queryFn: async (): Promise<Project> => {
       const res = await fetch(`/api/projects/${params.id}`)
       if (!res.ok) throw new Error()
@@ -31,7 +33,7 @@ export default function EditProjectPage() {
       <div className="bg-white shadow-md rounded-3xl p-6">
         {isError ? (
           <p className="text-muted text-sm">Project not found.</p>
-        ) : isLoading || !project ? (
+        ) : !isFetchedAfterMount || !project ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <ProjectForm

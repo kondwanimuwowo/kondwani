@@ -7,8 +7,10 @@ import { PostForm, type Post } from "../PostForm"
 export default function EditPostPage() {
   const { id } = useParams<{ id: string }>()
 
-  const { data: post, isLoading, isError, refetch } = useQuery({
+  const { data: post, isFetchedAfterMount, isError, refetch } = useQuery({
     queryKey: ["post", id],
+    // Forms seed state once, so never render them from a cached copy.
+    refetchOnMount: "always",
     queryFn: async (): Promise<Post> => {
       const res = await fetch(`/api/posts/${id}`)
       if (!res.ok) throw new Error(String(res.status))
@@ -28,7 +30,7 @@ export default function EditPostPage() {
     )
   }
 
-  if (isLoading || !post) {
+  if (!isFetchedAfterMount || !post) {
     return <div className="max-w-4xl mx-auto bg-white shadow-md rounded-3xl px-6 py-16 text-center text-muted text-sm">Loading...</div>
   }
 

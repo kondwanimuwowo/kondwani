@@ -10,8 +10,10 @@ export default function EditCaseStudyPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
 
-  const { data: study, isLoading, isError } = useQuery({
+  const { data: study, isFetchedAfterMount, isError } = useQuery({
     queryKey: ["case-study", params.id],
+    // Forms seed state once, so never render them from a cached copy.
+    refetchOnMount: "always",
     queryFn: async (): Promise<CaseStudy> => {
       const res = await fetch(`/api/case-studies/${params.id}`)
       if (!res.ok) throw new Error()
@@ -31,7 +33,7 @@ export default function EditCaseStudyPage() {
       <div className="bg-white shadow-md rounded-3xl p-6">
         {isError ? (
           <p className="text-muted text-sm">Case study not found.</p>
-        ) : isLoading || !study ? (
+        ) : !isFetchedAfterMount || !study ? (
           <p className="text-muted text-sm">Loading…</p>
         ) : (
           <CaseStudyForm
