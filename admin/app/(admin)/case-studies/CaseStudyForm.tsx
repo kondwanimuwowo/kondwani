@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
+import { responseError } from "@/lib/http"
 import { ImageUpload } from "@/components/ui/ImageUpload"
 import { GalleryUpload } from "@/components/ui/GalleryUpload"
 
@@ -90,12 +92,15 @@ export function CaseStudyForm({ caseStudy, onSaved, onCancel, onDeleted }: Props
           publishedAt: form.published ? new Date().toISOString() : null,
         }),
       })
-      if (!res.ok) throw new Error(`Save failed (${res.status})`)
+      if (!res.ok) throw await responseError(res, "Save")
       return res.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["case-studies"] })
-      if (editId) queryClient.invalidateQueries({ queryKey: ["case-study", editId] })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["case-studies"], refetchType: "all" }),
+        editId && queryClient.invalidateQueries({ queryKey: ["case-study", editId], refetchType: "all" }),
+      ])
+      toast.success(editId ? "Changes saved" : "Case study created")
       onSaved()
     },
   })
@@ -103,10 +108,11 @@ export function CaseStudyForm({ caseStudy, onSaved, onCancel, onDeleted }: Props
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/case-studies/${editId}`, { method: "DELETE" })
-      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
+      if (!res.ok) throw await responseError(res, "Delete")
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["case-studies"] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["case-studies"], refetchType: "all" })
+      toast.success("Case study deleted")
       onDeleted?.()
     },
   })
@@ -120,9 +126,9 @@ export function CaseStudyForm({ caseStudy, onSaved, onCancel, onDeleted }: Props
   const saving = saveMutation.isPending
   const deleting = deleteMutation.isPending
   const error = saveMutation.isError
-    ? "Something went wrong saving this case study. Please try again."
+    ? saveMutation.error.message || "Something went wrong saving this case study. Please try again."
     : deleteMutation.isError
-    ? "Something went wrong deleting this case study. Please try again."
+    ? deleteMutation.error.message || "Something went wrong deleting this case study. Please try again."
     : null
 
   const inputCls = "w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"

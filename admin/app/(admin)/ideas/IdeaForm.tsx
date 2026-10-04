@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
+import { responseError } from "@/lib/http"
 
 export type Idea = { id: string; title: string; body?: string | null; tags: string[]; createdAt: string }
 
@@ -33,12 +35,15 @@ export function IdeaForm({ idea, onSaved, onCancel, onDeleted }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: form.title, body: form.body || null, tags: form.tags.split(",").map(t => t.trim()).filter(Boolean) }),
       })
-      if (!res.ok) throw new Error(`Save failed (${res.status})`)
+      if (!res.ok) throw await responseError(res, "Save")
       return res.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ideas"] })
-      if (editId) queryClient.invalidateQueries({ queryKey: ["idea", editId] })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["ideas"], refetchType: "all" }),
+        editId && queryClient.invalidateQueries({ queryKey: ["idea", editId], refetchType: "all" }),
+      ])
+      toast.success(editId ? "Changes saved" : "Idea created")
       onSaved()
     },
   })
@@ -46,10 +51,11 @@ export function IdeaForm({ idea, onSaved, onCancel, onDeleted }: Props) {
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/ideas/${editId}`, { method: "DELETE" })
-      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
+      if (!res.ok) throw await responseError(res, "Delete")
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ideas"] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["ideas"], refetchType: "all" })
+      toast.success("Idea deleted")
       onDeleted?.()
     },
   })
@@ -63,9 +69,9 @@ export function IdeaForm({ idea, onSaved, onCancel, onDeleted }: Props) {
   const saving = saveMutation.isPending
   const deleting = deleteMutation.isPending
   const error = saveMutation.isError
-    ? "Something went wrong saving this idea. Please try again."
+    ? saveMutation.error.message || "Something went wrong saving this idea. Please try again."
     : deleteMutation.isError
-    ? "Something went wrong deleting this idea. Please try again."
+    ? deleteMutation.error.message || "Something went wrong deleting this idea. Please try again."
     : null
 
   return (

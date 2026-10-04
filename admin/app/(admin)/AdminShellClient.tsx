@@ -6,6 +6,7 @@ import { Sidebar } from "./Sidebar"
 import { MobileHeader } from "./MobileHeader"
 import { AdminMobileDrawer } from "./AdminMobileDrawer"
 import { QueryProvider } from "./QueryProvider"
+import { Toaster } from "@/components/ui/Toaster"
 
 export function AdminShellClient({ children, userEmail }: { children: React.ReactNode; userEmail: string }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -35,6 +36,7 @@ export function AdminShellClient({ children, userEmail }: { children: React.Reac
       {/* Mobile Drawer */}
       <AdminMobileDrawer isOpen={drawerOpen} onClose={closeDrawer} />
     </div>
+    <Toaster />
     </QueryProvider>
   )
 }

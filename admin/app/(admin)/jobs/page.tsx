@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
 import { JobForm, type Job } from "./JobForm"
 
 const STATUS_COLORS: Record<string, string> = {
@@ -35,8 +36,11 @@ export default function JobsPage() {
       const res = await fetch(`/api/jobs/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["jobs"] }),
-    onError: () => alert("Something went wrong deleting this application. Please try again."),
+    onSuccess: () => {
+      toast.success("Application deleted")
+      return queryClient.invalidateQueries({ queryKey: ["jobs"] })
+    },
+    onError: () => toast.error("Something went wrong deleting this application. Please try again."),
   })
 
   function handleDelete(id: string) {

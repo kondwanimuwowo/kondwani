@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
 import { Business, Email, Phone, Language, Add, Edit, Delete, Close } from "@mui/icons-material"
 import { Tooltip } from "@/components/ui/Tooltip"
 import { ClientForm, type Client } from "./ClientForm"
@@ -38,8 +39,11 @@ export default function ClientsPage() {
       const res = await fetch(`/api/studio/clients/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["clients"] }),
-    onError: () => alert("Something went wrong deleting this client. Please try again."),
+    onSuccess: () => {
+      toast.success("Client deleted")
+      return queryClient.invalidateQueries({ queryKey: ["clients"] })
+    },
+    onError: () => toast.error("Something went wrong deleting this client. Please try again."),
   })
 
   function handleDelete(id: string) {

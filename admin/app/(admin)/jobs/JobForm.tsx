@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
+import { responseError } from "@/lib/http"
 
 export type Job = {
   id: string
@@ -43,12 +45,15 @@ export function JobForm({ job, onSaved, onCancel, onDeleted }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, appliedAt: new Date(form.appliedAt).toISOString() }),
       })
-      if (!res.ok) throw new Error(`Save failed (${res.status})`)
+      if (!res.ok) throw await responseError(res, "Save")
       return res.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jobs"] })
-      if (editId) queryClient.invalidateQueries({ queryKey: ["job", editId] })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["jobs"], refetchType: "all" }),
+        editId && queryClient.invalidateQueries({ queryKey: ["job", editId], refetchType: "all" }),
+      ])
+      toast.success(editId ? "Changes saved" : "Application created")
       onSaved()
     },
   })
@@ -56,10 +61,11 @@ export function JobForm({ job, onSaved, onCancel, onDeleted }: Props) {
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/jobs/${editId}`, { method: "DELETE" })
-      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
+      if (!res.ok) throw await responseError(res, "Delete")
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jobs"] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["jobs"], refetchType: "all" })
+      toast.success("Application deleted")
       onDeleted?.()
     },
   })
@@ -73,9 +79,9 @@ export function JobForm({ job, onSaved, onCancel, onDeleted }: Props) {
   const saving = saveMutation.isPending
   const deleting = deleteMutation.isPending
   const error = saveMutation.isError
-    ? "Something went wrong saving this application. Please try again."
+    ? saveMutation.error.message || "Something went wrong saving this application. Please try again."
     : deleteMutation.isError
-    ? "Something went wrong deleting this application. Please try again."
+    ? deleteMutation.error.message || "Something went wrong deleting this application. Please try again."
     : null
 
   return (

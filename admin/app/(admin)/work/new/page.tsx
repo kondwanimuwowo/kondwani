@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
 import Link from "next/link"
 import { ArrowBack } from "@mui/icons-material"
 
@@ -58,8 +59,9 @@ export default function NewWorkProjectPage() {
       if (!res.ok) throw new Error(`Error ${res.status}, project was not saved`)
       return res.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["work-projects"] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["work-projects"], refetchType: "all" })
+      toast.success("Project created")
       router.push("/work")
     },
   })

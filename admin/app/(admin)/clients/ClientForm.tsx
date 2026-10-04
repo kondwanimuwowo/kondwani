@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
+import { responseError } from "@/lib/http"
 
 export type Client = {
   id: string
@@ -63,12 +65,15 @@ export function ClientForm({ client, onSaved, onCancel, onDeleted }: Props) {
           notes: form.notes || null,
         }),
       })
-      if (!res.ok) throw new Error(`Save failed (${res.status})`)
+      if (!res.ok) throw await responseError(res, "Save")
       return res.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] })
-      if (editId) queryClient.invalidateQueries({ queryKey: ["client", editId] })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["clients"], refetchType: "all" }),
+        editId && queryClient.invalidateQueries({ queryKey: ["client", editId], refetchType: "all" }),
+      ])
+      toast.success(editId ? "Changes saved" : "Client created")
       onSaved()
     },
   })
@@ -76,10 +81,11 @@ export function ClientForm({ client, onSaved, onCancel, onDeleted }: Props) {
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/studio/clients/${editId}`, { method: "DELETE" })
-      if (!res.ok) throw new Error(`Delete failed (${res.status})`)
+      if (!res.ok) throw await responseError(res, "Delete")
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["clients"], refetchType: "all" })
+      toast.success("Client deleted")
       onDeleted?.()
     },
   })
@@ -93,9 +99,9 @@ export function ClientForm({ client, onSaved, onCancel, onDeleted }: Props) {
   const saving = saveMutation.isPending
   const deleting = deleteMutation.isPending
   const error = saveMutation.isError
-    ? "Something went wrong saving this client. Please try again."
+    ? saveMutation.error.message || "Something went wrong saving this client. Please try again."
     : deleteMutation.isError
-    ? "Something went wrong deleting this client. Please try again."
+    ? deleteMutation.error.message || "Something went wrong deleting this client. Please try again."
     : null
 
   const inputCls = "w-full px-4 py-2.5 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"

@@ -2,9 +2,10 @@
 
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
 import { ImageUpload } from "@/components/ui/ImageUpload"
 import { GalleryUpload } from "@/components/ui/GalleryUpload"
-import { responseError } from "@/lib/upload"
+import { responseError } from "@/lib/http"
 
 export type Project = {
   id: string; title: string; slug?: string | null; description: string; excerpt?: string | null
@@ -86,9 +87,12 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
       if (!res.ok) throw await responseError(res, "Save")
       return res.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] })
-      if (editId) queryClient.invalidateQueries({ queryKey: ["project", editId] })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["projects"], refetchType: "all" }),
+        editId && queryClient.invalidateQueries({ queryKey: ["project", editId], refetchType: "all" }),
+      ])
+      toast.success(editId ? "Changes saved" : "Project created")
       onSaved()
     },
   })
@@ -98,8 +102,9 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
       const res = await fetch(`/api/projects/${editId}`, { method: "DELETE" })
       if (!res.ok) throw await responseError(res, "Delete")
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["projects"], refetchType: "all" })
+      toast.success("Project deleted")
       onDeleted?.()
     },
   })

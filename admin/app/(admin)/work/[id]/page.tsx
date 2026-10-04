@@ -15,6 +15,7 @@ import {
   ReceiptLong, Send, Edit, PlayArrow, Pause, CheckCircle, Save
 } from "@mui/icons-material"
 import { Tooltip } from "@/components/ui/Tooltip"
+import { toast } from "@/lib/toast"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -532,7 +533,12 @@ export default function WorkDetailPage() {
 
   async function deleteProject() {
     if (!confirm("Delete this project and all its tasks?")) return
-    await fetch(`/api/studio/work/${id}`, { method: "DELETE" })
+    const res = await fetch(`/api/studio/work/${id}`, { method: "DELETE" })
+    if (!res.ok) {
+      toast.error("Could not delete the project. Please try again.")
+      return
+    }
+    toast.success("Project deleted")
     router.push("/work")
   }
 
@@ -569,7 +575,7 @@ export default function WorkDetailPage() {
       load()
     } else {
       const err = await res.json()
-      alert(err.error || "Failed to delete milestone")
+      toast.error(err.error || "Failed to delete milestone")
     }
   }
 
@@ -584,7 +590,7 @@ export default function WorkDetailPage() {
       load()
     } else {
       const err = await res.json()
-      alert(err.error || "Failed to invoice milestone")
+      toast.error(err.error || "Failed to invoice milestone")
     }
   }
 
@@ -628,7 +634,7 @@ export default function WorkDetailPage() {
       loadRetainer()
     } else {
       const err = await res.json()
-      alert(err.error || "Failed to create retainer")
+      toast.error(err.error || "Failed to create retainer")
     }
   }
 
@@ -707,7 +713,7 @@ export default function WorkDetailPage() {
       loadContracts()
     } else {
       const err = await res.json()
-      alert(err.error || "Failed to send contract")
+      toast.error(err.error || "Failed to send contract")
     }
   }
 
@@ -732,7 +738,7 @@ export default function WorkDetailPage() {
       loadContracts()
     } else {
       const err = await res.json()
-      alert(err.error || "Failed to delete contract")
+      toast.error(err.error || "Failed to delete contract")
     }
   }
 
@@ -1354,7 +1360,7 @@ export default function WorkDetailPage() {
                                   onClick={() => {
                                     const link = `${window.location.origin.replace(":3001", ":3000")}/portal?contract=${contract.token}`
                                     navigator.clipboard.writeText(link)
-                                    alert("Link copied to clipboard!")
+                                    toast.success("Link copied")
                                   }}
                                   className="px-4 py-2 bg-surface rounded-full text-xs font-semibold text-muted hover:text-foreground transition-colors cursor-pointer"
                                 >

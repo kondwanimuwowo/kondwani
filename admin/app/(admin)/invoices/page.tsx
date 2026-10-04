@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
 import { Add, ContentCopy, Check, Delete } from "@mui/icons-material"
 import { Tooltip } from "@/components/ui/Tooltip"
 import { type Document } from "./InvoiceForm"
@@ -56,8 +57,11 @@ export default function InvoicesPage() {
       const res = await fetch(`/api/studio/invoices/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["invoices"] }),
-    onError: () => alert("Failed to delete. Please try again."),
+    onSuccess: () => {
+      toast.success("Invoice deleted")
+      return queryClient.invalidateQueries({ queryKey: ["invoices"] })
+    },
+    onError: () => toast.error("Failed to delete. Please try again."),
   })
 
   const statusMutation = useMutation({
@@ -70,7 +74,7 @@ export default function InvoicesPage() {
       if (!res.ok) throw new Error()
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["invoices"] }),
-    onError: () => alert("Failed to update status. Please try again."),
+    onError: () => toast.error("Failed to update status. Please try again."),
   })
 
   function handleDelete(id: string) {

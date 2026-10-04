@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
 import { Add, Close } from "@mui/icons-material"
 
 type Client = { id: string; name: string; company: string | null; currency: string }
@@ -102,9 +103,12 @@ export function InvoiceForm({ document: doc, initialType, initialProjectId, init
       if (!res.ok) throw new Error("Save failed")
       return res.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] })
-      if (editId) queryClient.invalidateQueries({ queryKey: ["invoice", editId] })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["invoices"], refetchType: "all" }),
+        editId && queryClient.invalidateQueries({ queryKey: ["invoice", editId], refetchType: "all" }),
+      ])
+      toast.success(editId ? "Changes saved" : "Invoice created")
       onSaved()
     },
   })
@@ -114,8 +118,9 @@ export function InvoiceForm({ document: doc, initialType, initialProjectId, init
       const res = await fetch(`/api/studio/invoices/${editId}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["invoices"], refetchType: "all" })
+      toast.success("Invoice deleted")
       onDeleted?.()
     },
   })
@@ -129,9 +134,9 @@ export function InvoiceForm({ document: doc, initialType, initialProjectId, init
   const saving = saveMutation.isPending
   const deleting = deleteMutation.isPending
   const saveError = saveMutation.isError
-    ? "Something went wrong. Please try again."
+    ? saveMutation.error.message || "Something went wrong. Please try again."
     : deleteMutation.isError
-    ? "Failed to delete. Please try again."
+    ? deleteMutation.error.message || "Failed to delete. Please try again."
     : null
 
   const subtotal = calcSubtotal(fItems)

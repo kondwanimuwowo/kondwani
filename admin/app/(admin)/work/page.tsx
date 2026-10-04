@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
 import {
   DndContext, DragOverlay, closestCorners,
   useSensor, useSensors, PointerSensor,
@@ -156,6 +157,7 @@ export default function WorkPage() {
       if (!res.ok) throw new Error()
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["work-projects"] }),
+    onError: () => toast.error("Could not add the project. Please try again."),
   })
 
   async function handleDragEnd(event: DragEndEvent) {

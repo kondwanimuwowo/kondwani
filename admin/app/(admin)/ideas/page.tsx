@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
 import { IdeaForm, type Idea } from "./IdeaForm"
 
 async function fetchIdeas(): Promise<Idea[]> {
@@ -25,8 +26,11 @@ export default function IdeasPage() {
       const res = await fetch(`/api/ideas/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ideas"] }),
-    onError: () => alert("Something went wrong deleting this idea. Please try again."),
+    onSuccess: () => {
+      toast.success("Idea deleted")
+      return queryClient.invalidateQueries({ queryKey: ["ideas"] })
+    },
+    onError: () => toast.error("Something went wrong deleting this idea. Please try again."),
   })
 
   function handleDelete(id: string) {

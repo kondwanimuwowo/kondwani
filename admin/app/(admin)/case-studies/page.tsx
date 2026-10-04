@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@/lib/toast"
 import { Close } from "@mui/icons-material"
 import { CaseStudyForm, type CaseStudy } from "./CaseStudyForm"
 
@@ -26,8 +27,11 @@ export default function CaseStudiesPage() {
       const res = await fetch(`/api/case-studies/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["case-studies"] }),
-    onError: () => alert("Something went wrong deleting this case study. Please try again."),
+    onSuccess: () => {
+      toast.success("Case study deleted")
+      return queryClient.invalidateQueries({ queryKey: ["case-studies"] })
+    },
+    onError: () => toast.error("Something went wrong deleting this case study. Please try again."),
   })
 
   function handleDelete(id: string) {
