@@ -1,10 +1,12 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { OpenInNew, GitHub, ArrowBack } from "@mui/icons-material"
+import { OpenInNew, GitHub, ArrowBack, ArrowForward } from "@mui/icons-material"
 import { db, project } from "@/lib/db"
-import { and, eq, isNotNull } from "drizzle-orm"
+import { and, asc, eq, isNotNull } from "drizzle-orm"
+import { AnimateIn } from "@/components/ui/AnimateIn"
+import { ProjectCover } from "@/components/project/ProjectCover"
+import { ProjectGallery } from "@/components/project/ProjectGallery"
 
 export const revalidate = 3600
 
@@ -57,110 +59,136 @@ export default async function ProjectDetailPage({ params }: Props) {
     operatingSystem: "Web",
   }
 
+  const cover = proj.imageUrl ?? proj.gallery?.[0] ?? null
+  const gallery = (proj.gallery ?? []).filter((src) => src !== cover)
+  const allImages = cover ? [cover, ...gallery] : gallery
+  const host = getHost(proj.liveUrl)
+  const alt = `${proj.title}, built by Kondwani Muwowo using ${proj.tech.join(", ")}`
+
+  const siblings = await db
+    .select({ slug: project.slug, title: project.title })
+    .from(project)
+    .where(and(eq(project.published, true), isNotNull(project.slug)))
+    .orderBy(asc(project.order))
+  const currentIndex = siblings.findIndex((p) => p.slug === slug)
+  const next = siblings.length > 1 ? siblings[(currentIndex + 1) % siblings.length] : null
+
+  const details = [
+    { label: "Role", value: proj.role },
+    { label: "Year", value: proj.year?.toString() },
+    { label: "Type", value: proj.category },
+    { label: "Status", value: proj.status },
+  ].filter((d): d is { label: string; value: string } => Boolean(d.value))
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main className="min-h-screen bg-surface pt-24 pb-20">
-        {/* Cover image */}
-        <div className="relative h-64 md:h-96 bg-surface overflow-hidden">
-          {proj.imageUrl ? (
-            <Image
-              src={proj.imageUrl}
-              alt={`${proj.title}, built by Kondwani Muwowo using ${proj.tech.join(", ")}`}
-              fill
-              className="object-cover"
-              priority
-              sizes="100vw"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-surface" />
-          )}
-        </div>
-
-        <div className="container-custom max-w-4xl -mt-16 relative z-10">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-muted mb-6" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <span>/</span>
-            <Link href="/projects" className="hover:text-primary transition-colors">Projects</Link>
-            <span>/</span>
-            <span className="text-foreground">{proj.title}</span>
-          </nav>
-
-          {/* Header card */}
-          <div className="bg-white rounded-3xl p-8 shadow-md mb-8">
-            <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
-              <div>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  <span className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary-tint px-3 py-1 rounded-full">
-                    {proj.category}
-                  </span>
-                  {proj.status && (
-                    <span className="text-[10px] font-bold tracking-widest uppercase text-muted bg-surface px-3 py-1 rounded-full">
-                      {proj.status}
-                    </span>
-                  )}
-                </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-foreground">{proj.title}</h1>
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex flex-wrap gap-3 shrink-0">
-                {proj.liveUrl && (
-                  <a href={proj.liveUrl} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-colors">
-                    Live Demo <OpenInNew sx={{ fontSize: 16 }} />
-                  </a>
-                )}
-                {proj.githubUrl && (
-                  <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-surface text-foreground px-5 py-2.5 rounded-full text-sm font-medium shadow-md hover:text-primary transition-colors">
-                    <GitHub sx={{ fontSize: 16 }} /> Code
-                  </a>
-                )}
-              </div>
+      <main className="min-h-screen bg-white pt-24">
+        {/* Hero band */}
+        <section className={`rounded-b-3xl bg-primary pt-16 ${cover ? "pb-40 md:pb-64" : "pb-20"}`}>
+          <AnimateIn className="container-custom max-w-3xl text-center">
+            <Link
+              href="/projects"
+              className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-primary-tint transition-colors hover:text-white"
+            >
+              <ArrowBack sx={{ fontSize: 16 }} /> All projects
+            </Link>
+            <h1 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-6xl">{proj.title}</h1>
+            {proj.excerpt && (
+              <p className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-primary-tint">{proj.excerpt}</p>
+            )}
+            <div className="flex flex-wrap justify-center gap-3">
+              {proj.liveUrl && (
+                <a href={proj.liveUrl} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-primary transition-colors hover:bg-primary-tint">
+                  Visit site <OpenInNew sx={{ fontSize: 16 }} />
+                </a>
+              )}
+              {proj.githubUrl && (
+                <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary-dark px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-hover">
+                  <GitHub sx={{ fontSize: 16 }} /> View code
+                </a>
+              )}
             </div>
+          </AnimateIn>
+        </section>
 
-            {/* Meta row */}
-            <div className="flex flex-wrap gap-6 text-sm text-muted pt-5">
-              {proj.year && <span><span className="font-medium text-foreground">Year</span> · {proj.year}</span>}
-              {proj.role && <span><span className="font-medium text-foreground">Role</span> · {proj.role}</span>}
-            </div>
+        {/* Cover in a browser frame, overlapping the band */}
+        {cover && (
+          <div className="container-custom relative z-10 -mt-28 max-w-5xl md:-mt-48">
+            <ProjectCover images={allImages} alt={alt} host={host} />
           </div>
+        )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main content */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white rounded-3xl p-8 shadow-md">
-                <h2 className="text-lg font-bold text-foreground mb-4">About This Project</h2>
-                <p className="text-muted leading-relaxed">{proj.description}</p>
-              </div>
-            </div>
+        {/* About + details */}
+        <section className="container-custom max-w-5xl py-24">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+            <AnimateIn className="lg:col-span-2">
+              <h2 className="mb-6 text-2xl font-bold text-foreground md:text-3xl">About this project</h2>
+              <p className="whitespace-pre-line text-lg leading-relaxed text-muted">{proj.description}</p>
+            </AnimateIn>
 
-            {/* Sidebar */}
-            <div className="space-y-5">
-              <div className="bg-white rounded-3xl p-6 shadow-md">
-                <h3 className="text-sm font-bold text-foreground mb-4 tracking-wide uppercase">Tech Stack</h3>
+            <AnimateIn delay={0.1}>
+              <aside className="rounded-3xl bg-white p-8 shadow-md">
+                {details.length > 0 && (
+                  <dl className="mb-8 space-y-4">
+                    {details.map((d) => (
+                      <div key={d.label} className="flex items-baseline justify-between gap-4">
+                        <dt className="text-sm text-muted">{d.label}</dt>
+                        <dd className="text-right text-sm font-medium text-foreground">{d.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+                <h3 className="mb-4 text-sm font-bold text-foreground">Stack</h3>
                 <div className="flex flex-wrap gap-2">
                   {proj.tech.map((t) => (
-                    <span key={t} className="text-xs font-medium bg-surface text-muted px-3 py-1.5 rounded-full">
+                    <span key={t} className="rounded-full bg-surface px-3 py-1 text-xs font-medium text-muted">
                       {t}
                     </span>
                   ))}
                 </div>
-              </div>
-            </div>
+              </aside>
+            </AnimateIn>
           </div>
+        </section>
 
-          {/* Back link */}
-          <div className="mt-12">
-            <Link href="/projects"
-              className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-primary transition-colors">
-              <ArrowBack sx={{ fontSize: 16 }} /> Back to Projects
+        {/* Gallery */}
+        {gallery.length > 0 && (
+          <section className="overflow-hidden bg-surface py-24">
+            <AnimateIn className="container-custom mb-16 max-w-5xl text-center">
+              <h2 className="text-2xl font-bold text-foreground md:text-3xl">More screens</h2>
+            </AnimateIn>
+            <ProjectGallery images={gallery} alt={proj.title} host={host} />
+          </section>
+        )}
+
+        {/* Next project */}
+        {next?.slug && (
+          <section className="container-custom max-w-5xl py-24">
+            <Link
+              href={`/projects/${next.slug}`}
+              className="group flex items-center justify-between gap-8 rounded-3xl bg-foreground px-8 py-12 transition-colors hover:bg-primary md:px-12"
+            >
+              <div>
+                <p className="mb-2 text-sm text-muted-dark group-hover:text-primary-tint">Next project</p>
+                <p className="text-2xl font-bold text-white md:text-4xl">{next.title}</p>
+              </div>
+              <ArrowForward className="shrink-0 text-white transition-transform group-hover:translate-x-2" sx={{ fontSize: 32 }} />
             </Link>
-          </div>
-        </div>
+          </section>
+        )}
       </main>
     </>
   )
+}
+
+function getHost(url: string | null) {
+  if (!url) return null
+  try {
+    return new URL(url).hostname.replace(/^www\./, "")
+  } catch {
+    return null
+  }
 }
