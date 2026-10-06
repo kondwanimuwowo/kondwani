@@ -24,7 +24,10 @@ export async function PUT(request: Request, { params }: Params) {
   const { id } = await params
   const body = await request.json()
   try {
-    const [project] = await db.update(projectTable).set(writable(projectTable, body)).where(eq(projectTable.id, id)).returning()
+    // Order is only changed through /api/projects/reorder
+    const values = writable(projectTable, body)
+    delete values.order
+    const [project] = await db.update(projectTable).set(values).where(eq(projectTable.id, id)).returning()
     if (!project) return NextResponse.json({ error: "Not found" }, { status: 404 })
     return NextResponse.json(project)
   } catch (e) {

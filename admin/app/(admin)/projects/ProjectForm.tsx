@@ -7,6 +7,7 @@ import { removeFromList } from "@/lib/queries"
 import { ImageUpload } from "@/components/ui/ImageUpload"
 import { GalleryUpload } from "@/components/ui/GalleryUpload"
 import { responseError } from "@/lib/http"
+import { PROJECT_CATEGORIES, PROJECT_ROLES, PROJECT_STATUSES, FIRST_PROJECT_YEAR } from "@/data/projectOptions"
 
 export type Project = {
   id: string; title: string; slug?: string | null; description: string; excerpt?: string | null
@@ -17,7 +18,17 @@ export type Project = {
 
 const empty = {
   title: "", slug: "", description: "", excerpt: "", tech: "", liveUrl: "", githubUrl: "",
-  imageUrl: "", gallery: [] as string[], category: "", role: "", status: "", year: "", featured: false, published: true, order: 0,
+  imageUrl: "", gallery: [] as string[], category: "", role: "", status: "", year: "", featured: false, published: true,
+}
+
+const YEARS = Array.from(
+  { length: new Date().getFullYear() - FIRST_PROJECT_YEAR + 1 },
+  (_, i) => String(new Date().getFullYear() - i),
+)
+
+// Keeps a stored value selectable even when it isn't one of the preset options
+function withCurrent(options: readonly string[], current: string) {
+  return current && !options.includes(current) ? [current, ...options] : options
 }
 
 function toSlug(title: string) {
@@ -32,7 +43,6 @@ function toFormState(p?: Project) {
     category: p.category,
     featured: p.featured,
     published: p.published,
-    order: p.order,
     slug: p.slug ?? "",
     excerpt: p.excerpt ?? "",
     tech: p.tech.join(", "),
@@ -59,7 +69,7 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
   const queryClient = useQueryClient()
 
   function f(field: keyof typeof form) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm(v => ({ ...v, [field]: e.target.value }))
   }
 
@@ -82,7 +92,6 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
           role: (form.role as string).trim() || null,
           year: form.year ? Number(form.year) : null,
           status: form.status || null,
-          order: Number(form.order),
         }),
       })
       if (!res.ok) throw await responseError(res, "Save")
@@ -168,32 +177,25 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
       </div>
       <div>
         <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Category</label>
-        <input
-          value={form.category}
-          onChange={f("category")}
-          placeholder="e.g. Web App"
-          className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
-        />
+        <select value={form.category} onChange={f("category")} className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans">
+          <option value="" disabled>Select a category</option>
+          {withCurrent(PROJECT_CATEGORIES, form.category).map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Role</label>
-          <input
-            value={form.role as string}
-            onChange={f("role")}
-            placeholder="e.g. Lead Developer"
-            className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
-          />
+          <select value={form.role as string} onChange={f("role")} className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans">
+            <option value="">None</option>
+            {withCurrent(PROJECT_ROLES, form.role as string).map(r => <option key={r} value={r}>{r}</option>)}
+          </select>
         </div>
         <div>
           <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Year</label>
-          <input
-            type="number"
-            value={form.year as string}
-            onChange={f("year")}
-            placeholder="2025"
-            className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
-          />
+          <select value={form.year as string} onChange={f("year")} className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans">
+            <option value="">None</option>
+            {withCurrent(YEARS, form.year as string).map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
         </div>
       </div>
       <div>
@@ -232,25 +234,12 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
         folder="project-gallery"
         onChange={urls => setForm(v => ({ ...v, gallery: urls }))}
       />
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Status badge</label>
-          <input
-            value={form.status as string}
-            onChange={f("status")}
-            placeholder="e.g. Live · In Progress"
-            className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Order</label>
-          <input
-            type="number"
-            value={form.order}
-            onChange={f("order")}
-            className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans"
-          />
-        </div>
+      <div>
+        <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Status badge</label>
+        <select value={form.status as string} onChange={f("status")} className="w-full px-3 py-2 bg-surface border border-border rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-tint transition-all font-sans">
+          <option value="">None</option>
+          {withCurrent(PROJECT_STATUSES, form.status as string).map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
       </div>
       <div className="flex items-center gap-6 pt-2">
         <label className="flex items-center gap-2 text-sm font-semibold text-foreground cursor-pointer select-none">

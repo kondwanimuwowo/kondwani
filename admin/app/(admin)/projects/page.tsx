@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
 import { removeFromList } from "@/lib/queries"
-import { Close } from "@mui/icons-material"
+import { ChevronLeft, ChevronRight, Close } from "@mui/icons-material"
 import { ProjectForm, type Project } from "./ProjectForm"
 
 async function fetchProjects(): Promise<Project[]> {
@@ -36,6 +36,37 @@ export default function ProjectsPage() {
     },
     onError: () => toast.error("Something went wrong deleting this project. Please try again."),
   })
+
+  // Moves a card one place and saves the whole order, so every project ends up with a unique position
+  const reorderMutation = useMutation({
+    mutationFn: async (ordered: Project[]) => {
+      const res = await fetch("/api/projects/reorder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: ordered.map(p => p.id) }),
+      })
+      if (!res.ok) throw new Error()
+    },
+    onMutate: async (ordered) => {
+      await queryClient.cancelQueries({ queryKey: ["projects"] })
+      const previous = queryClient.getQueryData<Project[]>(["projects"])
+      queryClient.setQueryData<Project[]>(["projects"], ordered.map((p, i) => ({ ...p, order: i + 1 })))
+      return { previous }
+    },
+    onError: (_err, _ordered, context) => {
+      if (context?.previous) queryClient.setQueryData(["projects"], context.previous)
+      toast.error("Couldn't save the new order. Please try again.")
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["projects"] }),
+  })
+
+  function move(index: number, step: -1 | 1) {
+    const target = index + step
+    if (target < 0 || target >= projects.length) return
+    const ordered = [...projects]
+    ;[ordered[index], ordered[target]] = [ordered[target], ordered[index]]
+    reorderMutation.mutate(ordered)
+  }
 
   function handleDelete(id: string) {
     if (!confirm("Delete this project?")) return
@@ -99,7 +130,7 @@ export default function ProjectsPage() {
             <p className="text-muted">No projects yet.</p>
           </div>
         ) : (
-          projects.map(p => (
+          projects.map((p, index) => (
             <div key={p.id} className="bg-white overflow-hidden flex flex-col justify-between shadow-md hover:shadow-md transition-shadow duration-200 rounded-3xl">
               <div>
                 {p.imageUrl ? (
@@ -145,16 +176,37 @@ export default function ProjectsPage() {
                     {deleteMutation.isPending && deleteMutation.variables === p.id ? "Deleting…" : "Delete"}
                   </button>
                 </div>
-                {p.liveUrl && (
-                  <a
-                    href={p.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs font-semibold text-primary hover:text-primary-hover transition-colors"
-                  >
-                    View site ↗
-                  </a>
-                )}
+                <div className="flex items-center gap-3">
+                  {p.liveUrl && (
+                    <a
+                      href={p.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-semibold text-primary hover:text-primary-hover transition-colors"
+                    >
+                      View site ↗
+                    </a>
+                  )}
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => move(index, -1)}
+                      disabled={index === 0 || reorderMutation.isPending}
+                      aria-label={`Move ${p.title} earlier`}
+                      className="bg-white shadow-md rounded-full p-1 text-muted hover:text-foreground transition-colors disabled:opacity-40"
+                    >
+                      <ChevronLeft sx={{ fontSize: 16 }} />
+                    </button>
+                    <span className="text-[10px] font-bold text-muted tabular-nums w-5 text-center">{index + 1}</span>
+                    <button
+                      onClick={() => move(index, 1)}
+                      disabled={index === projects.length - 1 || reorderMutation.isPending}
+                      aria-label={`Move ${p.title} later`}
+                      className="bg-white shadow-md rounded-full p-1 text-muted hover:text-foreground transition-colors disabled:opacity-40"
+                    >
+                      <ChevronRight sx={{ fontSize: 16 }} />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ))
