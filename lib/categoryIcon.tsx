@@ -8,6 +8,7 @@ import {
   VolunteerActivism,
   Description,
   Apps,
+  Computer,
 } from "@mui/icons-material"
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
@@ -16,6 +17,7 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
   "dashboard": Dashboard,
   "portfolio": Work,
   "mobile app": PhoneIphone,
+  "desktop app": Computer,
   "design": Palette,
   "nonprofit": VolunteerActivism,
   "case study": Description,

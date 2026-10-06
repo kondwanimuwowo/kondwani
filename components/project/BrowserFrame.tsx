@@ -19,7 +19,7 @@ const elevations = {
   lifted: "shadow-frame-lift",
 }
 
-// Tall full-page screenshots slowly scroll to the bottom on hover when `pan` is set.
+// Images always show their full width. Tall ones are cut at the bottom and scroll down on hover when `pan` is set.
 // `autoHeight` shows the whole image at its natural aspect ratio instead of filling a fixed box.
 export function BrowserFrame({ src, alt, host, sizes, priority, pan, autoHeight, elevation = "raised", className }: BrowserFrameProps) {
   return (
@@ -48,17 +48,19 @@ export function BrowserFrame({ src, alt, host, sizes, priority, pan, autoHeight,
           className="h-auto w-full bg-surface"
         />
       ) : (
-        <div className="relative flex-1 overflow-hidden bg-surface">
+        // Always full width, top-aligned; the size container lets the pan stop at the image's bottom edge
+        <div className="relative flex-1 overflow-hidden bg-surface [container-type:size]">
           <Image
             src={src}
             alt={alt}
-            fill
+            width={1920}
+            height={1080}
             sizes={sizes}
             priority={priority}
             draggable={false}
             className={cn(
-              "object-cover object-top",
-              pan && "transition-[object-position] duration-[6000ms] ease-in-out group-hover:object-bottom motion-reduce:transition-none"
+              "h-auto w-full",
+              pan && "transition-transform duration-[6000ms] ease-in-out group-hover:translate-y-[min(0px,calc(100cqh_-_100%))] motion-reduce:transition-none"
             )}
           />
         </div>
