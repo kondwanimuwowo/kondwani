@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "motion/react"
@@ -10,16 +10,20 @@ import { ExpandMore, Logout } from "@mui/icons-material"
 import { navSections, isNavActive, type NavItem } from "@/data/navigation"
 
 function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
-  const [openMenu, setOpenMenu] = useState(false)
   const { label, href, icon: Icon, subItems } = item
+  const childActive = subItems?.some(s => isNavActive(s.href, pathname)) ?? false
+  const [openMenu, setOpenMenu] = useState(childActive)
+  const [prevPathname, setPrevPathname] = useState(pathname)
+
+  // Open the submenu when navigating into one of its routes.
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname)
+    if (childActive) setOpenMenu(true)
+  }
 
   const isActive = href
     ? isNavActive(href, pathname)
-    : subItems?.some(s => isNavActive(s.href, pathname))
-
-  useEffect(() => {
-    if (subItems?.some(s => pathname.startsWith(s.href))) setOpenMenu(true)
-  }, [pathname, subItems])
+    : childActive
 
   if (subItems) {
     return (

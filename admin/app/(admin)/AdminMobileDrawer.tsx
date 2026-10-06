@@ -18,16 +18,16 @@ interface AdminMobileDrawerProps {
 export function AdminMobileDrawer({ isOpen, onClose }: AdminMobileDrawerProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const [openMenu, setOpenMenu] = useState<string | null>(null)
+  const activeMenu = navItems.find(item => item.subItems?.some(sub => isNavActive(sub.href, pathname)))?.label ?? null
+  const [openMenu, setOpenMenu] = useState<string | null>(activeMenu)
+  const [menuPathname, setMenuPathname] = useState(pathname)
   const prevPathname = useRef(pathname)
 
-  // Auto-open submenu matching current route
-  useEffect(() => {
-    const active = navItems.find(item =>
-      item.subItems?.some(sub => pathname.startsWith(sub.href))
-    )
-    setOpenMenu(active?.label ?? null)
-  }, [pathname])
+  // Open the submenu matching the current route when it changes.
+  if (pathname !== menuPathname) {
+    setMenuPathname(pathname)
+    setOpenMenu(activeMenu)
+  }
 
   // Close drawer on route change
   useEffect(() => {
