@@ -29,6 +29,11 @@
   --color-subtle-dark: #161616;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Layered shadows for framed screenshots; the lifted one carries a primary-dark tint */
+  --shadow-frame-flat: 0 1px 2px rgb(10 10 10 / 0.05), 0 8px 24px -8px rgb(10 10 10 / 0.12);
+  --shadow-frame: 0 1px 2px rgb(10 10 10 / 0.06), 0 8px 16px -4px rgb(10 10 10 / 0.08), 0 24px 48px -12px rgb(10 10 10 / 0.18);
+  --shadow-frame-lift: 0 2px 4px rgb(10 10 10 / 0.06), 0 16px 32px -8px rgb(10 10 10 / 0.14), 0 48px 80px -16px rgb(80 16 16 / 0.4);
 }
 
 html {

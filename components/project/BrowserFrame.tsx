@@ -9,14 +9,21 @@ interface BrowserFrameProps {
   priority?: boolean
   pan?: boolean
   autoHeight?: boolean
+  elevation?: "flat" | "raised" | "lifted"
   className?: string
+}
+
+const elevations = {
+  flat: "shadow-frame-flat",
+  raised: "shadow-frame",
+  lifted: "shadow-frame-lift",
 }
 
 // Tall full-page screenshots slowly scroll to the bottom on hover when `pan` is set.
 // `autoHeight` shows the whole image at its natural aspect ratio instead of filling a fixed box.
-export function BrowserFrame({ src, alt, host, sizes, priority, pan, autoHeight, className }: BrowserFrameProps) {
+export function BrowserFrame({ src, alt, host, sizes, priority, pan, autoHeight, elevation = "raised", className }: BrowserFrameProps) {
   return (
-    <div className={cn("group flex w-full flex-col overflow-hidden rounded-3xl border-2 border-foreground bg-white shadow-xl", !autoHeight && "h-full", className)}>
+    <div className={cn("group flex w-full flex-col overflow-hidden rounded-3xl bg-white transition-shadow duration-500", elevations[elevation], !autoHeight && "h-full", className)}>
       <div className="grid h-10 shrink-0 grid-cols-[1fr_auto_1fr] items-center bg-surface px-4">
         <div className="flex gap-2">
           <span className="h-3 w-3 rounded-full bg-border" />

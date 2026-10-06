@@ -70,7 +70,7 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
                 host={host}
                 sizes="(max-width: 768px) 80vw, 52vw"
                 pan={isActive}
-                className={isActive ? "shadow-xl" : "shadow-md"}
+                elevation={isActive ? "lifted" : "flat"}
               />
             </motion.div>
           )
