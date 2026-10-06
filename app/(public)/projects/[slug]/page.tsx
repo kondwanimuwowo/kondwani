@@ -83,9 +83,9 @@ export default async function ProjectDetailPage({ params }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main className="min-h-screen bg-white pt-24">
+      <main className="min-h-screen bg-white">
         {/* Hero band */}
-        <section className={`rounded-b-3xl bg-primary pt-16 ${cover ? "pb-40 md:pb-64" : "pb-20"}`}>
+        <section className={`bg-primary pt-40 ${cover ? "pb-32 md:pb-48" : "pb-24"}`}>
           <AnimateIn className="container-custom max-w-3xl text-center">
             <Link
               href="/projects"
@@ -93,7 +93,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             >
               <ArrowBack sx={{ fontSize: 16 }} /> All projects
             </Link>
-            <h1 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-6xl">{proj.title}</h1>
+            <h1 className="mb-6 text-3xl font-bold tracking-tight text-white md:text-5xl">{proj.title}</h1>
             {proj.excerpt && (
               <p className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-primary-tint">{proj.excerpt}</p>
             )}
@@ -116,13 +116,13 @@ export default async function ProjectDetailPage({ params }: Props) {
 
         {/* Cover in a browser frame, overlapping the band */}
         {cover && (
-          <div className="container-custom relative z-10 -mt-28 max-w-5xl md:-mt-48">
+          <div className="container-custom relative z-10 -mt-24 max-w-4xl md:-mt-36">
             <ProjectCover images={allImages} alt={alt} host={host} />
           </div>
         )}
 
         {/* About + details */}
-        <section className="container-custom max-w-5xl py-24">
+        <section className="container-custom max-w-4xl py-24">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
             <AnimateIn className="lg:col-span-2">
               <h2 className="mb-6 text-2xl font-bold text-foreground md:text-3xl">About this project</h2>
@@ -157,7 +157,7 @@ export default async function ProjectDetailPage({ params }: Props) {
         {/* Gallery */}
         {gallery.length > 0 && (
           <section className="overflow-hidden bg-surface py-24">
-            <AnimateIn className="container-custom mb-16 max-w-5xl text-center">
+            <AnimateIn className="container-custom mb-16 max-w-4xl text-center">
               <h2 className="text-2xl font-bold text-foreground md:text-3xl">More screens</h2>
             </AnimateIn>
             <ProjectGallery images={gallery} alt={proj.title} host={host} />
@@ -166,7 +166,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
         {/* Next project */}
         {next?.slug && (
-          <section className="container-custom max-w-5xl py-24">
+          <section className="container-custom max-w-4xl py-24">
             <Link
               href={`/projects/${next.slug}`}
               className="group flex items-center justify-between gap-8 rounded-3xl bg-foreground px-8 py-12 transition-colors hover:bg-primary md:px-12"

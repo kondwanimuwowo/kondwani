@@ -36,7 +36,7 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
 
   return (
     <div role="region" aria-roledescription="carousel" aria-label={`${alt} screens`} tabIndex={0} onKeyDown={onKeyDown} className="outline-none">
-      <div className="relative mx-auto aspect-[4/3] w-[84%] md:aspect-[16/10] md:w-[64%]">
+      <div className="relative mx-auto aspect-[4/3] w-[80%] md:aspect-[16/10] md:w-[52%]">
         {images.map((src, i) => {
           const d = offsetOf(i)
           const isActive = d === 0
@@ -68,7 +68,7 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
                 src={src}
                 alt={`${alt}, screen ${i + 1}`}
                 host={host}
-                sizes="(max-width: 768px) 84vw, 64vw"
+                sizes="(max-width: 768px) 80vw, 52vw"
                 pan={isActive}
                 className={isActive ? "shadow-xl" : "shadow-md"}
               />

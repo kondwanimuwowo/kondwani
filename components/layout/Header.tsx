@@ -24,11 +24,15 @@ export function Header({ showBlog = false }: HeaderProps) {
   const navLinks = showBlog ? [...baseNavLinks.slice(0, 3), blogNavLink, baseNavLinks[3]] : baseNavLinks
   const pathname = usePathname()
   const isHome = pathname === "/"
+  // Project detail pages open on a dark hero, so the header starts light until it gets its own background
+  const darkHero = /^\/projects\/[^/]+$/.test(pathname)
   const { scrollY } = useScroll()
   const [hidden, setHidden] = React.useState(false)
   const [isScrolled, setIsScrolled] = React.useState(false)
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const lastScrollDownStart = React.useRef(0)
+
+  const onDark = darkHero && !isScrolled
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() ?? 0
@@ -68,7 +72,10 @@ export function Header({ showBlog = false }: HeaderProps) {
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-extrabold tracking-tight text-foreground hover:text-primary transition-colors duration-300"
+          className={cn(
+            "text-xl font-extrabold tracking-tight transition-colors duration-300",
+            onDark ? "text-white hover:text-primary-tint" : "text-foreground hover:text-primary"
+          )}
         >
           [&lt;ondwani
         </Link>
@@ -83,7 +90,7 @@ export function Header({ showBlog = false }: HeaderProps) {
                 "transition-colors duration-200 flex items-center",
                 link.href === "/"
                   ? "px-2 py-1"
-                  : "px-4 py-2 text-sm font-medium text-muted hover:text-foreground"
+                  : cn("px-4 py-2 text-sm font-medium", onDark ? "text-primary-tint hover:text-white" : "text-muted hover:text-foreground")
               )}
             >
               {link.href === "/" ? (
@@ -91,7 +98,7 @@ export function Header({ showBlog = false }: HeaderProps) {
                   sx={{ fontSize: 20 }}
                   className={cn(
                     "transition-colors duration-200",
-                    isHome ? "text-primary" : "text-muted hover:text-primary"
+                    onDark ? "text-primary-tint hover:text-white" : isHome ? "text-primary" : "text-muted hover:text-primary"
                   )}
                   aria-label="Home"
                 />
@@ -104,7 +111,10 @@ export function Header({ showBlog = false }: HeaderProps) {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
+          className={cn(
+            "md:hidden p-2 transition-colors",
+            onDark ? "text-white hover:text-primary-tint" : "text-foreground hover:text-primary"
+          )}
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
         >

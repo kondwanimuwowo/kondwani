@@ -29,7 +29,7 @@ export function ProjectCover({ images, alt, host }: ProjectCoverProps) {
           src={images[0]}
           alt={alt}
           host={host}
-          sizes="(max-width: 1024px) 100vw, 1024px"
+          sizes="(max-width: 896px) 100vw, 896px"
           priority
           pan
         />
