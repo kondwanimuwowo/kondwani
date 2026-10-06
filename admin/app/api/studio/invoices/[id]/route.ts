@@ -3,6 +3,11 @@ import { db, document, documentItem } from "@/lib/db"
 import { writable } from "@/lib/db/writable"
 import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
+import { z } from "zod"
+import { parseBody, lineItems } from "@/lib/validation"
+import { toItemRows } from "@/lib/documents"
+
+const updateSchema = z.looseObject({ items: lineItems.optional() })
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -29,23 +34,20 @@ export async function PUT(request: Request, { params }: Params) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  const { items, ...body } = await request.json()
+  const parsed = await parseBody(request, updateSchema)
+  if (parsed.error) return parsed.error
+  const { items, ...body } = parsed.data
 
   await db.transaction(async (tx) => {
-    await tx.delete(documentItem).where(eq(documentItem.documentId, id))
+    const fields = writable(document, body)
+    if (Object.keys(fields).length > 0) await tx.update(document).set(fields).where(eq(document.id, id))
 
-    await tx.update(document).set(writable(document, body)).where(eq(document.id, id))
-
-    const rows = (items ?? []).map((item: { description: string; quantity: number; rate: number; flat?: boolean; position?: number }) => ({
-      documentId: id,
-      description: item.description,
-      quantity: item.quantity,
-      rate: item.rate,
-      flat: item.flat ?? false,
-      amount: item.flat ? item.rate : item.quantity * item.rate,
-      position: item.position ?? 0,
-    }))
-    if (rows.length > 0) await tx.insert(documentItem).values(rows)
+    // Only replace line items when the caller sent them; a status change must not wipe them.
+    if (items) {
+      await tx.delete(documentItem).where(eq(documentItem.documentId, id))
+      const rows = toItemRows(id, items)
+      if (rows.length > 0) await tx.insert(documentItem).values(rows)
+    }
   })
 
   const doc = await db.query.document.findFirst({

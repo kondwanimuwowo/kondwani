@@ -1,8 +1,33 @@
 import { NextResponse } from "next/server"
 import { db, billingMilestone, document, documentItem } from "@/lib/db"
-import { and, count, desc, eq } from "drizzle-orm"
+import { and, count, eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 import { nanoid } from "nanoid"
+import { z } from "zod"
+import { parseBody } from "@/lib/validation"
+import { nextDocumentNumber } from "@/lib/documents"
+
+const postSchema = z.union([
+  z.object({ action: z.literal("invoice"), milestoneId: z.string().min(1, "Milestone ID is required") }),
+  z.object({
+    action: z.undefined().optional(),
+    title: z.string().trim().min(1, "Title is required"),
+    amount: z.coerce.number().positive("Amount must be more than 0"),
+    percentage: z.coerce.number().nullish(),
+    dueDate: z.string().nullish(),
+  }),
+])
+
+const reorderSchema = z.object({
+  milestones: z.array(z.object({
+    id: z.string(),
+    title: z.string().optional(),
+    percentage: z.number().nullish(),
+    amount: z.number().optional(),
+    dueDate: z.string().nullish(),
+    position: z.number().int().optional(),
+  })),
+})
 
 // ── GET /api/studio/work/[id]/milestones ─────────────────────────────────────
 export async function GET(
@@ -31,17 +56,16 @@ export async function POST(
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  const body = await req.json()
+  const parsed = await parseBody(req, postSchema)
+  if (parsed.error) return parsed.error
+  const body = parsed.data
 
   // Handle conversion of a milestone to a draft invoice
   if (body.action === "invoice") {
     const { milestoneId } = body
-    if (!milestoneId) {
-      return NextResponse.json({ error: "Milestone ID is required" }, { status: 400 })
-    }
 
     const milestone = await db.query.billingMilestone.findFirst({
-      where: (t, { eq }) => eq(t.id, milestoneId),
+      where: (t, { eq, and }) => and(eq(t.id, milestoneId), eq(t.projectId, id)),
       with: { project: true, invoice: true },
     })
 
@@ -56,19 +80,8 @@ export async function POST(
       return NextResponse.json({ error: "Project has no client assigned" }, { status: 400 })
     }
 
-    const nextNumber = async (type: "invoice" | "quote") => {
-      const prefix = type === "invoice" ? "INV" : "QUO"
-      const last = await db.query.document.findFirst({
-        where: (t, { eq }) => eq(t.type, type),
-        orderBy: (t, { desc }) => desc(t.number),
-        columns: { number: true },
-      })
-      if (!last) return `${prefix}-001`
-      const n = parseInt(last.number.split("-")[1] ?? "0", 10)
-      return `${prefix}-${String(n + 1).padStart(3, "0")}`
-    }
 
-    const invoiceNumber = await nextNumber("invoice")
+    const invoiceNumber = await nextDocumentNumber("invoice")
     const token = nanoid(10)
 
     const invoice = await db.transaction(async (tx) => {
@@ -133,16 +146,9 @@ export async function PUT(
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id: projectId } = await params
-  const { milestones } = await req.json() as {
-    milestones: Array<{
-      id: string
-      title?: string
-      percentage?: number | null
-      amount?: number
-      dueDate?: string | null
-      position?: number
-    }>
-  }
+  const parsed = await parseBody(req, reorderSchema)
+  if (parsed.error) return parsed.error
+  const { milestones } = parsed.data
 
   await Promise.all(
     milestones.map((m) =>
@@ -167,6 +173,7 @@ export async function DELETE(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { id: projectId } = await params
   const { searchParams } = new URL(req.url)
   const milestoneId = searchParams.get("milestoneId")
 
@@ -175,7 +182,7 @@ export async function DELETE(
   }
 
   const milestone = await db.query.billingMilestone.findFirst({
-    where: (t, { eq }) => eq(t.id, milestoneId),
+    where: (t, { eq, and }) => and(eq(t.id, milestoneId), eq(t.projectId, projectId)),
     with: { invoice: true },
   })
 

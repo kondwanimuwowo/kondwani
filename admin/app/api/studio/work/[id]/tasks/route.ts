@@ -2,6 +2,14 @@ import { NextResponse } from "next/server"
 import { db, workTask } from "@/lib/db"
 import { and, eq, isNull, max } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
+import { z } from "zod"
+import { writable } from "@/lib/db/writable"
+import { parseBody } from "@/lib/validation"
+
+const taskSchema = z.looseObject({
+  title: z.string().trim().min(1, "Task title is required"),
+  status: z.string().optional(),
+})
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -24,7 +32,9 @@ export async function POST(request: Request, { params }: Params) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id: projectId } = await params
-  const body = await request.json()
+  const parsed = await parseBody(request, taskSchema)
+  if (parsed.error) return parsed.error
+  const body = parsed.data
 
   const [{ maxPosition }] = await db
     .select({ maxPosition: max(workTask.position) })
@@ -32,7 +42,8 @@ export async function POST(request: Request, { params }: Params) {
     .where(and(eq(workTask.projectId, projectId), eq(workTask.status, body.status ?? "todo"), isNull(workTask.parentId)))
 
   const [inserted] = await db.insert(workTask).values({
-    ...body,
+    ...writable(workTask, body),
+    title: body.title,
     projectId,
     position: (maxPosition ?? 0) + 1,
   }).returning()

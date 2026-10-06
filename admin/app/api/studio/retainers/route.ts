@@ -2,6 +2,38 @@ import { NextResponse } from "next/server"
 import { db, retainerContract } from "@/lib/db"
 import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
+import { z } from "zod"
+import { parseBody } from "@/lib/validation"
+
+const frequency = z.enum(["monthly", "quarterly", "annually"])
+const date = z.string().min(1)
+
+const createSchema = z.object({
+  clientId: z.string({ error: "The project needs a client first" }).min(1, "The project needs a client first"),
+  projectId: z.string().nullish(),
+  title: z.string().trim().min(1, "Title is required"),
+  amount: z.coerce.number().positive("Amount must be more than 0"),
+  currency: z.string().optional(),
+  frequency: frequency.optional(),
+  startDate: date,
+  endDate: date.nullish(),
+  status: z.enum(["active", "paused", "cancelled"]).optional(),
+  nextInvoiceAt: date.optional(),
+})
+
+const updateSchema = z.object({
+  id: z.string().min(1, "Retainer ID is required"),
+  title: z.string().trim().min(1).optional(),
+  amount: z.coerce.number().positive().optional(),
+  currency: z.string().optional(),
+  frequency: frequency.optional(),
+  startDate: date.optional(),
+  endDate: date.nullish(),
+  status: z.enum(["active", "paused", "cancelled"]).optional(),
+  nextInvoiceAt: date.optional(),
+  lastInvoicedAt: date.nullish(),
+  projectId: z.string().nullish(),
+})
 
 // ── GET /api/studio/retainers ────────────────────────────────────────────────
 export async function GET(req: Request) {
@@ -29,11 +61,9 @@ export async function POST(req: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const body = await req.json()
-
-  if (!body.clientId || !body.title || !body.amount || !body.startDate) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
-  }
+  const parsed = await parseBody(req, createSchema)
+  if (parsed.error) return parsed.error
+  const body = parsed.data
 
   const startDate = new Date(body.startDate)
 
@@ -41,7 +71,7 @@ export async function POST(req: Request) {
     clientId: body.clientId,
     projectId: body.projectId || null,
     title: body.title,
-    amount: parseFloat(body.amount),
+    amount: body.amount,
     currency: body.currency || "USD",
     frequency: body.frequency || "monthly",
     startDate,
@@ -67,16 +97,13 @@ export async function PUT(req: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const body = await req.json()
-  const { id, ...fields } = body
-
-  if (!id) {
-    return NextResponse.json({ error: "Retainer ID is required" }, { status: 400 })
-  }
+  const parsed = await parseBody(req, updateSchema)
+  if (parsed.error) return parsed.error
+  const { id, ...fields } = parsed.data
 
   await db.update(retainerContract).set({
     ...(fields.title !== undefined && { title: fields.title }),
-    ...(fields.amount !== undefined && { amount: parseFloat(fields.amount) }),
+    ...(fields.amount !== undefined && { amount: fields.amount }),
     ...(fields.currency !== undefined && { currency: fields.currency }),
     ...(fields.frequency !== undefined && { frequency: fields.frequency }),
     ...(fields.startDate !== undefined && { startDate: new Date(fields.startDate) }),

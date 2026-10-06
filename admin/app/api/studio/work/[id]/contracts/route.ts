@@ -4,6 +4,22 @@ import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 import { nanoid } from "nanoid"
 import { Resend } from "resend"
+import { z } from "zod"
+import { parseBody } from "@/lib/validation"
+import { escapeHtml } from "@/lib/html"
+
+const createSchema = z.object({
+  title: z.string().trim().min(1, "Title is required"),
+  content: z.string().trim().min(1, "Contract text is required"),
+})
+
+const updateSchema = z.object({
+  contractId: z.string().min(1, "Contract ID is required"),
+  action: z.literal("send").optional(),
+  title: z.string().trim().min(1).optional(),
+  content: z.string().trim().min(1).optional(),
+  status: z.enum(["draft", "sent"]).optional(),
+})
 
 export async function GET(
   _req: Request,
@@ -29,7 +45,9 @@ export async function POST(
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id: projectId } = await params
-  const body = await req.json()
+  const parsed = await parseBody(req, createSchema)
+  if (parsed.error) return parsed.error
+  const body = parsed.data
 
   // Find project and its client
   const project = await db.query.workProject.findFirst({
@@ -67,12 +85,9 @@ export async function PUT(
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id: projectId } = await params
-  const body = await req.json()
-  const { contractId, action, ...fields } = body
-
-  if (!contractId) {
-    return NextResponse.json({ error: "Contract ID is required" }, { status: 400 })
-  }
+  const parsed = await parseBody(req, updateSchema)
+  if (parsed.error) return parsed.error
+  const { contractId, action, ...fields } = parsed.data
 
   const contract = await db.query.contract.findFirst({
     where: (t, { eq, and }) => and(eq(t.id, contractId), eq(t.projectId, projectId)),
@@ -84,7 +99,7 @@ export async function PUT(
   }
 
   // Handle action=send
-  if (action === "send" || body.status === "sent") {
+  if (action === "send" || fields.status === "sent") {
     if (contract.status === "signed") {
       return NextResponse.json({ error: "Contract is already signed" }, { status: 400 })
     }
@@ -105,8 +120,8 @@ export async function PUT(
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
               <h2 style="color: #1a1a1a; margin-top: 0;">Contract Signature Request</h2>
-              <p>Hi ${contract.client.name},</p>
-              <p>I have prepared the contract for our project: <strong>${contract.project?.title ?? contract.title}</strong>.</p>
+              <p>Hi ${escapeHtml(contract.client.name)},</p>
+              <p>I have prepared the contract for our project: <strong>${escapeHtml(contract.project?.title ?? contract.title)}</strong>.</p>
               <p>Please click the button below to review, accept, and digitally sign the contract:</p>
               <div style="text-align: center; margin: 30px 0;">
                 <a href="${portalUrl}" style="background-color: #0A0A0A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 500;">Review & Sign Contract</a>
@@ -118,12 +133,16 @@ export async function PUT(
             </div>
           `,
         })
-      } catch (err: any) {
+      } catch (err) {
         console.error("Failed to send contract email:", err)
       }
     }
 
     return NextResponse.json(updated)
+  }
+
+  if (contract.status === "signed") {
+    return NextResponse.json({ error: "Signed contracts can't be edited" }, { status: 400 })
   }
 
   // Regular field updates
@@ -144,6 +163,7 @@ export async function DELETE(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { id: projectId } = await params
   const { searchParams } = new URL(req.url)
   const contractId = searchParams.get("contractId")
 
@@ -152,7 +172,7 @@ export async function DELETE(
   }
 
   const contract = await db.query.contract.findFirst({
-    where: (t, { eq }) => eq(t.id, contractId),
+    where: (t, { eq, and }) => and(eq(t.id, contractId), eq(t.projectId, projectId)),
   })
 
   if (!contract) {

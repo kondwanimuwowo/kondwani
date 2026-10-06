@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server"
 import { db, projectMessage } from "@/lib/db"
 import { createClient } from "@/lib/supabase/server"
+import { Resend } from "resend"
+import { z } from "zod"
+import { parseBody } from "@/lib/validation"
+import { escapeHtml } from "@/lib/html"
+
+const messageSchema = z.object({
+  content: z.string().trim().min(1, "Message content cannot be empty"),
+  attachments: z.array(z.string()).optional(),
+})
 
 export async function GET(
   _req: Request,
@@ -26,11 +35,9 @@ export async function POST(
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id: projectId } = await params
-  const body = await req.json()
-
-  if (!body.content?.trim()) {
-    return NextResponse.json({ error: "Message content cannot be empty" }, { status: 400 })
-  }
+  const parsed = await parseBody(req, messageSchema)
+  if (parsed.error) return parsed.error
+  const body = parsed.data
 
   const name = user.user_metadata?.full_name ?? "Kondwani Muwowo"
 
@@ -51,7 +58,6 @@ export async function POST(
     })
 
     if (project?.client?.email && process.env.RESEND_API_KEY) {
-      const { Resend } = require("resend")
       const resend = new Resend(process.env.RESEND_API_KEY)
       const fromEmail = process.env.RESEND_FROM_EMAIL ?? "billing@kondwanimuwowo.com"
       const portalUrl = `${process.env.NEXT_PUBLIC_PORTAL_URL ?? "https://kondwanimuwowo.com/portal"}?project=${projectId}`
@@ -63,7 +69,7 @@ export async function POST(
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
             <h3 style="color: #1a1a1a;">New message from Kondwani</h3>
-            <p style="white-space: pre-wrap; background-color: #f9f9f9; padding: 15px; border-left: 4px solid #0A0A0A; border-radius: 4px; font-style: italic;">"${body.content}"</p>
+            <p style="white-space: pre-wrap; background-color: #f9f9f9; padding: 15px; border-left: 4px solid #0A0A0A; border-radius: 4px; font-style: italic;">"${escapeHtml(body.content)}"</p>
             <p>You can reply directly in the client portal:</p>
             <div style="text-align: center; margin: 20px 0;">
               <a href="${portalUrl}" style="background-color: #0A0A0A; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Open Client Portal</a>

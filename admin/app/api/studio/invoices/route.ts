@@ -2,18 +2,16 @@ import { NextResponse } from "next/server"
 import { db, document, documentItem } from "@/lib/db"
 import { createClient } from "@/lib/supabase/server"
 import { nanoid } from "nanoid"
+import { z } from "zod"
+import { writable } from "@/lib/db/writable"
+import { parseBody, lineItems } from "@/lib/validation"
+import { nextDocumentNumber, toItemRows } from "@/lib/documents"
 
-async function nextNumber(type: "invoice" | "quote") {
-  const prefix = type === "invoice" ? "INV" : "QUO"
-  const last = await db.query.document.findFirst({
-    where: (t, { eq }) => eq(t.type, type),
-    orderBy: (t, { desc }) => desc(t.number),
-    columns: { number: true },
-  })
-  if (!last) return `${prefix}-001`
-  const n = parseInt(last.number.split("-")[1] ?? "0", 10)
-  return `${prefix}-${String(n + 1).padStart(3, "0")}`
-}
+const createSchema = z.looseObject({
+  type: z.enum(["invoice", "quote"]),
+  clientId: z.string().min(1, "Choose a client"),
+  items: lineItems.optional(),
+})
 
 export async function GET() {
   const supabase = await createClient()
@@ -36,26 +34,22 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { items, ...body } = await request.json()
-  const number = await nextNumber(body.type)
+  const parsed = await parseBody(request, createSchema)
+  if (parsed.error) return parsed.error
+  const { items, ...body } = parsed.data
+  const number = await nextDocumentNumber(body.type)
   const token = nanoid(10)
 
   const docId = await db.transaction(async (tx) => {
     const [inserted] = await tx.insert(document).values({
-      ...body,
+      ...writable(document, body),
+      type: body.type,
+      clientId: body.clientId,
       number,
       token,
     }).returning()
 
-    const rows = (items ?? []).map((item: { description: string; quantity: number; rate: number; flat?: boolean; position?: number }) => ({
-      documentId: inserted.id,
-      description: item.description,
-      quantity: item.quantity,
-      rate: item.rate,
-      flat: item.flat ?? false,
-      amount: item.flat ? item.rate : item.quantity * item.rate,
-      position: item.position ?? 0,
-    }))
+    const rows = toItemRows(inserted.id, items ?? [])
     if (rows.length > 0) await tx.insert(documentItem).values(rows)
 
     return inserted.id
