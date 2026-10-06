@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -16,6 +17,7 @@ import {
 } from "@mui/icons-material"
 import { Tooltip } from "@/components/ui/Tooltip"
 import { toast } from "@/lib/toast"
+import { apiFetch, errorText } from "@/lib/http"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -251,9 +253,19 @@ function TaskCard({ task, onStatusMove, onDelete }: {
     <div className="bg-white rounded-3xl p-3 group shadow-md hover:shadow-md transition-all">
       <p className={`text-sm mb-2 ${task.status === "done" ? "line-through text-muted" : "text-foreground"}`}>{task.title}</p>
       <div className="flex items-center justify-between">
-        <Tooltip content={PRIORITY_TIPS[task.priority] ?? task.priority}>
-          <span className={`text-[10px] font-bold uppercase cursor-default ${PRIORITY_COLORS[task.priority] ?? "text-muted"}`}>{task.priority}</span>
-        </Tooltip>
+        <div className="flex items-center gap-2">
+          <Tooltip content={PRIORITY_TIPS[task.priority] ?? task.priority}>
+            <span className={`text-[10px] font-bold uppercase cursor-default ${PRIORITY_COLORS[task.priority] ?? "text-muted"}`}>{task.priority}</span>
+          </Tooltip>
+          <select
+            value={task.status}
+            onChange={e => onStatusMove(task.id, e.target.value)}
+            aria-label="Move task"
+            className="text-[10px] font-semibold text-muted bg-surface rounded-full px-2 py-0.5 outline-none cursor-pointer"
+          >
+            {TASK_STATUSES.map(st => <option key={st} value={st}>{TASK_STATUS_LABELS[st]}</option>)}
+          </select>
+        </div>
         <button onClick={() => onDelete(task.id)} className="opacity-0 group-hover:opacity-100 text-muted hover:!text-danger transition-colors">
           <Delete sx={{ fontSize: 14 }} />
         </button>
@@ -320,11 +332,24 @@ function MilestoneRow({ milestone, onInvoice, onDelete }: {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
+const CONTRACT_TEMPLATES: Record<string, { title: string; content: string }> = {
+  web_dev: {
+    title: "Web Development Services Agreement",
+    content: `WEB DEVELOPMENT AGREEMENT\n\nThis Web Development Agreement (the "Agreement") is entered into by and between Kondwani Muwowo ("Developer") and the Client named in this project.\n\n1. Services & Scope\nDeveloper agrees to perform the web development services described in the project tasks and milestones. Any additional work outside this scope will require a new agreement or written change order.\n\n2. Compensation & Payment\nClient agrees to pay Developer according to the agreed billing type (Fixed-Price Milestones or Retainer Agreement). For Fixed-Price projects, payments are due upon completion of each milestone. For Retainers, payment is due on the recurring billing date.\n\n3. Intellectual Property\nUpon final payment, all intellectual property rights in the custom code and deliverables created by Developer for Client under this Agreement will transfer to the Client. Developer retains rights to developer tools, library components, and pre-existing code.\n\n4. Client Responsibilities\nClient agrees to provide all necessary assets, copy, credentials, and feedback in a timely manner. Developer is not responsible for project delays caused by client responsiveness.\n\n5. Termination\nEither party may terminate this agreement with 14 days written notice if the other party breaches any material term and fails to cure it.\n\nBy signing below, both parties agree to the terms of this Agreement.`
+  },
+  web_design: {
+    title: "UI/UX Design Services Agreement",
+    content: `UI/UX DESIGN AGREEMENT\n\nThis Agreement is between Kondwani Muwowo ("Designer") and the Client.\n\n1. Scope of Work\nDesigner will provide professional user interface and user experience design services including wireframes, mockups, design systems, and interactive prototypes.\n\n2. Revisions\nUp to 3 rounds of design revisions are included in the project scope. Additional revision cycles will be billed at standard hourly rates.\n\n3. Source Files\nSource Figma files and assets will be delivered to the Client upon receipt of final project payment.`
+  },
+  retainer: {
+    title: "Ongoing Support & Maintenance Retainer Agreement",
+    content: `RECURRING RETAINER AGREEMENT\n\nThis Retainer Agreement is between Kondwani Muwowo ("Developer") and the Client.\n\n1. Services & Scope\nDeveloper will provide ongoing design, development, maintenance, and support services on a retainer basis. The scope of work is limited to the hours/tasks specified in the retainer plan.\n\n2. Monthly Retainer Fee\nClient agrees to pay the recurring retainer amount in advance of each billing period. Invoices will be generated automatically and are due upon receipt.\n\n3. Unused Hours\nUnused retainer hours do not roll over to the next month unless agreed in writing.\n\n4. Termination\nEither party may terminate this recurring agreement with 30 days written notice.`
+  }
+}
 export default function WorkDetailPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  const [project, setProject] = useState<WorkProject | null>(null)
-  const [tasks, setTasks] = useState<WorkTask[]>([])
+  const queryClient = useQueryClient()
   const [taskView, setTaskView] = useState<"list" | "board">("list")
   const [newTaskTitle, setNewTaskTitle] = useState("")
   const [editingTitle, setEditingTitle] = useState(false)
@@ -334,122 +359,64 @@ export default function WorkDetailPage() {
 
   const [activeTab, setActiveTab] = useState<"tasks" | "billing" | "contracts" | "chat">("tasks")
 
-  // Milestones State
-  const [milestones, setMilestones] = useState<BillingMilestone[]>([])
+  // Milestones form
   const [newMilestoneTitle, setNewMilestoneTitle] = useState("")
   const [newMilestonePercentage, setNewMilestonePercentage] = useState<number | "">("")
   const [newMilestoneAmount, setNewMilestoneAmount] = useState<number | "">("")
   const [newMilestoneDueDate, setNewMilestoneDueDate] = useState("")
 
-  // Retainer State
-  const [retainer, setRetainer] = useState<RetainerContract | null>(null)
+  // Retainer form
   const [newRetainerTitle, setNewRetainerTitle] = useState("")
   const [newRetainerAmount, setNewRetainerAmount] = useState<number | "">("")
   const [newRetainerFrequency, setNewRetainerFrequency] = useState("monthly")
   const [newRetainerStartDate, setNewRetainerStartDate] = useState("")
   const [newRetainerEndDate, setNewRetainerEndDate] = useState("")
 
-  // Contracts State
-  const [contracts, setContracts] = useState<Contract[]>([])
+  // Contracts form
   const [newContractTitle, setNewContractTitle] = useState("")
   const [newContractContent, setNewContractContent] = useState("")
   const [selectedTemplate, setSelectedTemplate] = useState("")
   const [editingContractId, setEditingContractId] = useState<string | null>(null)
 
-  // Messages State
-  const [messages, setMessages] = useState<ProjectMessage[]>([])
+  // Messages form
   const [newMessageContent, setNewMessageContent] = useState("")
   const [sendingMessage, setSendingMessage] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
-  // Load project details
-  async function load() {
-    const res = await fetch(`/api/studio/work/${id}`)
-    const data = await res.json()
-    setProject(data)
-    setTasks(data.tasks ?? [])
-    setTitle(data.title)
-    setDesc(data.description ?? "")
+  const keys = {
+    project: ["work-project", id],
+    milestones: ["work-milestones", id],
+    retainer: ["work-retainer", id],
+    contracts: ["work-contracts", id],
+    messages: ["work-messages", id],
   }
 
-  // Load Milestones
-  async function loadMilestones() {
-    try {
-      const res = await fetch(`/api/studio/work/${id}/milestones`)
-      if (res.ok) {
-        const data = await res.json()
-        setMilestones(data)
-      }
-    } catch {
-      // network failure — milestones panel stays empty
-    }
-  }
+  const projectQuery = useQuery({
+    queryKey: keys.project,
+    queryFn: () => apiFetch<WorkProject>(`/api/studio/work/${id}`),
+  })
+  const project = projectQuery.data
+  const tasks = project?.tasks ?? []
 
-  // Load Retainer
-  async function loadRetainer() {
-    try {
-      const res = await fetch(`/api/studio/retainers?projectId=${id}`)
-      if (res.ok) {
-        const data = await res.json()
-        setRetainer(data[0] || null)
-        if (data[0]) {
-          setNewRetainerTitle(data[0].title)
-          setNewRetainerAmount(data[0].amount)
-          setNewRetainerFrequency(data[0].frequency)
-        }
-      }
-    } catch {
-      // network failure — retainer panel stays empty
-    }
-  }
-
-  // Load Contracts
-  async function loadContracts() {
-    try {
-      const res = await fetch(`/api/studio/work/${id}/contracts`)
-      if (res.ok) {
-        const data = await res.json()
-        setContracts(data)
-      }
-    } catch {
-      // network failure — contracts panel stays empty
-    }
-  }
-
-  // Load Messages
-  async function loadMessages() {
-    try {
-      const res = await fetch(`/api/studio/work/${id}/messages`)
-      if (res.ok) {
-        const data = await res.json()
-        setMessages(data)
-      }
-    } catch {
-      // network failure — messages panel stays empty
-    }
-  }
-
-  useEffect(() => {
-    load()
-    loadMilestones()
-    loadRetainer()
-    loadContracts()
-    loadMessages()
-  }, [id])
-
-  // Poll chat messages every 5 seconds when chat tab is active
-  useEffect(() => {
-    let interval: NodeJS.Timeout
-    if (activeTab === "chat") {
-      loadMessages()
-      interval = setInterval(loadMessages, 5000)
-    }
-    return () => {
-      if (interval) clearInterval(interval)
-    }
-  }, [activeTab])
+  const { data: milestones = [] } = useQuery({
+    queryKey: keys.milestones,
+    queryFn: () => apiFetch<BillingMilestone[]>(`/api/studio/work/${id}/milestones`),
+  })
+  const { data: retainer = null } = useQuery({
+    queryKey: keys.retainer,
+    queryFn: async () => (await apiFetch<RetainerContract[]>(`/api/studio/retainers?projectId=${id}`))[0] ?? null,
+  })
+  const { data: contracts = [] } = useQuery({
+    queryKey: keys.contracts,
+    queryFn: () => apiFetch<Contract[]>(`/api/studio/work/${id}/contracts`),
+  })
+  const { data: messages = [] } = useQuery({
+    queryKey: keys.messages,
+    queryFn: () => apiFetch<ProjectMessage[]>(`/api/studio/work/${id}/messages`),
+    refetchInterval: activeTab === "chat" ? 5000 : false,
+  })
 
   // Scroll to chat bottom
   useEffect(() => {
@@ -458,26 +425,49 @@ export default function WorkDetailPage() {
     }
   }, [messages, activeTab])
 
+  const reload = (key: readonly unknown[]) => queryClient.invalidateQueries({ queryKey: key })
+
+  // Optimistic edits write to the cache; a failed request reloads the real state.
+  function setTasks(update: WorkTask[] | ((prev: WorkTask[]) => WorkTask[])) {
+    queryClient.setQueryData<WorkProject>(keys.project, p =>
+      p && { ...p, tasks: typeof update === "function" ? update(p.tasks ?? []) : update })
+  }
+
+  async function run(action: () => Promise<unknown>, { refresh = [] as (readonly unknown[])[], fallback = "Something went wrong" } = {}) {
+    try {
+      await action()
+      return true
+    } catch (e) {
+      toast.error(errorText(e, fallback))
+      return false
+    } finally {
+      await Promise.all(refresh.map(reload))
+    }
+  }
+
   async function patchProject(body: Record<string, unknown>) {
-    await fetch(`/api/studio/work/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    })
-    load()
+    await run(() => apiFetch(`/api/studio/work/${id}`, { method: "PUT", body, action: "Update" }), { refresh: [keys.project] })
+    queryClient.invalidateQueries({ queryKey: ["work-projects"] })
   }
 
   // Tasks Handlers
+  async function createTask(taskTitle: string, status = "todo") {
+    await run(
+      () => apiFetch(`/api/studio/work/${id}/tasks`, { method: "POST", body: { title: taskTitle, status }, action: "Add task" }),
+      { refresh: [keys.project] },
+    )
+  }
+
   async function addTask(status = "todo") {
     const t = newTaskTitle.trim()
     if (!t) return
     setNewTaskTitle("")
-    await fetch(`/api/studio/work/${id}/tasks`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: t, status }),
-    })
-    load()
+    await createTask(t, status)
+  }
+
+  async function updateTask(taskId: string, body: Record<string, unknown>) {
+    const ok = await run(() => apiFetch(`/api/studio/tasks/${taskId}`, { method: "PATCH", body, action: "Update task" }))
+    if (!ok) reload(keys.project)
   }
 
   async function cycleStatus(taskId: string) {
@@ -486,34 +476,23 @@ export default function WorkDetailPage() {
     const idx = TASK_STATUSES.indexOf(task.status)
     const next = TASK_STATUSES[(idx + 1) % TASK_STATUSES.length]
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: next } : t))
-    await fetch(`/api/studio/tasks/${taskId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: next }),
-    })
+    await updateTask(taskId, { status: next })
   }
 
   async function moveTaskStatus(taskId: string, status: string) {
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status } : t))
-    await fetch(`/api/studio/tasks/${taskId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    })
+    await updateTask(taskId, { status })
   }
 
   async function deleteTask(taskId: string) {
     setTasks(prev => prev.filter(t => t.id !== taskId))
-    await fetch(`/api/studio/tasks/${taskId}`, { method: "DELETE" })
+    const ok = await run(() => apiFetch(`/api/studio/tasks/${taskId}`, { method: "DELETE", action: "Delete task" }))
+    if (!ok) reload(keys.project)
   }
 
   async function saveTaskTitle(taskId: string, newTitle: string) {
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, title: newTitle } : t))
-    await fetch(`/api/studio/tasks/${taskId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newTitle }),
-    })
+    await updateTask(taskId, { title: newTitle })
   }
 
   async function handleTaskDragEnd(event: DragEndEvent) {
@@ -522,22 +501,15 @@ export default function WorkDetailPage() {
     const oldIndex = tasks.findIndex(t => t.id === active.id)
     const newIndex = tasks.findIndex(t => t.id === over.id)
     if (oldIndex === -1 || newIndex === -1) return
-    const reordered = arrayMove(tasks, oldIndex, newIndex)
-    setTasks(reordered)
-    await fetch(`/api/studio/tasks/${active.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ position: newIndex }),
-    })
+    setTasks(arrayMove(tasks, oldIndex, newIndex))
+    await updateTask(String(active.id), { position: newIndex })
   }
 
   async function deleteProject() {
     if (!confirm("Delete this project and all its tasks?")) return
-    const res = await fetch(`/api/studio/work/${id}`, { method: "DELETE" })
-    if (!res.ok) {
-      toast.error("Could not delete the project. Please try again.")
-      return
-    }
+    const ok = await run(() => apiFetch(`/api/studio/work/${id}`, { method: "DELETE", action: "Delete project" }))
+    if (!ok) return
+    queryClient.setQueryData<{ id: string }[]>(["work-projects"], rows => rows?.filter(r => r.id !== id))
     toast.success("Project deleted")
     router.push("/work")
   }
@@ -551,46 +523,35 @@ export default function WorkDetailPage() {
       percentage: newMilestonePercentage ? parseFloat(newMilestonePercentage.toString()) : null,
       dueDate: newMilestoneDueDate || null,
     }
-    const res = await fetch(`/api/studio/work/${id}/milestones`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    })
-    if (res.ok) {
+    const ok = await run(
+      () => apiFetch(`/api/studio/work/${id}/milestones`, { method: "POST", body, action: "Add milestone" }),
+      { refresh: [keys.milestones] },
+    )
+    if (ok) {
       setNewMilestoneTitle("")
       setNewMilestoneAmount("")
       setNewMilestonePercentage("")
       setNewMilestoneDueDate("")
-      loadMilestones()
     }
   }
 
   async function deleteMilestone(mId: string) {
     if (!confirm("Delete this milestone? Any linked draft invoice will be deleted as well.")) return
-    const res = await fetch(`/api/studio/work/${id}/milestones?milestoneId=${mId}`, {
-      method: "DELETE",
-    })
-    if (res.ok) {
-      loadMilestones()
-      load()
-    } else {
-      const err = await res.json()
-      toast.error(err.error || "Failed to delete milestone")
-    }
+    const ok = await run(
+      () => apiFetch(`/api/studio/work/${id}/milestones?milestoneId=${mId}`, { method: "DELETE", action: "Delete milestone" }),
+      { refresh: [keys.milestones, keys.project] },
+    )
+    if (ok) toast.success("Milestone deleted")
   }
 
   async function invoiceMilestone(mId: string) {
-    const res = await fetch(`/api/studio/work/${id}/milestones`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "invoice", milestoneId: mId }),
-    })
-    if (res.ok) {
-      loadMilestones()
-      load()
-    } else {
-      const err = await res.json()
-      toast.error(err.error || "Failed to invoice milestone")
+    const ok = await run(
+      () => apiFetch(`/api/studio/work/${id}/milestones`, { method: "POST", body: { action: "invoice", milestoneId: mId }, action: "Create invoice" }),
+      { refresh: [keys.milestones, keys.project] },
+    )
+    if (ok) {
+      toast.success("Invoice created")
+      queryClient.invalidateQueries({ queryKey: ["invoices"] })
     }
   }
 
@@ -601,15 +562,12 @@ export default function WorkDetailPage() {
     const newIndex = milestones.findIndex(m => m.id === over.id)
     if (oldIndex === -1 || newIndex === -1) return
     const reordered = arrayMove(milestones, oldIndex, newIndex)
-    setMilestones(reordered)
-    
+    queryClient.setQueryData(keys.milestones, reordered)
     const payload = reordered.map((m, idx) => ({ id: m.id, position: idx }))
-    await fetch(`/api/studio/work/${id}/milestones`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ milestones: payload }),
-    })
-    loadMilestones()
+    await run(
+      () => apiFetch(`/api/studio/work/${id}/milestones`, { method: "PUT", body: { milestones: payload }, action: "Reorder" }),
+      { refresh: [keys.milestones] },
+    )
   }
 
   // Retainer Handlers
@@ -625,58 +583,32 @@ export default function WorkDetailPage() {
       endDate: newRetainerEndDate || null,
       status: "active",
     }
-    const res = await fetch(`/api/studio/retainers`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    })
-    if (res.ok) {
-      loadRetainer()
-    } else {
-      const err = await res.json()
-      toast.error(err.error || "Failed to create retainer")
-    }
+    const ok = await run(
+      () => apiFetch(`/api/studio/retainers`, { method: "POST", body, action: "Create retainer" }),
+      { refresh: [keys.retainer] },
+    )
+    if (ok) toast.success("Retainer created")
   }
 
   async function updateRetainerStatus(status: string) {
     if (!retainer) return
-    const res = await fetch(`/api/studio/retainers`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: retainer.id, status }),
-    })
-    if (res.ok) {
-      loadRetainer()
-    }
+    const ok = await run(
+      () => apiFetch(`/api/studio/retainers`, { method: "PUT", body: { id: retainer.id, status }, action: "Update retainer" }),
+      { refresh: [keys.retainer] },
+    )
+    if (ok) toast.success(status === "paused" ? "Retainer paused" : "Retainer resumed")
   }
 
   async function deleteRetainer() {
-    if (!confirm("Are you sure you want to cancel and delete this retainer contract?")) return
-    const res = await fetch(`/api/studio/retainers?id=${retainer?.id}`, {
-      method: "DELETE",
-    })
-    if (res.ok) {
-      setRetainer(null)
-      loadRetainer()
-    }
+    if (!retainer || !confirm("Are you sure you want to cancel and delete this retainer contract?")) return
+    const ok = await run(
+      () => apiFetch(`/api/studio/retainers?id=${retainer.id}`, { method: "DELETE", action: "Delete retainer" }),
+      { refresh: [keys.retainer] },
+    )
+    if (ok) toast.success("Retainer deleted")
   }
 
   // Contracts Handlers
-  const CONTRACT_TEMPLATES: Record<string, { title: string; content: string }> = {
-    web_dev: {
-      title: "Web Development Services Agreement",
-      content: `WEB DEVELOPMENT AGREEMENT\n\nThis Web Development Agreement (the "Agreement") is entered into by and between Kondwani Muwowo ("Developer") and the Client named in this project.\n\n1. Services & Scope\nDeveloper agrees to perform the web development services described in the project tasks and milestones. Any additional work outside this scope will require a new agreement or written change order.\n\n2. Compensation & Payment\nClient agrees to pay Developer according to the agreed billing type (Fixed-Price Milestones or Retainer Agreement). For Fixed-Price projects, payments are due upon completion of each milestone. For Retainers, payment is due on the recurring billing date.\n\n3. Intellectual Property\nUpon final payment, all intellectual property rights in the custom code and deliverables created by Developer for Client under this Agreement will transfer to the Client. Developer retains rights to developer tools, library components, and pre-existing code.\n\n4. Client Responsibilities\nClient agrees to provide all necessary assets, copy, credentials, and feedback in a timely manner. Developer is not responsible for project delays caused by client responsiveness.\n\n5. Termination\nEither party may terminate this agreement with 14 days written notice if the other party breaches any material term and fails to cure it.\n\nBy signing below, both parties agree to the terms of this Agreement.`
-    },
-    web_design: {
-      title: "UI/UX Design Services Agreement",
-      content: `UI/UX DESIGN AGREEMENT\n\nThis Agreement is between Kondwani Muwowo ("Designer") and the Client.\n\n1. Scope of Work\nDesigner will provide professional user interface and user experience design services including wireframes, mockups, design systems, and interactive prototypes.\n\n2. Revisions\nUp to 3 rounds of design revisions are included in the project scope. Additional revision cycles will be billed at standard hourly rates.\n\n3. Source Files\nSource Figma files and assets will be delivered to the Client upon receipt of final project payment.`
-    },
-    retainer: {
-      title: "Ongoing Support & Maintenance Retainer Agreement",
-      content: `RECURRING RETAINER AGREEMENT\n\nThis Retainer Agreement is between Kondwani Muwowo ("Developer") and the Client.\n\n1. Services & Scope\nDeveloper will provide ongoing design, development, maintenance, and support services on a retainer basis. The scope of work is limited to the hours/tasks specified in the retainer plan.\n\n2. Monthly Retainer Fee\nClient agrees to pay the recurring retainer amount in advance of each billing period. Invoices will be generated automatically and are due upon receipt.\n\n3. Unused Hours\nUnused retainer hours do not roll over to the next month unless agreed in writing.\n\n4. Termination\nEither party may terminate this recurring agreement with 30 days written notice.`
-    }
-  }
-
   function applyTemplate(key: string) {
     setSelectedTemplate(key)
     if (key && CONTRACT_TEMPLATES[key]) {
@@ -687,83 +619,81 @@ export default function WorkDetailPage() {
 
   async function createContract() {
     if (!newContractTitle.trim() || !newContractContent.trim()) return
-    const res = await fetch(`/api/studio/work/${id}/contracts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: newContractTitle.trim(),
-        content: newContractContent.trim(),
+    const ok = await run(
+      () => apiFetch(`/api/studio/work/${id}/contracts`, {
+        method: "POST",
+        body: { title: newContractTitle.trim(), content: newContractContent.trim() },
+        action: "Create contract",
       }),
-    })
-    if (res.ok) {
+      { refresh: [keys.contracts] },
+    )
+    if (ok) {
       setNewContractTitle("")
       setNewContractContent("")
       setSelectedTemplate("")
-      loadContracts()
+      toast.success("Contract created")
     }
   }
 
   async function sendContract(cId: string) {
-    const res = await fetch(`/api/studio/work/${id}/contracts`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contractId: cId, action: "send" }),
-    })
-    if (res.ok) {
-      loadContracts()
-    } else {
-      const err = await res.json()
-      toast.error(err.error || "Failed to send contract")
-    }
+    const ok = await run(
+      () => apiFetch(`/api/studio/work/${id}/contracts`, { method: "PUT", body: { contractId: cId, action: "send" }, action: "Send contract" }),
+      { refresh: [keys.contracts] },
+    )
+    if (ok) toast.success("Contract sent to the client")
   }
 
   async function updateContractContent(cId: string, titleStr: string, contentStr: string) {
-    const res = await fetch(`/api/studio/work/${id}/contracts`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contractId: cId, title: titleStr, content: contentStr }),
-    })
-    if (res.ok) {
+    const ok = await run(
+      () => apiFetch(`/api/studio/work/${id}/contracts`, {
+        method: "PUT",
+        body: { contractId: cId, title: titleStr, content: contentStr },
+        action: "Save contract",
+      }),
+      { refresh: [keys.contracts] },
+    )
+    if (ok) {
       setEditingContractId(null)
-      loadContracts()
+      toast.success("Contract saved")
     }
   }
 
   async function deleteContract(cId: string) {
     if (!confirm("Are you sure you want to delete this contract? Signed contracts cannot be deleted.")) return
-    const res = await fetch(`/api/studio/work/${id}/contracts?contractId=${cId}`, {
-      method: "DELETE",
-    })
-    if (res.ok) {
-      loadContracts()
-    } else {
-      const err = await res.json()
-      toast.error(err.error || "Failed to delete contract")
-    }
+    const ok = await run(
+      () => apiFetch(`/api/studio/work/${id}/contracts?contractId=${cId}`, { method: "DELETE", action: "Delete contract" }),
+      { refresh: [keys.contracts] },
+    )
+    if (ok) toast.success("Contract deleted")
   }
 
   // Messages Handlers
   async function sendMessage() {
-    if (!newMessageContent.trim() || sendingMessage) return
-    setSendingMessage(true)
     const content = newMessageContent.trim()
+    if (!content || sendingMessage) return
+    setSendingMessage(true)
     setNewMessageContent("")
-    
     try {
-      const res = await fetch(`/api/studio/work/${id}/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
-      })
-      if (res.ok) {
-        const msg = await res.json()
-        setMessages(prev => [...prev, msg])
-      }
-    } catch {
-      // send failed — user can retry
+      const msg = await apiFetch<ProjectMessage>(`/api/studio/work/${id}/messages`, { method: "POST", body: { content }, action: "Send" })
+      queryClient.setQueryData<ProjectMessage[]>(keys.messages, prev => [...(prev ?? []), msg])
+    } catch (e) {
+      setNewMessageContent(content)
+      toast.error(errorText(e, "Message not sent"))
     } finally {
       setSendingMessage(false)
     }
+  }
+
+  if (projectQuery.isError) {
+    return (
+      <div className="max-w-xl mx-auto mt-16 bg-white shadow-md rounded-3xl px-6 py-16 text-center space-y-3">
+        <p className="text-danger font-medium">Couldn&apos;t load this project.</p>
+        <button onClick={() => projectQuery.refetch()}
+          className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-hover transition-colors">
+          Retry
+        </button>
+      </div>
+    )
   }
 
   if (!project) return <div className="p-8 text-sm text-muted">Loading…</div>
@@ -795,14 +725,14 @@ export default function WorkDetailPage() {
             <input
               value={title}
               onChange={e => setTitle(e.target.value)}
-              onBlur={() => { setEditingTitle(false); if (title.trim() !== project.title) patchProject({ title: title.trim() }) }}
-              onKeyDown={e => { if (e.key === "Enter") { setEditingTitle(false); patchProject({ title: title.trim() }) } }}
+              onBlur={() => { setEditingTitle(false); if (title.trim() && title.trim() !== project.title) patchProject({ title: title.trim() }) }}
+              onKeyDown={e => { if (e.key === "Enter") e.currentTarget.blur() }}
               className="w-full text-4xl font-bold text-foreground bg-transparent outline-none shadow-[0_2px_0_0_var(--color-primary)] mb-2"
               autoFocus
             />
           ) : (
             <h1
-              onClick={() => setEditingTitle(true)}
+              onClick={() => { setTitle(project.title); setEditingTitle(true) }}
               className="text-4xl font-bold text-foreground mb-2 cursor-text hover:text-muted transition-colors"
             >
               {project.title}
@@ -814,7 +744,7 @@ export default function WorkDetailPage() {
             <textarea
               value={desc}
               onChange={e => setDesc(e.target.value)}
-              onBlur={() => { setEditingDesc(false); patchProject({ description: desc || null }) }}
+              onBlur={() => { setEditingDesc(false); if ((desc || null) !== project.description) patchProject({ description: desc || null }) }}
               rows={3}
               className="w-full text-muted text-sm bg-surface outline-none rounded-3xl p-3 resize-none mb-8"
               placeholder="Add a description"
@@ -822,10 +752,10 @@ export default function WorkDetailPage() {
             />
           ) : (
             <p
-              onClick={() => setEditingDesc(true)}
-              className={`text-sm mb-8 cursor-text hover:text-foreground transition-colors ${desc ? "text-muted" : "text-muted italic"}`}
+              onClick={() => { setDesc(project.description ?? ""); setEditingDesc(true) }}
+              className={`text-sm mb-8 cursor-text hover:text-foreground transition-colors ${project.description ? "text-muted" : "text-muted italic"}`}
             >
-              {desc || "Click to add a description"}
+              {project.description || "Click to add a description"}
             </p>
           )}
 
@@ -933,12 +863,7 @@ export default function WorkDetailPage() {
                             if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
                               const val = (e.target as HTMLInputElement).value.trim()
                               ;(e.target as HTMLInputElement).value = ""
-                              await fetch(`/api/studio/work/${id}/tasks`, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ title: val, status: col }),
-                              })
-                              load()
+                              await createTask(val, col)
                             }
                           }}
                           placeholder="+ Add task"
@@ -1051,6 +976,16 @@ export default function WorkDetailPage() {
                             type="date"
                             value={newRetainerStartDate}
                             onChange={e => setNewRetainerStartDate(e.target.value)}
+                            className="w-full mt-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-muted uppercase font-bold tracking-wider">End Date <span className="normal-case font-normal">(optional)</span></label>
+                          <input
+                            type="date"
+                            value={newRetainerEndDate}
+                            min={newRetainerStartDate || undefined}
+                            onChange={e => setNewRetainerEndDate(e.target.value)}
                             className="w-full mt-1 px-3 py-2 bg-surface border border-border rounded-3xl text-sm outline-none focus:ring-2 focus:ring-primary-tint"
                           />
                         </div>
