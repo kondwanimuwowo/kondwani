@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { Close } from "@mui/icons-material"
 import { CaseStudyForm, type CaseStudy } from "./CaseStudyForm"
 
@@ -27,7 +28,8 @@ export default function CaseStudiesPage() {
       const res = await fetch(`/api/case-studies/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      removeFromList(queryClient, ["case-studies"], id)
       toast.success("Case study deleted")
       return queryClient.invalidateQueries({ queryKey: ["case-studies"] })
     },

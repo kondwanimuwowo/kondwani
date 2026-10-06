@@ -8,6 +8,7 @@ import { ArrowBack, OpenInNew } from "@mui/icons-material"
 import { TiptapEditor } from "@/components/editor/TiptapEditor"
 import { ImageUpload } from "@/components/ui/ImageUpload"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { responseError } from "@/lib/http"
 import { uploadImage } from "@/lib/upload"
 import { BLOG_URL } from "@/lib/site"
@@ -110,6 +111,7 @@ export function PostForm({ post }: { post?: Post }) {
       if (!res.ok) throw await responseError(res, "Delete")
     },
     onSuccess: async () => {
+      removeFromList(queryClient, ["posts"], editId)
       await queryClient.invalidateQueries({ queryKey: ["posts"], refetchType: "all" })
       toast.success("Post deleted")
       router.push("/blog")

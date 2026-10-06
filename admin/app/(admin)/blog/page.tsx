@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { responseError } from "@/lib/http"
 import type { Post } from "./PostForm"
 
@@ -45,7 +46,8 @@ export default function BlogPage() {
       const res = await fetch(`/api/posts/${id}`, { method: "DELETE" })
       if (!res.ok) throw await responseError(res, "Delete")
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      removeFromList(queryClient, ["posts"], id)
       toast.success("Post deleted")
       return queryClient.invalidateQueries({ queryKey: ["posts"] })
     },

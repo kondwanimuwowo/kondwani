@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { IdeaForm, type Idea } from "./IdeaForm"
 
 async function fetchIdeas(): Promise<Idea[]> {
@@ -26,7 +27,8 @@ export default function IdeasPage() {
       const res = await fetch(`/api/ideas/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      removeFromList(queryClient, ["ideas"], id)
       toast.success("Idea deleted")
       return queryClient.invalidateQueries({ queryKey: ["ideas"] })
     },

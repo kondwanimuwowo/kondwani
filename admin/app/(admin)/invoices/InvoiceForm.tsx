@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { Add, Close } from "@mui/icons-material"
 
 type Client = { id: string; name: string; company: string | null; currency: string }
@@ -119,6 +120,7 @@ export function InvoiceForm({ document: doc, initialType, initialProjectId, init
       if (!res.ok) throw new Error()
     },
     onSuccess: async () => {
+      removeFromList(queryClient, ["invoices"], editId)
       await queryClient.invalidateQueries({ queryKey: ["invoices"], refetchType: "all" })
       toast.success("Invoice deleted")
       onDeleted?.()

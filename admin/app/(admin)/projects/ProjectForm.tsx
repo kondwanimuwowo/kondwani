@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { ImageUpload } from "@/components/ui/ImageUpload"
 import { GalleryUpload } from "@/components/ui/GalleryUpload"
 import { responseError } from "@/lib/http"
@@ -103,6 +104,7 @@ export function ProjectForm({ project, onSaved, onCancel, onDeleted }: Props) {
       if (!res.ok) throw await responseError(res, "Delete")
     },
     onSuccess: async () => {
+      removeFromList(queryClient, ["projects"], editId)
       await queryClient.invalidateQueries({ queryKey: ["projects"], refetchType: "all" })
       toast.success("Project deleted")
       onDeleted?.()

@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { ContentCopy } from "@mui/icons-material"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { responseError } from "@/lib/http"
 
 type Subscriber = { id: string; email: string; createdAt: string }
@@ -29,7 +30,8 @@ export default function SubscribersPage() {
       const res = await fetch(`/api/subscribers/${id}`, { method: "DELETE" })
       if (!res.ok) throw await responseError(res, "Remove")
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      removeFromList(queryClient, ["subscribers"], id)
       toast.success("Subscriber removed")
       return queryClient.invalidateQueries({ queryKey: ["subscribers"] })
     },

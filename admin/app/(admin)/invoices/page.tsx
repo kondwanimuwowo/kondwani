@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { Add, ContentCopy, Check, Delete } from "@mui/icons-material"
 import { Tooltip } from "@/components/ui/Tooltip"
 import { type Document } from "./InvoiceForm"
@@ -57,7 +58,8 @@ export default function InvoicesPage() {
       const res = await fetch(`/api/studio/invoices/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      removeFromList(queryClient, ["invoices"], id)
       toast.success("Invoice deleted")
       return queryClient.invalidateQueries({ queryKey: ["invoices"] })
     },

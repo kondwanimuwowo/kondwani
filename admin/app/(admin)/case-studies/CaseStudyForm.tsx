@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { responseError } from "@/lib/http"
 import { ImageUpload } from "@/components/ui/ImageUpload"
 import { GalleryUpload } from "@/components/ui/GalleryUpload"
@@ -111,6 +112,7 @@ export function CaseStudyForm({ caseStudy, onSaved, onCancel, onDeleted }: Props
       if (!res.ok) throw await responseError(res, "Delete")
     },
     onSuccess: async () => {
+      removeFromList(queryClient, ["case-studies"], editId)
       await queryClient.invalidateQueries({ queryKey: ["case-studies"], refetchType: "all" })
       toast.success("Case study deleted")
       onDeleted?.()

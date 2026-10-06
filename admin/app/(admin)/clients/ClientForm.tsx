@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { responseError } from "@/lib/http"
 
 export type Client = {
@@ -84,6 +85,7 @@ export function ClientForm({ client, onSaved, onCancel, onDeleted }: Props) {
       if (!res.ok) throw await responseError(res, "Delete")
     },
     onSuccess: async () => {
+      removeFromList(queryClient, ["clients"], editId)
       await queryClient.invalidateQueries({ queryKey: ["clients"], refetchType: "all" })
       toast.success("Client deleted")
       onDeleted?.()

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { responseError } from "@/lib/http"
 
 export type Idea = { id: string; title: string; body?: string | null; tags: string[]; createdAt: string }
@@ -54,6 +55,7 @@ export function IdeaForm({ idea, onSaved, onCancel, onDeleted }: Props) {
       if (!res.ok) throw await responseError(res, "Delete")
     },
     onSuccess: async () => {
+      removeFromList(queryClient, ["ideas"], editId)
       await queryClient.invalidateQueries({ queryKey: ["ideas"], refetchType: "all" })
       toast.success("Idea deleted")
       onDeleted?.()

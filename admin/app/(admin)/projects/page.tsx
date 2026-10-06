@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { Close } from "@mui/icons-material"
 import { ProjectForm, type Project } from "./ProjectForm"
 
@@ -28,7 +29,8 @@ export default function ProjectsPage() {
       const res = await fetch(`/api/projects/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      removeFromList(queryClient, ["projects"], id)
       toast.success("Project deleted")
       return queryClient.invalidateQueries({ queryKey: ["projects"] })
     },

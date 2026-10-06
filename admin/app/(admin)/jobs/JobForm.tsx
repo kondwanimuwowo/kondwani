@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/lib/toast"
+import { removeFromList } from "@/lib/queries"
 import { responseError } from "@/lib/http"
 
 export type Job = {
@@ -64,6 +65,7 @@ export function JobForm({ job, onSaved, onCancel, onDeleted }: Props) {
       if (!res.ok) throw await responseError(res, "Delete")
     },
     onSuccess: async () => {
+      removeFromList(queryClient, ["jobs"], editId)
       await queryClient.invalidateQueries({ queryKey: ["jobs"], refetchType: "all" })
       toast.success("Application deleted")
       onDeleted?.()
