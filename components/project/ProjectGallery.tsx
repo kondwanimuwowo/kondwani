@@ -36,8 +36,8 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
 
   return (
     <div role="region" aria-roledescription="carousel" aria-label={`${alt} screens`} tabIndex={0} onKeyDown={onKeyDown} className="outline-none">
-      {/* Side screens fade into the page edges; padding keeps the shadows inside the mask */}
-      <div className="-my-16 py-16 md:[mask-image:linear-gradient(to_right,transparent,black_22%,black_78%,transparent)]">
+      {/* Fully opaque across the 800px content column, fading out through the gutters; padding keeps the shadows inside the mask */}
+      <div className="-my-16 py-16 md:[mask-image:linear-gradient(to_right,transparent,black_calc(50%_-_400px),black_calc(50%_+_400px),transparent)]">
         <div className="relative mx-auto aspect-[4/3] w-[80%] md:aspect-[16/10] md:w-[52%]">
           {images.map((src, i) => {
             const d = offsetOf(i)
