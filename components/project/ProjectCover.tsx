@@ -23,15 +23,15 @@ export function ProjectCover({ images, alt, host }: ProjectCoverProps) {
         initial={{ opacity: 0, y: 48 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
-        className="block aspect-[4/3] w-full cursor-zoom-in md:aspect-[16/10]"
+        className="block w-full cursor-zoom-in"
       >
         <BrowserFrame
           src={images[0]}
           alt={alt}
           host={host}
-          sizes="(max-width: 896px) 100vw, 896px"
+          sizes="(max-width: 768px) 100vw, 768px"
           priority
-          pan
+          autoHeight
         />
       </motion.button>
       <Lightbox images={images} index={open} alt={alt} onIndexChange={setOpen} />

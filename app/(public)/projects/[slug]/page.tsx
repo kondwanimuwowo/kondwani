@@ -93,7 +93,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             >
               <ArrowBack sx={{ fontSize: 16 }} /> All projects
             </Link>
-            <h1 className="mb-6 text-3xl font-bold tracking-tight text-white md:text-5xl">{proj.title}</h1>
+            <h1 className="mb-6 text-2xl font-bold tracking-tight text-white md:text-4xl">{proj.title}</h1>
             {proj.excerpt && (
               <p className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-primary-tint">{proj.excerpt}</p>
             )}
@@ -116,7 +116,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
         {/* Cover in a browser frame, overlapping the band */}
         {cover && (
-          <div className="container-custom relative z-10 -mt-24 max-w-4xl md:-mt-36">
+          <div className="container-custom relative z-10 -mt-24 max-w-3xl md:-mt-36">
             <ProjectCover images={allImages} alt={alt} host={host} />
           </div>
         )}
