@@ -36,45 +36,48 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
 
   return (
     <div role="region" aria-roledescription="carousel" aria-label={`${alt} screens`} tabIndex={0} onKeyDown={onKeyDown} className="outline-none">
-      <div className="relative mx-auto aspect-[4/3] w-[80%] md:aspect-[16/10] md:w-[52%]">
-        {images.map((src, i) => {
-          const d = offsetOf(i)
-          const isActive = d === 0
-          const visible = Math.abs(d) <= 1
-          return (
-            <motion.div
-              key={src}
-              aria-hidden={!isActive}
-              initial={false}
-              animate={{
-                x: `${d * 62}%`,
-                scale: isActive ? 1 : 0.8,
-                opacity: visible ? 1 : 0,
-                filter: isActive ? "grayscale(0)" : "grayscale(1)",
-              }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              style={{ zIndex: 10 - Math.abs(d), pointerEvents: visible ? "auto" : "none" }}
-              drag={isActive && count > 1 ? "x" : false}
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.2}
-              onDragEnd={(_, info) => {
-                if (info.offset.x < -SWIPE_THRESHOLD) go(1)
-                if (info.offset.x > SWIPE_THRESHOLD) go(-1)
-              }}
-              onTap={() => (isActive ? setLightbox(i) : setActive(i))}
-              className={`absolute inset-0 ${isActive ? "cursor-zoom-in" : "cursor-pointer"}`}
-            >
-              <BrowserFrame
-                src={src}
-                alt={`${alt}, screen ${i + 1}`}
-                host={host}
-                sizes="(max-width: 768px) 80vw, 52vw"
-                pan={isActive}
-                elevation={isActive ? "lifted" : "flat"}
-              />
-            </motion.div>
-          )
-        })}
+      {/* Side screens fade into the page edges; padding keeps the shadows inside the mask */}
+      <div className="-my-16 py-16 md:[mask-image:linear-gradient(to_right,transparent,black_22%,black_78%,transparent)]">
+        <div className="relative mx-auto aspect-[4/3] w-[80%] md:aspect-[16/10] md:w-[52%]">
+          {images.map((src, i) => {
+            const d = offsetOf(i)
+            const isActive = d === 0
+            const visible = Math.abs(d) <= 1
+            return (
+              <motion.div
+                key={src}
+                aria-hidden={!isActive}
+                initial={false}
+                animate={{
+                  x: `${d * 62}%`,
+                  scale: isActive ? 1 : 0.8,
+                  opacity: visible ? 1 : 0,
+                  filter: isActive ? "grayscale(0)" : "grayscale(1)",
+                }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                style={{ zIndex: 10 - Math.abs(d), pointerEvents: visible ? "auto" : "none" }}
+                drag={isActive && count > 1 ? "x" : false}
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.2}
+                onDragEnd={(_, info) => {
+                  if (info.offset.x < -SWIPE_THRESHOLD) go(1)
+                  if (info.offset.x > SWIPE_THRESHOLD) go(-1)
+                }}
+                onTap={() => (isActive ? setLightbox(i) : setActive(i))}
+                className={`absolute inset-0 ${isActive ? "cursor-zoom-in" : "cursor-pointer"}`}
+              >
+                <BrowserFrame
+                  src={src}
+                  alt={`${alt}, screen ${i + 1}`}
+                  host={host}
+                  sizes="(max-width: 768px) 80vw, 52vw"
+                  pan={isActive}
+                  elevation={isActive ? "lifted" : "flat"}
+                />
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
 
       <div className="mt-12 flex items-center justify-center gap-4">
