@@ -36,8 +36,10 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
 
   return (
     <div role="region" aria-roledescription="carousel" aria-label={`${alt} screens`} tabIndex={0} onKeyDown={onKeyDown} className="outline-none">
-      {/* Fully opaque across the 800px content column, fading out through the gutters; padding keeps the shadows inside the mask */}
-      <div className="-my-16 py-16 md:[mask-image:linear-gradient(to_right,transparent,black_calc(50%_-_400px),black_calc(50%_+_400px),transparent)]">
+      {/* Fully opaque across the 800px content column, fading out through the gutters.
+          The padding is deeper than the lifted shadow so the mask never clips it, and the
+          wrapper ignores clicks so it doesn't cover the controls; the frames opt back in. */}
+      <div className="pointer-events-none -my-32 py-32 md:[mask-image:linear-gradient(to_right,transparent,black_calc(50%_-_400px),black_calc(50%_+_400px),transparent)]">
         <div className="relative mx-auto aspect-[4/3] w-[80%] md:aspect-[16/10] md:w-[52%]">
           {images.map((src, i) => {
             const d = offsetOf(i)
@@ -80,7 +82,7 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
         </div>
       </div>
 
-      <div className="mt-12 flex items-center justify-center gap-4">
+      <div className="relative z-10 mt-12 flex items-center justify-center gap-4">
         {count > 1 && (
           <button
             type="button"
