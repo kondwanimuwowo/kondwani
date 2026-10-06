@@ -1,9 +1,9 @@
 import Link from "next/link"
-import { db, project, contactSubmission, jobApplication, idea, workProject } from "@/lib/db"
+import { db, project, contactSubmission, jobApplication, idea, workProject, blogPost, newsletterSubscriber } from "@/lib/db"
 import { count, eq, inArray } from "drizzle-orm"
 import {
   Code, Mail, Article, Lightbulb,
-  ChevronRight, Message, ViewKanban, RequestQuote,
+  ChevronRight, Message, ViewKanban, RequestQuote, EditNote, MarkEmailRead,
 } from "@mui/icons-material"
 
 export const dynamic = "force-dynamic"
@@ -16,6 +16,9 @@ export default async function DashboardPage() {
     [{ count: ideas }],
     [{ count: activeWork }],
     unpaidDocs,
+    [{ count: publishedPosts }],
+    [{ count: draftPosts }],
+    [{ count: subscribers }],
   ] = await Promise.all([
     db.select({ count: count() }).from(project),
     db.select({ count: count() }).from(contactSubmission).where(eq(contactSubmission.read, false)),
@@ -26,12 +29,21 @@ export default async function DashboardPage() {
       where: (t, { eq, and, inArray }) => and(eq(t.type, "invoice"), inArray(t.status, ["sent", "draft"])),
       with: { items: { columns: { amount: true } } },
     }),
+    db.select({ count: count() }).from(blogPost).where(eq(blogPost.published, true)),
+    db.select({ count: count() }).from(blogPost).where(eq(blogPost.published, false)),
+    db.select({ count: count() }).from(newsletterSubscriber),
   ])
 
-  const unpaidTotal = unpaidDocs.reduce((sum: number, doc) => {
-    const sub = doc.items.reduce((s: number, i: { amount: number }) => s + i.amount, 0)
-    return sum + sub
-  }, 0)
+  // Totals include tax and stay per currency rather than mixing them.
+  const unpaidByCurrency = new Map<string, number>()
+  for (const doc of unpaidDocs) {
+    const subtotal = doc.items.reduce((s, i) => s + i.amount, 0)
+    unpaidByCurrency.set(doc.currency, (unpaidByCurrency.get(doc.currency) ?? 0) + subtotal * (1 + doc.taxRate / 100))
+  }
+  const unpaidLabel = [...unpaidByCurrency]
+    .filter(([, amount]) => amount > 0)
+    .map(([currency, amount]) => `${currency} ${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
+    .join(" + ") || null
 
   const recentContacts = await db.query.contactSubmission.findMany({
     orderBy: (t, { desc }) => desc(t.createdAt),
@@ -47,7 +59,12 @@ export default async function DashboardPage() {
 
   const studioStats = [
     { label: "Active Work", value: activeWork, icon: ViewKanban, href: "/work", color: "bg-info-bg text-info", urgent: false, sub: "in progress" },
-    { label: "Unpaid Invoices", value: unpaidDocs.length, icon: RequestQuote, href: "/invoices", color: "bg-warning-bg text-warning", urgent: unpaidDocs.length > 0, sub: unpaidTotal > 0 ? `USD ${unpaidTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : null },
+    { label: "Unpaid Invoices", value: unpaidDocs.length, icon: RequestQuote, href: "/invoices", color: "bg-warning-bg text-warning", urgent: unpaidDocs.length > 0, sub: unpaidLabel },
+  ]
+
+  const blogStats = [
+    { label: "Published Posts", value: publishedPosts, icon: EditNote, href: "/blog", color: "bg-success-bg text-success", sub: draftPosts > 0 ? `${draftPosts} draft${draftPosts === 1 ? "" : "s"}` : null },
+    { label: "Subscribers", value: subscribers, icon: MarkEmailRead, href: "/blog/subscribers", color: "bg-info-bg text-info", sub: null },
   ]
 
   return (
@@ -114,6 +131,23 @@ export default async function DashboardPage() {
             )}
           </Link>
         ))}
+        </div>
+      </div>
+
+      {/* Blog stats */}
+      <div>
+        <p className="text-[10px] font-bold tracking-widest uppercase text-muted mb-3">Blog</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {blogStats.map(({ label, value, icon: Icon, href, color, sub }) => (
+            <Link key={label} href={href} className="bg-white p-5 hover:shadow-md transition-all rounded-3xl shadow-md">
+              <div className={`inline-flex p-2.5 rounded-3xl ${color} mb-4`}>
+                <Icon sx={{ fontSize: 20 }} />
+              </div>
+              <p className="text-3xl font-extrabold text-foreground tracking-tight">{value}</p>
+              <p className="text-sm font-medium text-muted mt-1">{label}</p>
+              {sub && <p className="text-xs text-muted mt-0.5">{sub}</p>}
+            </Link>
+          ))}
         </div>
       </div>
 

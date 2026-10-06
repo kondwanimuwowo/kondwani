@@ -1,5 +1,5 @@
 import { db } from "@/lib/db"
-import { MarkReadButton } from "./MarkReadButton"
+import { ContactActions } from "./ContactActions"
 
 export const dynamic = "force-dynamic"
 
@@ -28,9 +28,7 @@ export default async function ContactsPage() {
           {contacts.map((c) => (
             <div
               key={c.id}
-              className={`bg-white rounded-3xl p-6 hover:shadow-md transition-all duration-200 ${
-                !c.read ? "shadow-md" : "shadow-md"
-              }`}
+              className="bg-white rounded-3xl p-6 shadow-md"
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                 <div>
@@ -48,7 +46,6 @@ export default async function ContactsPage() {
                 </div>
                 <div className="flex items-center gap-3 self-start sm:self-center shrink-0">
                   <time className="text-xs text-muted font-semibold">{formatDate(c.createdAt)}</time>
-                  {!c.read && <MarkReadButton id={c.id} />}
                 </div>
               </div>
 
@@ -68,6 +65,7 @@ export default async function ContactsPage() {
                 >
                   Reply via email
                 </a>
+                <ContactActions id={c.id} read={c.read} name={c.name} />
               </div>
             </div>
           ))}
