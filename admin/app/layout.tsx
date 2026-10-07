@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://hub.kondwanimuwowo.com"),
-  title: "Admin — Kondwani Muwowo",
+  title: "Admin, Kondwani Muwowo",
   robots: { index: false, follow: false },
 }
 

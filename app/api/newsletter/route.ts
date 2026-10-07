@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL ?? "portfolio@kondwanimuwowo.com",
       to: email,
-      subject: "You're in — Kondwani Muwowo",
+      subject: "You're subscribed to Kondwani Muwowo's blog",
       text: `Hey,\n\nThanks for subscribing. I'll send occasional thoughts on design, code, and building things that matter.\n\nTalk soon,\nKondwani`,
     })
 

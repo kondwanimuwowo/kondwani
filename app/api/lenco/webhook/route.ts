@@ -79,7 +79,7 @@ export async function POST(req: Request) {
               <div style="text-align: center; margin-bottom: 20px;">
                 <span style="font-size: 24px; font-weight: 900; color: #1a1a1a;">[&lt;ondwani</span>
               </div>
-              <h2 style="color: #059669; border-bottom: 2px solid #059669; padding-bottom: 10px; text-align: center;">Payment Received — Thank You!</h2>
+              <h2 style="color: #059669; border-bottom: 2px solid #059669; padding-bottom: 10px; text-align: center;">Payment received. Thank you!</h2>
               <p>Hello ${doc.client.name},</p>
               <p>We have successfully received your payment for Invoice <strong>${doc.number}</strong> via Mobile Money.</p>
               <div style="background-color: #f0fdf4; padding: 15px; border-radius: 4px; margin: 20px 0; border: 1px solid #bbf7d0;">

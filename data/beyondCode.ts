@@ -23,7 +23,7 @@ export const organizations: Organization[] = [
     title: "TAKUZA",
     subtitle: "Talitha Kum Zambia",
     description:
-      "Serving as a Transit Monitor with the global Talitha Kum network — a Catholic religious initiative fighting human trafficking at border crossings, bus terminals, and transit hubs across Zambia.",
+      "Serving as a Transit Monitor with the global Talitha Kum network, a Catholic religious initiative fighting human trafficking at border crossings, bus terminals, and transit hubs across Zambia.",
     details: "Transit Monitor | Anti-Human Trafficking",
     logo: "/images/logos/takuza-logo.png",
     link: null,
@@ -58,7 +58,7 @@ export const lifestyle: Lifestyle[] = [
   {
     icon: "FitnessCenter",
     label: "Fitness",
-    description: "Gym 5–6 days a week",
+    description: "Gym 5 to 6 days a week",
   },
   {
     icon: "Casino",

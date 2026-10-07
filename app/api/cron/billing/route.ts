@@ -270,7 +270,7 @@ export async function GET(req: Request) {
                   </tr>
                   <tr>
                     <td style="padding: 6px 0; font-weight: bold; color: #990000;">Due Date:</td>
-                    <td style="padding: 6px 0; color: #111; font-weight: bold;">${inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : "—"}</td>
+                    <td style="padding: 6px 0; color: #111; font-weight: bold;">${inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : "Not set"}</td>
                   </tr>
                   <tr>
                     <td style="padding: 6px 0; font-weight: bold; color: #990000;">Amount Overdue:</td>
