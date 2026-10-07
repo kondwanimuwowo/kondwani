@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { ogImage, twitterCard } from "@/lib/seo"
 import { ProjectsAndCaseStudies } from "@/components/sections/ProjectsAndCaseStudies"
 import { db } from "@/lib/db"
 
@@ -6,13 +7,15 @@ export const revalidate = 300
 
 export const metadata: Metadata = {
   title: "Projects",
-  description: "Web apps, design work, and nonprofit websites by Kondwani Muwowo, a Software Developer and UI Designer based in Lusaka, Zambia.",
+  description: "Websites, online shops, booking systems, dashboards and web apps designed and built by Kondwani Muwowo for clients in Zambia.",
   alternates: { canonical: "/projects" },
   openGraph: {
-    title: "Projects — Kondwani Muwowo",
-    description: "Web apps, design work, and nonprofit websites by Kondwani Muwowo.",
+    title: "Projects, Kondwani Muwowo",
+    description: "Websites, online shops, booking systems and web apps built for clients in Zambia.",
     url: "/projects",
+    images: ogImage("page", "projects", "Projects by Kondwani Muwowo"),
   },
+  twitter: twitterCard(ogImage("page", "projects", "Projects by Kondwani Muwowo")),
 }
 
 export default async function ProjectsPage() {

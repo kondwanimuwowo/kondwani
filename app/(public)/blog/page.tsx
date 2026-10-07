@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { ogImage, twitterCard } from "@/lib/seo"
 import Link from "next/link"
 import Image from "next/image"
 import { db, blogPost } from "@/lib/db"
@@ -6,13 +7,15 @@ import { desc, eq } from "drizzle-orm"
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Thoughts on front-end development, UI design, and building purposeful digital products, by Kondwani Muwowo.",
+  description: "Notes on web development, design and building websites and web systems for businesses in Zambia, by Kondwani Muwowo.",
   alternates: { canonical: "/blog" },
   openGraph: {
-    title: "Blog — Kondwani Muwowo",
-    description: "Thoughts on front-end development, UI design, and building purposeful digital products.",
+    title: "Blog, Kondwani Muwowo",
+    description: "Notes on web development, design and building for businesses in Zambia.",
     url: "/blog",
+    images: ogImage("page", "blog", "Blog by Kondwani Muwowo"),
   },
+  twitter: twitterCard(ogImage("page", "blog", "Blog by Kondwani Muwowo")),
 }
 
 export const revalidate = 300

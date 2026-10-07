@@ -1,17 +1,20 @@
 import type { Metadata } from "next"
+import { ogImage, twitterCard } from "@/lib/seo"
 import Image from "next/image"
 import { OpenInNew, Circle, FitnessCenter, Casino } from "@mui/icons-material"
 import { organizations, lifestyle } from "@/data/beyondCode"
 
 export const metadata: Metadata = {
   title: "Beyond Code",
-  description: "Kondwani Muwowo's purpose-driven work: fighting human trafficking with TAKUZA, supporting girls' education through GAN, and teaching forex trading to Zambian communities.",
+  description: "What Kondwani Muwowo does outside client work: anti-trafficking work with TAKUZA, girls' education with the Great Achievers Network, and teaching forex trading in Zambia.",
   alternates: { canonical: "/beyond-code" },
   openGraph: {
     title: "Beyond Code, Kondwani Muwowo",
-    description: "Purpose-driven work beyond development: anti-trafficking, nonprofit design, and community education.",
+    description: "Anti-trafficking work with TAKUZA, girls' education with the Great Achievers Network, and teaching forex trading in Zambia.",
     url: "/beyond-code",
+    images: ogImage("page", "beyond-code", "Beyond code, Kondwani Muwowo"),
   },
+  twitter: twitterCard(ogImage("page", "beyond-code", "Beyond code, Kondwani Muwowo")),
 }
 
 const iconMap: Record<string, React.ElementType> = { FitnessCenter, Casino }

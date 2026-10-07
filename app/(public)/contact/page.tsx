@@ -1,15 +1,18 @@
 import type { Metadata } from "next"
+import { ogImage, twitterCard } from "@/lib/seo"
 import { ContactForm } from "@/components/sections/ContactForm"
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Get in touch with Kondwani Muwowo, available for freelance work, collaborations, and conversations about web development and UI design.",
+  description: "Get in touch with Kondwani Muwowo about a website, online shop, booking system or web app. Free 15-minute consultation.",
   alternates: { canonical: "/contact" },
   openGraph: {
     title: "Contact Kondwani Muwowo",
-    description: "Get in touch, available for freelance work, collaborations, and conversations.",
+    description: "Tell me about the website or system you need built. Free 15-minute consultation.",
     url: "/contact",
+    images: ogImage("page", "contact", "Contact Kondwani Muwowo"),
   },
+  twitter: twitterCard(ogImage("page", "contact", "Contact Kondwani Muwowo")),
 }
 
 export default function ContactPage() {

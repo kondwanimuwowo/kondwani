@@ -4,6 +4,8 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import { ArrowBack } from "@mui/icons-material"
 import { db } from "@/lib/db"
+import { SITE } from "@/data/site"
+import { breadcrumbJsonLd, ogImage, PERSON_REF, twitterCard } from "@/lib/seo"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -16,6 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const post = await db.query.blogPost.findFirst({ where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)) })
     if (!post) return {}
+    const images = ogImage("blog", slug, post.title, post.updatedAt)
     return {
       title: post.title,
       description: post.excerpt,
@@ -26,8 +29,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         url: `/blog/${slug}`,
         type: "article",
         publishedTime: post.publishedAt?.toISOString(),
-        images: post.coverImage ? [{ url: post.coverImage }] : [],
+        modifiedTime: post.updatedAt.toISOString(),
+        authors: [SITE.url],
+        images,
       },
+      twitter: twitterCard(images),
     }
   } catch {
     return {}
@@ -49,15 +55,24 @@ export default async function BlogPostPage({ params }: Props) {
     "@type": "Article",
     headline: post.title,
     description: post.excerpt,
-    author: { "@type": "Person", name: "Kondwani Muwowo", url: "https://kondwanimuwowo.com" },
+    author: PERSON_REF,
+    publisher: PERSON_REF,
     datePublished: post.publishedAt?.toISOString(),
-    image: post.coverImage,
-    url: `https://kondwanimuwowo.com/blog/${slug}`,
+    dateModified: post.updatedAt.toISOString(),
+    image: post.coverImage ?? `${SITE.url}/og/blog/${slug}`,
+    url: `${SITE.url}/blog/${slug}`,
+    mainEntityOfPage: `${SITE.url}/blog/${slug}`,
   }
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
+    { name: post.title, path: `/blog/${slug}` },
+  ])
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
       <main className="min-h-screen bg-background pt-24 pb-20">
         {post.coverImage && (
           <div className="relative h-64 md:h-96 bg-surface overflow-hidden mb-0">

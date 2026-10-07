@@ -7,6 +7,8 @@ import { and, asc, eq, isNotNull } from "drizzle-orm"
 import { AnimateIn } from "@/components/ui/AnimateIn"
 import { ProjectCover } from "@/components/project/ProjectCover"
 import { ProjectGallery } from "@/components/project/ProjectGallery"
+import { SITE } from "@/data/site"
+import { breadcrumbJsonLd, ogImage, PERSON_REF, twitterCard } from "@/lib/seo"
 
 export const revalidate = 3600
 
@@ -26,6 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const proj = await db.query.project.findFirst({ where: (t, { eq }) => eq(t.slug, slug) })
   if (!proj) return {}
+  const images = ogImage("project", slug, proj.title, proj.updatedAt)
   return {
     title: proj.title,
     description: proj.excerpt ?? proj.description,
@@ -34,8 +37,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${proj.title}, Kondwani Muwowo`,
       description: proj.excerpt ?? proj.description,
       url: `/projects/${slug}`,
-      images: proj.imageUrl ? [{ url: proj.imageUrl }] : [],
+      type: "article",
+      images,
     },
+    twitter: twitterCard(images),
   }
 }
 
@@ -46,18 +51,27 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
+    "@type": "CreativeWork",
     name: proj.title,
+    headline: proj.title,
     description: proj.excerpt ?? proj.description,
-    applicationCategory: "WebApplication",
-    author: {
-      "@type": "Person",
-      name: "Kondwani Muwowo",
-      url: "https://kondwanimuwowo.com",
-    },
-    url: proj.liveUrl,
-    operatingSystem: "Web",
+    abstract: proj.excerpt ?? undefined,
+    url: `${SITE.url}/projects/${slug}`,
+    image: [proj.imageUrl, ...(proj.gallery ?? [])].filter(Boolean),
+    creator: PERSON_REF,
+    author: PERSON_REF,
+    dateCreated: proj.year ? String(proj.year) : undefined,
+    dateModified: proj.updatedAt.toISOString(),
+    genre: proj.category,
+    keywords: proj.tech.join(", "),
+    sameAs: proj.liveUrl ?? undefined,
+    codeRepository: proj.githubUrl ?? undefined,
   }
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Projects", path: "/projects" },
+    { name: proj.title, path: `/projects/${slug}` },
+  ])
 
   const cover = proj.imageUrl ?? proj.gallery?.[0] ?? null
   const gallery = (proj.gallery ?? []).filter((src) => src !== cover)
@@ -83,6 +97,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
       <main className="min-h-screen bg-white">
         {/* Hero band */}
         <section className={`bg-primary pt-40 ${cover ? "pb-32 md:pb-48" : "pb-24"}`}>

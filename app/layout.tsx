@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { ScrollToTop } from "@/components/ui/ScrollToTop"
 import "./globals.css"
+import { SITE } from "@/data/site"
+import { ogImage } from "@/lib/seo"
 
 const inter = Inter({
   variable: "--font-inter",
@@ -11,35 +13,37 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kondwanimuwowo.com"),
+  metadataBase: new URL(SITE.url),
   title: {
-    default: "Kondwani Muwowo | Software Developer & UI Designer",
+    default: SITE.title,
     template: "%s | Kondwani Muwowo",
   },
-  description:
-    "Software Developer and UI Designer based in Lusaka, Zambia. Building clean, thoughtful, and smooth digital experiences.",
-  keywords: ["Software Developer", "UI Designer", "React", "Next.js", "Zambia", "Kondwani Muwowo"],
-  authors: [{ name: "Kondwani Muwowo" }],
-  creator: "Kondwani Muwowo",
+  description: SITE.description,
+  applicationName: SITE.name,
+  authors: [{ name: SITE.name, url: SITE.url }],
+  creator: SITE.name,
+  publisher: SITE.name,
   openGraph: {
     type: "website",
-    locale: "en_US",
-    url: "https://kondwanimuwowo.com",
-    siteName: "Kondwani Muwowo",
-    title: "Kondwani Muwowo | Software Developer & UI Designer",
-    description:
-      "Software Developer and UI Designer based in Lusaka, Zambia. Building clean, thoughtful, and smooth digital experiences.",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    locale: "en_GB",
+    url: SITE.url,
+    siteName: SITE.name,
+    title: SITE.title,
+    description: SITE.description,
+    images: ogImage("page", "home", SITE.title),
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kondwani Muwowo | Software Developer & UI Designer",
-    description: "Software Developer and UI Designer based in Lusaka, Zambia.",
-    creator: "@kondwanimuwow0",
+    title: SITE.title,
+    description: SITE.shortDescription,
+    creator: SITE.twitter,
+    site: SITE.twitter,
+    images: ogImage("page", "home", SITE.title),
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   verification: {
     other: {
