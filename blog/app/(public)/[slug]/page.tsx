@@ -3,6 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
+import { MAIN_SITE } from "@/lib/site"
 import { ArrowBack } from "@mui/icons-material"
 
 export const revalidate = 60
@@ -11,9 +12,28 @@ type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const post = await db.query.blogPost.findFirst({ where: (t, { eq }) => eq(t.slug, slug), columns: { title: true, excerpt: true } })
+  const post = await db.query.blogPost.findFirst({
+    where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)),
+    columns: { title: true, excerpt: true, publishedAt: true, updatedAt: true },
+  })
   if (!post) return {}
-  return { title: post.title, description: post.excerpt }
+  const url = `${MAIN_SITE}/blog/${slug}`
+  const images = [{ url: `${MAIN_SITE}/og/blog/${slug}?v=${post.updatedAt.getTime()}`, width: 1200, height: 630, alt: post.title }]
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      title: `${post.title}, Kondwani Muwowo`,
+      description: post.excerpt,
+      url,
+      publishedTime: post.publishedAt?.toISOString(),
+      modifiedTime: post.updatedAt.toISOString(),
+      images,
+    },
+    twitter: { card: "summary_large_image", creator: "@kondwanimuwow0", site: "@kondwanimuwow0", images },
+  }
 }
 
 export async function generateStaticParams() {
