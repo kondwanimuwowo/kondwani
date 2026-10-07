@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion, type Variants } from "motion/react"
 import { GitHub, LinkedIn, X } from "@mui/icons-material"
 import { PillLink } from "@/components/ui/PillLink"
+import { Tilt } from "@/components/ui/Tilt"
 
 const socialLinks = [
   { name: "GitHub", href: "https://github.com/kondwanimuwowo", icon: GitHub },
@@ -147,11 +148,7 @@ export function Hero() {
                 animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.1, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: 2 }}
               />
-              <motion.div
-                animate={{ y: [0, -4, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="relative w-80 h-80 xl:w-96 xl:h-96 cursor-pointer"
-              >
+              <Tilt className="relative w-80 h-80 xl:w-96 xl:h-96 cursor-pointer">
                 <Image
                   src="/kondwani.png"
                   alt="Kondwani Muwowo"
@@ -160,7 +157,7 @@ export function Hero() {
                   priority
                   sizes="(max-width: 1280px) 320px, 384px"
                 />
-              </motion.div>
+              </Tilt>
             </div>
           </motion.div>
         </div>
