@@ -9,7 +9,7 @@ export interface OgCard {
 
 const WIDTH = 1200
 const HEIGHT = 630
-const COLORS = { white: "#FFFFFF", ink: "#0A0A0A", muted: "#6B7280", primary: "#7E1416", primaryTint: "#F2E5E5", surface: "#F8F9FA", border: "#E5E7EB" }
+const COLORS = { white: "#FFFFFF", ink: "#0A0A0A", muted: "#6B7280", primary: "#7E1416", surface: "#F8F9FA", border: "#E5E7EB" }
 
 // Google serves TTF to clients that don't send a browser user agent, which is what satori needs
 async function loadInter(weight: number): Promise<ArrayBuffer> {
@@ -60,29 +60,12 @@ const RESPONSE_OPTIONS = {
   headers: { "cache-control": "public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400" },
 }
 
-// Cards without a screenshot use a centred layout on solid primary, after the Smile FX Traders cards
-function centredCard(card: OgCard) {
-  const titleSize = card.title.length > 40 ? 60 : 76
-  return (
-    <div style={{ width: WIDTH, height: HEIGHT, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: COLORS.primary, fontFamily: "Inter", padding: 96 }}>
-      <div style={{ display: "flex", fontSize: 36, fontWeight: 700, color: COLORS.white }}>[&lt;ondwani</div>
-      <div style={{ display: "flex", marginTop: 40, fontSize: titleSize, fontWeight: 700, color: COLORS.white, lineHeight: 1.1, letterSpacing: -1, textAlign: "center", justifyContent: "center" }}>
-        {clip(card.title, 80)}
-      </div>
-      {card.subtitle && (
-        <div style={{ display: "flex", marginTop: 40, padding: "12px 32px", borderRadius: 999, background: COLORS.primaryTint, color: COLORS.primary, fontSize: 26, fontWeight: 500, textAlign: "center" }}>
-          {clip(card.subtitle, 90)}
-        </div>
-      )}
-      <div style={{ display: "flex", position: "absolute", bottom: 48, fontSize: 22, fontWeight: 700, color: COLORS.primaryTint }}>kondwanimuwowo.com</div>
-    </div>
-  )
-}
-
+// Returns null when the record has no usable screenshot, so the caller can fall back to a static image
 export async function renderOgCard(card: OgCard) {
-  const [fonts, image] = await Promise.all([loadFonts(), card.image ? toDataUrl(card.image) : null])
+  const image = card.image ? await toDataUrl(card.image) : null
+  if (!image) return null
+  const fonts = await loadFonts()
   const options = { ...RESPONSE_OPTIONS, fonts: fonts.length > 0 ? fonts : undefined }
-  if (!image) return new ImageResponse(centredCard(card), options)
 
   const textWidth = 560
   const titleSize = card.title.length > 48 ? 52 : card.title.length > 28 ? 60 : 72

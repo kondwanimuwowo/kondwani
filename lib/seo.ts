@@ -2,8 +2,13 @@ import { SITE, SERVICES } from "@/data/site"
 
 export type OgCardType = "page" | "project" | "case-study" | "blog"
 
-// Share card for a page or record; `version` busts social and CDN caches when the content changes
+// Static share images made in Canva, one per top-level page, in public/images/og
+export type StaticOgPage = "home" | "projects" | "beyond-code" | "contact" | "blog"
+export const staticOgUrl = (page: StaticOgPage) => `${SITE.url}/images/og/${page}.png`
+
+// Pages use their static image; records get a generated card, with `version` busting caches when content changes
 export function ogImage(type: OgCardType, slug: string, alt: string, version?: Date | null) {
+  if (type === "page") return [{ url: staticOgUrl(slug as StaticOgPage), width: 1200, height: 630, alt }]
   const query = version ? `?v=${version.getTime()}` : ""
   return [{ url: `${SITE.url}/og/${type}/${encodeURIComponent(slug)}${query}`, width: 1200, height: 630, alt }]
 }
@@ -42,7 +47,7 @@ export function siteGraphJsonLd() {
         jobTitle: SITE.jobTitle,
         description: SITE.description,
         url: SITE.url,
-        image: `${SITE.url}/og/page/home`,
+        image: staticOgUrl("home"),
         sameAs: SITE.sameAs,
         address: { "@type": "PostalAddress", addressLocality: SITE.locality, addressCountry: SITE.countryCode },
         worksFor: { "@id": BUSINESS_ID },
@@ -50,10 +55,10 @@ export function siteGraphJsonLd() {
       {
         "@type": "ProfessionalService",
         "@id": BUSINESS_ID,
-        name: `${SITE.name}, web design and development`,
+        name: `${SITE.name}, software development`,
         description: SITE.description,
         url: SITE.url,
-        image: `${SITE.url}/og/page/home`,
+        image: staticOgUrl("home"),
         founder: { "@id": PERSON_ID },
         address: { "@type": "PostalAddress", addressLocality: SITE.locality, addressCountry: SITE.countryCode },
         areaServed: [
@@ -64,7 +69,7 @@ export function siteGraphJsonLd() {
         sameAs: SITE.sameAs,
         hasOfferCatalog: {
           "@type": "OfferCatalog",
-          name: "Web design and development services",
+          name: "Software development services",
           itemListElement: SERVICES.map((s) => ({
             "@type": "Offer",
             itemOffered: { "@type": "Service", name: s.name, description: s.description, provider: { "@id": BUSINESS_ID } },

@@ -23,14 +23,14 @@ export const metadata: Metadata = {
   twitter: twitterCard(ogImage("page", "home", SITE.title)),
 }
 
-// Mirrors questions people ask about hiring a web designer, phrased the way answer engines quote them
+// Mirrors questions people ask about hiring a developer, phrased the way answer engines quote them
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: [
     {
       q: "Who is Kondwani Muwowo?",
-      a: "Kondwani Muwowo is a web designer and developer in Lusaka, Zambia. He builds websites and web systems for businesses, churches and nonprofits.",
+      a: "Kondwani Muwowo is a software developer in Lusaka, Zambia. He builds websites and web systems for businesses, churches and nonprofits.",
     },
     {
       q: "What does Kondwani Muwowo build?",

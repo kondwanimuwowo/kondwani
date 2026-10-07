@@ -7,7 +7,7 @@ import { MAIN_SITE } from "@/lib/site"
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 const description = "Notes on web development, design and building websites and web systems for businesses in Zambia, by Kondwani Muwowo."
-const card = [{ url: `${MAIN_SITE}/og/page/blog`, width: 1200, height: 630, alt: "Blog by Kondwani Muwowo" }]
+const card = [{ url: `${MAIN_SITE}/images/og/blog.png`, width: 1200, height: 630, alt: "Blog by Kondwani Muwowo" }]
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://blog.kondwanimuwowo.com"),
