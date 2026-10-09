@@ -13,12 +13,17 @@ interface ProjectCoverProps {
 
 export function ProjectCover({ images, alt, host }: ProjectCoverProps) {
   const [open, setOpen] = useState<number | null>(null)
+  const [origin, setOrigin] = useState<{ x: number; y: number } | null>(null)
 
   return (
     <>
       <motion.button
         type="button"
-        onClick={() => setOpen(0)}
+        onClick={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect()
+          setOrigin({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
+          setOpen(0)
+        }}
         aria-label={`View ${alt} full size`}
         initial={{ opacity: 0, y: 48 }}
         animate={{ opacity: 1, y: 0 }}
@@ -36,7 +41,7 @@ export function ProjectCover({ images, alt, host }: ProjectCoverProps) {
           elevation="lifted"
         />
       </motion.button>
-      <Lightbox images={images} index={open} alt={alt} onIndexChange={setOpen} />
+      <Lightbox images={images} index={open} alt={alt} onIndexChange={setOpen} origin={origin} />
     </>
   )
 }

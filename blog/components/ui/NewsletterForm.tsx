@@ -3,10 +3,11 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { Check } from "@mui/icons-material"
+import { MorphLabel, Spinner } from "@/components/ui/MorphLabel"
 
 export function NewsletterForm() {
   const [email, setEmail] = useState("")
-  const [state, setState] = useState<"idle" | "loading" | "done">("idle")
+  const [state, setState] = useState<"idle" | "loading" | "sent" | "done">("idle")
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -21,7 +22,9 @@ export function NewsletterForm() {
         body: JSON.stringify({ email: email.trim() }),
       })
       if (!res.ok) throw new Error(res.status === 400 ? "That email address doesn't look right." : "Something went wrong. Please try again.")
-      setState("done")
+      // The button shows its check briefly before the thank-you message replaces the form
+      setState("sent")
+      setTimeout(() => setState("done"), 900)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
       setState("idle")
@@ -51,19 +54,15 @@ export function NewsletterForm() {
             />
             <button
               type="submit"
-              disabled={state === "loading"}
-              className="shrink-0 bg-primary text-white text-xs font-semibold px-5 py-2 rounded-full hover:bg-primary-hover transition-colors duration-200 disabled:opacity-60 flex items-center gap-2 cursor-pointer"
+              disabled={state === "loading" || state === "sent"}
+              className="shrink-0 min-w-40 bg-primary text-white text-xs font-semibold px-5 py-2 rounded-full hover:bg-primary-hover transition-[background-color,scale] duration-200 active:scale-[0.97] disabled:opacity-60 flex items-center justify-center cursor-pointer"
             >
-              {state === "loading" ? (
-                <>
-                  <motion.span
-                    className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 0.7, repeat: Infinity, ease: "linear" }}
-                  />
-                  Subscribing…
-                </>
-              ) : "SEND ME UPDATES"}
+              <MorphLabel
+                state={state === "loading" ? "loading" : state === "sent" ? "sent" : "idle"}
+                idle="SEND ME UPDATES"
+                loading={<><Spinner className="h-3 w-3" /> Subscribing</>}
+                sent={<><Check sx={{ fontSize: 14 }} /> Subscribed</>}
+              />
             </button>
           </motion.form>
         ) : (

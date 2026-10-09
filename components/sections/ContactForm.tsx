@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { Check } from "@mui/icons-material"
+import { MorphLabel, Spinner } from "@/components/ui/MorphLabel"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod/v4"
@@ -21,7 +23,7 @@ const inputClass =
   "w-full px-4 py-3 bg-surface border border-border rounded-3xl text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary-tint transition-colors"
 
 export function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+  const [status, setStatus] = useState<"idle" | "loading" | "sent" | "success" | "error">("idle")
 
   const {
     register,
@@ -39,8 +41,10 @@ export function ContactForm() {
         body: JSON.stringify(data),
       })
       if (!res.ok) throw new Error()
-      setStatus("success")
+      // Let the button show its check before the success panel takes over
+      setStatus("sent")
       reset()
+      setTimeout(() => setStatus("success"), 900)
     } catch {
       setStatus("error")
     }
@@ -138,15 +142,15 @@ export function ContactForm() {
 
             <motion.button
               type="submit"
-              disabled={status === "loading"}
-              className="inline-flex items-center gap-2 bg-foreground text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-primary transition-[background-color,scale] duration-200 active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={status === "loading" || status === "sent"}
+              className="inline-flex min-w-44 items-center justify-center gap-2 bg-foreground text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-primary transition-[background-color,scale] duration-200 active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {status === "loading" ? (
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <Send fontSize="small" />
-              )}
-              {status === "loading" ? "Sending…" : "Send Message"}
+              <MorphLabel
+                state={status === "loading" ? "loading" : status === "sent" ? "sent" : "idle"}
+                idle={<><Send fontSize="small" /> Send message</>}
+                loading={<><Spinner className="h-4 w-4" /> Sending</>}
+                sent={<><Check fontSize="small" /> Sent</>}
+              />
             </motion.button>
           </form>
         )}

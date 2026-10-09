@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type KeyboardEvent } from "react"
+import { useRef, useState, type KeyboardEvent } from "react"
 import { motion } from "motion/react"
 import { ArrowBack, ArrowForward, Fullscreen } from "@mui/icons-material"
 import { BrowserFrame } from "./BrowserFrame"
@@ -13,10 +13,23 @@ interface ProjectGalleryProps {
 }
 
 const SWIPE_THRESHOLD = 64
+// px/s; a quick flick changes screens even when the drag distance is short
+const FLICK_VELOCITY = 110
+// Springs carry velocity through an interrupted swipe instead of restarting
+const SPRING = { type: "spring", duration: 0.55, bounce: 0.15 } as const
 
 export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
   const [active, setActive] = useState(0)
   const [lightbox, setLightbox] = useState<number | null>(null)
+  const [origin, setOrigin] = useState<{ x: number; y: number } | null>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+
+  // The lightbox grows out of the active screen, wherever it is on the page
+  const openLightbox = (i: number) => {
+    const rect = stageRef.current?.getBoundingClientRect()
+    setOrigin(rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null)
+    setLightbox(i)
+  }
   const count = images.length
 
   const go = (step: number) => setActive((i) => (i + step + count) % count)
@@ -40,7 +53,7 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
           The padding is deeper than the lifted shadow so the mask never clips it, and the
           wrapper ignores clicks so it doesn't cover the controls; the frames opt back in. */}
       <div className="pointer-events-none -my-32 py-32 md:[mask-image:linear-gradient(to_right,transparent,black_calc(50%_-_400px),black_calc(50%_+_400px),transparent)]">
-        <div className="relative mx-auto aspect-[4/3] w-[80%] md:aspect-[16/10] md:w-[52%]">
+        <div ref={stageRef} className="relative mx-auto aspect-[4/3] w-[80%] md:aspect-[16/10] md:w-[52%]">
           {images.map((src, i) => {
             const d = offsetOf(i)
             const isActive = d === 0
@@ -56,16 +69,17 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
                   opacity: visible ? 1 : 0,
                   filter: isActive ? "grayscale(0)" : "grayscale(1)",
                 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                transition={SPRING}
                 style={{ zIndex: 10 - Math.abs(d), pointerEvents: visible ? "auto" : "none" }}
                 drag={isActive && count > 1 ? "x" : false}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.2}
                 onDragEnd={(_, info) => {
-                  if (info.offset.x < -SWIPE_THRESHOLD) go(1)
-                  if (info.offset.x > SWIPE_THRESHOLD) go(-1)
+                  const flick = Math.abs(info.velocity.x) > FLICK_VELOCITY
+                  if (info.offset.x < -SWIPE_THRESHOLD || (flick && info.velocity.x < 0)) go(1)
+                  else if (info.offset.x > SWIPE_THRESHOLD || (flick && info.velocity.x > 0)) go(-1)
                 }}
-                onTap={() => (isActive ? setLightbox(i) : setActive(i))}
+                onTap={() => (isActive ? openLightbox(i) : setActive(i))}
                 className={`absolute inset-0 ${isActive ? "cursor-zoom-in" : "cursor-pointer"}`}
               >
                 <BrowserFrame
@@ -110,14 +124,14 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
         )}
         <button
           type="button"
-          onClick={() => setLightbox(active)}
+          onClick={() => openLightbox(active)}
           className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-white transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:bg-primary"
         >
           <Fullscreen sx={{ fontSize: 18 }} /> Full size
         </button>
       </div>
 
-      <Lightbox images={images} index={lightbox} alt={alt} onIndexChange={setLightbox} />
+      <Lightbox images={images} index={lightbox} alt={alt} onIndexChange={setLightbox} origin={origin} />
     </div>
   )
 }

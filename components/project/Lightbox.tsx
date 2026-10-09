@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import Image from "next/image"
 import { AnimatePresence, motion } from "motion/react"
 import { useLenis } from "lenis/react"
+import { useReducedMotion } from "motion/react"
 import { ArrowBack, ArrowForward, Close } from "@mui/icons-material"
 
 interface LightboxProps {
@@ -11,10 +12,15 @@ interface LightboxProps {
   index: number | null
   alt: string
   onIndexChange: (index: number | null) => void
+  // Viewport point the lightbox grows out of and shrinks back into (centre of the clicked image)
+  origin?: { x: number; y: number } | null
 }
 
-export function Lightbox({ images, index, alt, onIndexChange }: LightboxProps) {
+const EASE_OUT = [0.23, 1, 0.32, 1] as const
+
+export function Lightbox({ images, index, alt, onIndexChange, origin }: LightboxProps) {
   const lenis = useLenis()
+  const reduceMotion = useReducedMotion()
   const open = index !== null
   const count = images.length
 
@@ -47,11 +53,17 @@ export function Lightbox({ images, index, alt, onIndexChange }: LightboxProps) {
           aria-modal="true"
           aria-label={`${alt}, image ${index + 1} of ${count}`}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[60] flex flex-col bg-foreground"
+          animate={{ opacity: 1, transition: { duration: 0.3, ease: EASE_OUT } }}
+          exit={{ opacity: 0, transition: { duration: 0.2, ease: EASE_OUT } }}
+          className="fixed inset-0 z-[60] bg-foreground"
         >
+          <motion.div
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, transform: "scale(0.9)" }}
+            animate={{ opacity: 1, transform: "scale(1)", transition: { duration: 0.4, ease: EASE_OUT } }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, transform: "scale(0.9)", transition: { duration: 0.2, ease: EASE_OUT } }}
+            style={{ transformOrigin: origin ? `${origin.x}px ${origin.y}px` : "50% 50%" }}
+            className="absolute inset-0 flex flex-col"
+          >
           <div className="flex shrink-0 items-center justify-between px-4 py-4 md:px-8">
             <span className="text-sm tabular-nums text-muted-dark">
               {String(index + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}
@@ -104,6 +116,7 @@ export function Lightbox({ images, index, alt, onIndexChange }: LightboxProps) {
               </button>
             </>
           )}
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
