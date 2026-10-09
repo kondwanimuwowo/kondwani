@@ -24,8 +24,8 @@ export function Header({ showBlog = false }: HeaderProps) {
   const navLinks = showBlog ? [...baseNavLinks.slice(0, 3), blogNavLink, baseNavLinks[3]] : baseNavLinks
   const pathname = usePathname()
   const isHome = pathname === "/"
-  // Project detail pages open on a dark hero, so the header starts light until it gets its own background
-  const darkHero = /^\/projects\/[^/]+$/.test(pathname)
+  // Project and case study pages open on a dark hero, so the header starts light until it gets its own background
+  const darkHero = /^\/(projects|case-studies)\/[^/]+$/.test(pathname)
   const { scrollY } = useScroll()
   const [hidden, setHidden] = React.useState(false)
   const [isScrolled, setIsScrolled] = React.useState(false)
