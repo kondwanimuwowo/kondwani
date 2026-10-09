@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowForward } from "@mui/icons-material"
+import { RevealImage } from "@/components/ui/RevealImage"
 import { categoryLabel } from "@/data/blogCategories"
 import { formatDate, type PostSummary } from "@/lib/blogPosts"
 
@@ -13,14 +14,16 @@ export function FeaturedPost({ post }: { post: PostSummary }) {
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-surface md:aspect-auto md:min-h-80">
         {post.coverImage ? (
-          <Image
-            src={post.coverImage}
-            alt={post.title}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 512px"
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-          />
+          <RevealImage className="absolute inset-0">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 512px"
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          </RevealImage>
         ) : (
           <div className="flex h-full min-h-48 items-center justify-center bg-primary-tint">
             <span className="text-6xl font-extrabold text-primary">[&lt;</span>

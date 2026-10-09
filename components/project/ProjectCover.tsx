@@ -32,6 +32,7 @@ export function ProjectCover({ images, alt, host }: ProjectCoverProps) {
           sizes="(max-width: 768px) 100vw, 768px"
           priority
           autoHeight
+          reveal
           elevation="lifted"
         />
       </motion.button>

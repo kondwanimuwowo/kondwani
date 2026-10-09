@@ -8,6 +8,7 @@ import { categoryLabel } from "@/data/blogCategories"
 import { canonicalUrl, formatDate, getRelated, readingMinutes } from "@/lib/posts"
 import { MAIN_SITE, TWITTER } from "@/lib/site"
 import { AnimateIn } from "@/components/ui/AnimateIn"
+import { RevealImage } from "@/components/ui/RevealImage"
 import { AuthorBox } from "@/components/blog/AuthorBox"
 import { PostCard } from "@/components/blog/PostCard"
 
@@ -106,7 +107,9 @@ export default async function BlogPost({ params }: Props) {
         <div className="container-custom relative z-10 -mt-24 max-w-4xl md:-mt-36">
           <AnimateIn>
             <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-surface shadow-frame-lift">
-              <Image src={post.coverImage} alt={post.title} fill priority sizes="(max-width: 896px) 100vw, 896px" className="object-cover" />
+              <RevealImage className="absolute inset-0" delay={0.2}>
+                <Image src={post.coverImage} alt={post.title} fill priority sizes="(max-width: 896px) 100vw, 896px" className="object-cover" />
+              </RevealImage>
             </div>
           </AnimateIn>
         </div>

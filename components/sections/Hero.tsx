@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { motion, type Variants } from "motion/react"
+import { motion, useReducedMotion, type Variants } from "motion/react"
 import { GitHub, LinkedIn, X } from "@mui/icons-material"
 import { PillLink } from "@/components/ui/PillLink"
 import { Tilt } from "@/components/ui/Tilt"
@@ -20,10 +20,25 @@ const container: Variants = {
   },
 }
 
+const EASE_OUT = [0.23, 1, 0.32, 1] as const
+
 const item: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 12, filter: "blur(4px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: EASE_OUT }, transitionEnd: { filter: "none" } },
 }
+
+// Each word rises out of its own mask, one after the other
+const headline: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09 } },
+}
+
+const headlineWord: Variants = {
+  hidden: { y: "110%", opacity: 0, filter: "blur(6px)" },
+  show: { y: "0%", opacity: 1, filter: "blur(0px)", transition: { duration: 0.8, ease: EASE_OUT }, transitionEnd: { filter: "none" } },
+}
+
+const HEADLINE = ["Kondwani", "Muwowo."]
 
 const imageVariant: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -39,6 +54,8 @@ const imageVariant: Variants = {
 }
 
 export function Hero() {
+  const reduceMotion = useReducedMotion()
+
   return (
     <section className="relative min-h-[100dvh] flex items-center bg-background pt-20 overflow-hidden">
       <div className="container-custom w-full py-16 lg:py-24">
@@ -79,10 +96,18 @@ export function Hero() {
             </motion.div>
 
             <motion.h1
-              variants={item}
+              variants={reduceMotion ? item : headline}
+              aria-label={HEADLINE.join(" ")}
               className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05]"
             >
-              Kondwani Muwowo.
+              {HEADLINE.map((word, i) => (
+                <span key={word} aria-hidden className="inline-block overflow-hidden pb-[0.1em] align-bottom">
+                  <motion.span variants={reduceMotion ? undefined : headlineWord} className="inline-block">
+                    {word}
+                  </motion.span>
+                  {i < HEADLINE.length - 1 && "\u00a0"}
+                </span>
+              ))}
             </motion.h1>
 
             <motion.p

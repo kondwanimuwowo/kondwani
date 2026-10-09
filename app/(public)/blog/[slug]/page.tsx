@@ -10,6 +10,7 @@ import { breadcrumbJsonLd, ogImage, PERSON_REF, twitterCard } from "@/lib/seo"
 import { formatDate, getRelated, readingMinutes } from "@/lib/blogPosts"
 import { BLOG_SITE } from "@/lib/blogSite"
 import { AnimateIn } from "@/components/ui/AnimateIn"
+import { RevealImage } from "@/components/ui/RevealImage"
 import { PostCard } from "@/components/blog/PostCard"
 
 interface Props {
@@ -104,7 +105,9 @@ export default async function BlogPostPage({ params }: Props) {
           <div className="container-custom relative z-10 -mt-24 max-w-4xl md:-mt-36">
             <AnimateIn>
               <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-surface shadow-frame-lift">
+                <RevealImage className="absolute inset-0" delay={0.2}>
                 <Image src={post.coverImage} alt={post.title} fill priority sizes="(max-width: 896px) 100vw, 896px" className="object-cover" />
+              </RevealImage>
               </div>
             </AnimateIn>
           </div>

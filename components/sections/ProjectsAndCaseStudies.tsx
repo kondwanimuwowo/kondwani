@@ -14,8 +14,8 @@ const container: Variants = {
 }
 
 const cardVariant: Variants = {
-  hidden: { opacity: 0, y: 32 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } },
 }
 
 type Tab = "all" | "projects" | "case-studies"
@@ -145,6 +145,10 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
   )
 }
 
+// The active tab's pill glides between buttons, and cards reflow instead of the whole grid swapping
+const TAB_SPRING = { type: "spring", duration: 0.45, bounce: 0.15 } as const
+const CARD_EASE = [0.23, 1, 0.32, 1] as const
+
 export function ProjectsAndCaseStudies({ projects, caseStudies }: Props) {
   const [tab, setTab] = useState<Tab>("all")
 
@@ -154,46 +158,63 @@ export function ProjectsAndCaseStudies({ projects, caseStudies }: Props) {
     { id: "case-studies", label: "Case Studies", count: caseStudies.length },
   ]
 
+  const items = [
+    ...(tab === "all" || tab === "projects" ? projects.map((p) => ({ key: `project-${p.id}`, node: <ProjectCard project={p} /> })) : []),
+    ...(tab === "all" || tab === "case-studies" ? caseStudies.map((s) => ({ key: `case-${s.id}`, node: <CaseStudyCard study={s} /> })) : []),
+  ]
+
   return (
     <div>
       {/* Tab switcher */}
       <div className="flex flex-wrap gap-2 justify-center mb-10">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-[color,background-color,scale] duration-200 active:scale-[0.97] flex items-center gap-2 ${
-              tab === t.id
-                ? "bg-primary text-white"
-                : "bg-white text-muted hover:text-primary"
-            }`}
-          >
-            {t.label}
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${tab === t.id ? "bg-primary-hover text-white" : "bg-surface text-muted"}`}>
-              {t.count}
-            </span>
-          </button>
-        ))}
+        {tabs.map((t) => {
+          const active = tab === t.id
+          return (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`relative px-5 py-2 rounded-full text-sm font-medium shadow-md bg-white transition-[color,scale] duration-200 active:scale-[0.97] flex items-center gap-2 ${
+                active ? "text-white" : "text-muted hover:text-primary"
+              }`}
+            >
+              {active && (
+                <motion.span
+                  layoutId="projects-tab-pill"
+                  transition={TAB_SPRING}
+                  className="absolute inset-0 rounded-full bg-primary"
+                />
+              )}
+              <span className="relative">{t.label}</span>
+              <span className={`relative text-[10px] font-bold px-1.5 py-0.5 rounded-full transition-colors duration-200 ${active ? "bg-primary-hover text-white" : "bg-surface text-muted"}`}>
+                {t.count}
+              </span>
+            </button>
+          )
+        })}
       </div>
 
       {/* Grid */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={tab}
-          variants={container}
-          initial="hidden"
-          animate="show"
-          exit={{ opacity: 0 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {(tab === "all" || tab === "projects") && projects.map((p) => (
-            <ProjectCard key={p.id} project={p} />
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <AnimatePresence mode="popLayout" initial={false}>
+          {items.map((item) => (
+            <motion.div
+              key={item.key}
+              layout
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.15, ease: CARD_EASE } }}
+              transition={{ duration: 0.35, ease: CARD_EASE }}
+            >
+              {item.node}
+            </motion.div>
           ))}
-          {(tab === "all" || tab === "case-studies") && caseStudies.map((s) => (
-            <CaseStudyCard key={s.id} study={s} />
-          ))}
-        </motion.div>
-      </AnimatePresence>
+        </AnimatePresence>
+      </motion.div>
     </div>
   )
 }
