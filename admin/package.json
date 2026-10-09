@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vinext dev --port 3003",
+    "dev": "node --env-file-if-exists=.dev.vars node_modules/vinext/dist/cli.js dev --port 3003",
     "build": "vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "deploy": "vinext build && vinext-cloudflare deploy --config dist/server/wrangler.json",
