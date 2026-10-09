@@ -6,7 +6,9 @@ import * as schema from "./schema"
 const globalForDb = globalThis as unknown as { db?: NodePgDatabase<typeof schema> }
 
 function createDb() {
-  const connectionString = env.HYPERDRIVE?.connectionString ?? process.env.DATABASE_URL!
+  // LOCAL_DATABASE_URL only exists in .dev.vars: Wrangler's local Hyperdrive stand-in rebuilds the URL
+  // without re-encoding special characters in the password, so local dev connects directly instead
+  const connectionString = process.env.LOCAL_DATABASE_URL ?? env.HYPERDRIVE?.connectionString ?? process.env.DATABASE_URL!
   // Workers can't reuse a socket opened during another request: the query
   // stalls until query_timeout. The pool outlives requests (cached on
   // globalThis), so an idle connection handed to the next request made every
