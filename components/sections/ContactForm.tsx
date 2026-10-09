@@ -139,9 +139,7 @@ export function ContactForm() {
             <motion.button
               type="submit"
               disabled={status === "loading"}
-              whileHover={{ scale: status === "loading" ? 1 : 1.02 }}
-              whileTap={{ scale: status === "loading" ? 1 : 0.98 }}
-              className="inline-flex items-center gap-2 bg-foreground text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-primary transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 bg-foreground text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-primary transition-[background-color,scale] duration-200 active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {status === "loading" ? (
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

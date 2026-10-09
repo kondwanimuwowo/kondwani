@@ -75,7 +75,7 @@ function LoginForm() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-surface text-foreground hover:bg-primary-tint py-3.5 px-5 rounded-full font-bold text-sm tracking-tight transition-all duration-300 shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+            className="w-full flex items-center justify-center gap-3 bg-surface text-foreground hover:bg-primary-tint py-3.5 px-5 rounded-full font-bold text-sm tracking-tight transition-[color,background-color,scale] duration-200 active:scale-[0.97] shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-foreground border-t-transparent rounded-full animate-spin" />

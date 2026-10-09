@@ -113,13 +113,13 @@ export default async function CaseStudyDetailPage({ params }: Props) {
             <div className="flex flex-wrap justify-center gap-3">
               {cs.liveUrl && (
                 <a href={cs.liveUrl} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-primary transition-colors hover:bg-primary-tint">
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-primary transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:bg-primary-tint">
                   Visit site <OpenInNew sx={{ fontSize: 16 }} />
                 </a>
               )}
               {cs.githubUrl && (
                 <a href={cs.githubUrl} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-primary-dark px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-hover">
+                  className="inline-flex items-center gap-2 rounded-full bg-primary-dark px-6 py-3 text-sm font-medium text-white transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:bg-primary-hover">
                   <GitHub sx={{ fontSize: 16 }} /> View code
                 </a>
               )}
@@ -241,7 +241,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
           {next?.slug ? (
             <Link
               href={`/case-studies/${next.slug}`}
-              className="group flex items-center justify-between gap-8 rounded-3xl bg-foreground px-8 py-12 transition-colors hover:bg-primary md:px-12"
+              className="group flex items-center justify-between gap-8 rounded-3xl bg-foreground px-8 py-12 transition-[background-color,scale] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-primary active:scale-[0.99] md:px-12"
             >
               <div>
                 <p className="mb-2 text-sm text-muted-dark group-hover:text-primary-tint">Next case study</p>

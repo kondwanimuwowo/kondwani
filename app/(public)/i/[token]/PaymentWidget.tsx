@@ -190,7 +190,7 @@ export function PaymentWidget({ token, currency, total }: Props) {
             <button
               type="submit"
               disabled={momoLoading}
-              className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-full text-xs font-bold font-mono uppercase tracking-wider transition-all disabled:opacity-50"
+              className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-full text-xs font-bold font-mono uppercase tracking-wider transition-[color,background-color,scale] duration-200 active:scale-[0.97] disabled:opacity-50"
             >
               {momoLoading ? "Triggering PIN prompt..." : `Pay ZMW ${convertedZMW.toLocaleString(undefined, { minimumFractionDigits: 2 })} now`}
             </button>
@@ -235,7 +235,7 @@ export function PaymentWidget({ token, currency, total }: Props) {
                 <button
                   type="submit"
                   disabled={!file || bankLoading}
-                  className="w-full bg-foreground hover:bg-primary text-white py-2.5 rounded-full text-xs font-bold font-mono uppercase tracking-wider transition-all disabled:opacity-40"
+                  className="w-full bg-foreground hover:bg-primary text-white py-2.5 rounded-full text-xs font-bold font-mono uppercase tracking-wider transition-[color,background-color,scale] duration-200 active:scale-[0.97] disabled:opacity-40"
                 >
                   {bankLoading ? "Uploading file..." : "Submit receipt for verification"}
                 </button>

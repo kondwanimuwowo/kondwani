@@ -58,8 +58,7 @@ export function BeyondCode() {
             <motion.div
               key={org.id}
               variants={fadeUp}
-              whileHover={{ y: -6 }}
-              className="relative group overflow-hidden bg-surface rounded-3xl shadow-md grayscale hover:grayscale-0 hover:shadow-xl transition-all duration-500 flex flex-col min-h-[280px]"
+              className="relative group overflow-hidden bg-surface rounded-3xl shadow-md grayscale hover:grayscale-0 hover:shadow-xl hover:-translate-y-1.5 transition-[translate,scale,box-shadow,filter,border-color] duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] flex flex-col min-h-[280px]"
             >
               {/* Content */}
               <div className="relative z-10 p-6 flex flex-col flex-1">
@@ -133,8 +132,7 @@ export function BeyondCode() {
               <motion.div
                 key={item.label}
                 variants={fadeUp}
-                whileHover={{ scale: 1.05, y: -2 }}
-                className="flex items-center gap-2.5 bg-surface rounded-full px-5 py-3 shadow-md cursor-default"
+                className="flex items-center gap-2.5 bg-surface rounded-full px-5 py-3 shadow-md cursor-default transition-[translate,scale] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:scale-105"
               >
                 {Icon && <Icon className="text-primary" sx={{ fontSize: 18 }} />}
                 <span className="text-sm font-medium text-foreground">{item.label}</span>

@@ -23,7 +23,7 @@ export function PillLink({ href, children, external, dark, className }: PillLink
       href={href}
       whileHover="hover"
       className={cn(
-        "inline-flex items-center gap-5 rounded-full border pl-7 pr-2 py-2 text-sm font-medium transition-colors duration-300 group",
+        "inline-flex items-center gap-5 rounded-full border pl-7 pr-2 py-2 text-sm font-medium transition-[color,border-color,scale] duration-200 active:scale-[0.97] group",
         dark
           ? "border-white/20 text-white hover:border-primary"
           : "border-border text-foreground hover:border-primary hover:text-primary",

@@ -59,16 +59,11 @@ export function Projects({ projects }: { projects: Project[] }) {
             <motion.article
               key={project.id}
               variants={cardVariant}
-              whileHover={{ y: -6 }}
-              className="relative group bg-surface rounded-3xl overflow-hidden shadow-md grayscale hover:grayscale-0 hover:shadow-xl border-2 border-surface hover:border-primary transition-all duration-500"
+              className="relative group bg-surface rounded-3xl overflow-hidden shadow-md grayscale hover:grayscale-0 hover:shadow-xl border-2 border-surface hover:border-primary hover:-translate-y-1.5 active:scale-[0.98] transition-[translate,scale,box-shadow,filter,border-color] duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]"
             >
               {/* Image */}
               <div className="relative h-52 overflow-hidden bg-background">
-                <motion.div
-                  className="absolute inset-0"
-                  whileHover={{ scale: 1.04 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                >
+                <div className="absolute inset-0 transition-[scale] duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.04]">
                   {project.imageUrl ? (
                     <Image
                       src={project.imageUrl}
@@ -80,7 +75,7 @@ export function Projects({ projects }: { projects: Project[] }) {
                   ) : (
                     <div className="absolute inset-0 bg-background" />
                   )}
-                </motion.div>
+                </div>
                 <div title={project.category} className="absolute bottom-3 left-3 z-10 text-primary drop-shadow-md">
                   {(() => { const Icon = getCategoryIcon(project.category); return <Icon sx={{ fontSize: 22 }} /> })()}
                 </div>

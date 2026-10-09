@@ -7,7 +7,7 @@ export function PostCard({ post }: { post: PostSummary }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="group flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-md transition-[translate,scale,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-1 hover:shadow-xl active:scale-[0.98]"
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-surface">
         {post.coverImage ? (

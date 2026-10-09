@@ -60,7 +60,7 @@ export function Lightbox({ images, index, alt, onIndexChange }: LightboxProps) {
               type="button"
               onClick={() => onIndexChange(null)}
               aria-label="Close"
-              className="rounded-full bg-subtle-dark p-2 text-white transition-colors hover:bg-primary"
+              className="rounded-full bg-subtle-dark p-2 text-white transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:bg-primary"
             >
               <Close sx={{ fontSize: 20 }} />
             </button>
@@ -90,7 +90,7 @@ export function Lightbox({ images, index, alt, onIndexChange }: LightboxProps) {
                 type="button"
                 onClick={() => onIndexChange((index - 1 + count) % count)}
                 aria-label="Previous image"
-                className="absolute left-4 top-1/2 hidden -translate-y-1/2 rounded-full bg-subtle-dark p-3 text-white transition-colors hover:bg-primary md:block"
+                className="absolute left-4 top-1/2 hidden -translate-y-1/2 rounded-full bg-subtle-dark p-3 text-white transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:bg-primary md:block"
               >
                 <ArrowBack sx={{ fontSize: 20 }} />
               </button>
@@ -98,7 +98,7 @@ export function Lightbox({ images, index, alt, onIndexChange }: LightboxProps) {
                 type="button"
                 onClick={() => onIndexChange((index + 1) % count)}
                 aria-label="Next image"
-                className="absolute right-4 top-1/2 hidden -translate-y-1/2 rounded-full bg-subtle-dark p-3 text-white transition-colors hover:bg-primary md:block"
+                className="absolute right-4 top-1/2 hidden -translate-y-1/2 rounded-full bg-subtle-dark p-3 text-white transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:bg-primary md:block"
               >
                 <ArrowForward sx={{ fontSize: 20 }} />
               </button>

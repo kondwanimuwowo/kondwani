@@ -31,7 +31,7 @@ export function BlogHero({ title, subtitle, categories, active, overlap }: BlogH
                 key={link.key}
                 href={link.href}
                 aria-current={active === link.key ? "page" : undefined}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                className={`rounded-full px-5 py-2 text-sm font-medium transition-[color,background-color,scale] duration-200 active:scale-[0.97] ${
                   active === link.key ? "bg-white text-primary" : "bg-primary-dark text-white hover:bg-primary-hover"
                 }`}
               >

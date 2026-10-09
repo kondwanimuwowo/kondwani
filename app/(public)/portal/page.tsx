@@ -182,13 +182,13 @@ export default function ClientPortalDashboard() {
           <div className="flex gap-4 justify-center">
             <button
               onClick={() => { setError(null); setLoading(true); fetchDashboardData() }}
-              className="bg-foreground text-white hover:bg-primary py-2 px-5 rounded-full text-xs font-bold font-mono uppercase tracking-wider transition-all"
+              className="bg-foreground text-white hover:bg-primary py-2 px-5 rounded-full text-xs font-bold font-mono uppercase tracking-wider transition-[color,background-color,scale] duration-200 active:scale-[0.97]"
             >
               Retry
             </button>
             <button
               onClick={handleLogout}
-              className="bg-surface hover:text-primary text-muted py-2 px-5 rounded-full text-xs font-bold font-mono uppercase tracking-wider transition-all"
+              className="bg-surface hover:text-primary text-muted py-2 px-5 rounded-full text-xs font-bold font-mono uppercase tracking-wider transition-[color,background-color,scale] duration-200 active:scale-[0.97]"
             >
               Logout
             </button>
@@ -242,7 +242,7 @@ export default function ClientPortalDashboard() {
 
           <button
             onClick={handleLogout}
-            className="bg-surface hover:text-primary text-muted py-1.5 px-3 rounded-full text-xs font-bold font-mono uppercase tracking-wider transition-all duration-300"
+            className="bg-surface hover:text-primary text-muted py-1.5 px-3 rounded-full text-xs font-bold font-mono uppercase tracking-wider transition-[color,background-color,scale] duration-200 active:scale-[0.97]"
           >
             Logout
           </button>
@@ -265,7 +265,7 @@ export default function ClientPortalDashboard() {
                   setSelectedProjectId(proj.id)
                   setActiveTab("overview")
                 }}
-                className={`w-full text-left p-3 rounded-3xl transition-all duration-300 group ${
+                className={`w-full text-left p-3 rounded-3xl transition-colors duration-300 group ${
                   selectedProjectId === proj.id
                     ? "bg-white shadow-md text-foreground"
                     : "bg-transparent text-muted hover:text-foreground"
@@ -331,7 +331,7 @@ export default function ClientPortalDashboard() {
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`text-xs font-medium px-3.5 py-1.5 rounded-full capitalize transition-all duration-300 font-mono tracking-tight ${
+                      className={`text-xs font-medium px-3.5 py-1.5 rounded-full capitalize transition-colors duration-300 font-mono tracking-tight ${
                         activeTab === tab
                           ? "bg-white shadow-md text-foreground"
                           : "text-muted hover:text-foreground"
@@ -363,7 +363,7 @@ export default function ClientPortalDashboard() {
                         </div>
                         <div className="w-full bg-surface h-2.5 rounded-full overflow-hidden">
                           <div
-                            className="bg-primary h-full rounded-full transition-all duration-500"
+                            className="bg-primary h-full rounded-full transition-[width] duration-500"
                             style={{ width: `${completionPercentage}%` }}
                           />
                         </div>
@@ -417,7 +417,7 @@ export default function ClientPortalDashboard() {
 
                       <button
                         onClick={() => setChatOpen(true)}
-                        className="mt-6 w-full flex items-center justify-center gap-2 bg-foreground text-white hover:bg-primary py-2.5 rounded-full text-xs font-bold tracking-tight transition-all"
+                        className="mt-6 w-full flex items-center justify-center gap-2 bg-foreground text-white hover:bg-primary py-2.5 rounded-full text-xs font-bold tracking-tight transition-[color,background-color,scale] duration-200 active:scale-[0.97]"
                       >
                         Discuss Project
                       </button>
@@ -438,7 +438,7 @@ export default function ClientPortalDashboard() {
                         activeProject.tasks.map((task: any) => (
                           <div
                             key={task.id}
-                            className={`flex items-start gap-4 p-3.5 rounded-3xl transition-all duration-300 ${
+                            className={`flex items-start gap-4 p-3.5 rounded-3xl transition-colors duration-300 ${
                               task.status === "done" ? "bg-surface opacity-60" : "bg-surface"
                             }`}
                           >
@@ -520,7 +520,7 @@ export default function ClientPortalDashboard() {
                                         href={`/i/${milestone.invoice.token}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="bg-primary hover:bg-primary-hover text-white font-bold text-xs py-1.5 px-3.5 rounded-full transition-all"
+                                        className="bg-primary hover:bg-primary-hover text-white font-bold text-xs py-1.5 px-3.5 rounded-full transition-[color,background-color,scale] duration-200 active:scale-[0.97]"
                                       >
                                         PAY NOW
                                       </a>
@@ -599,7 +599,7 @@ export default function ClientPortalDashboard() {
                               href={`/i/${inv.token}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center justify-between p-3.5 rounded-3xl bg-surface hover:shadow-md transition-all duration-300 group"
+                              className="flex items-center justify-between p-3.5 rounded-3xl bg-surface hover:shadow-md transition-shadow duration-300 group"
                             >
                               <div>
                                 <div className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
@@ -665,7 +665,7 @@ export default function ClientPortalDashboard() {
                           ) : (
                             <button
                               onClick={() => setSigningContract(projectContract)}
-                              className="bg-foreground hover:bg-primary text-white font-bold text-xs py-2 px-4 rounded-full transition-all"
+                              className="bg-foreground hover:bg-primary text-white font-bold text-xs py-2 px-4 rounded-full transition-[color,background-color,scale] duration-200 active:scale-[0.97]"
                             >
                               REVIEW AND SIGN
                             </button>
@@ -705,7 +705,7 @@ export default function ClientPortalDashboard() {
           {activeProject && (
             <button
               onClick={() => setChatOpen(!chatOpen)}
-              className="fixed bottom-6 right-6 md:right-8 z-40 bg-primary hover:bg-primary-hover text-white rounded-full p-4 shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
+              className="fixed bottom-6 right-6 md:right-8 z-40 bg-primary hover:bg-primary-hover text-white rounded-full p-4 shadow-lg transition-[background-color,scale] hover:scale-105 active:scale-95 flex items-center justify-center"
             >
               {chatOpen ? <Close sx={{ fontSize: 24 }} /> : <Chat sx={{ fontSize: 24 }} />}
             </button>
@@ -764,7 +764,7 @@ export default function ClientPortalDashboard() {
 
               {/* Chat Input */}
               <form onSubmit={handleSendMessage} className="p-3 bg-surface shrink-0">
-                <div className="flex gap-2 bg-white rounded-3xl p-1.5 shadow-md focus-within:ring-2 focus-within:ring-primary-tint transition-all duration-300">
+                <div className="flex gap-2 bg-white rounded-3xl p-1.5 shadow-md focus-within:ring-2 focus-within:ring-primary-tint transition-shadow duration-300">
                   <input
                     type="text"
                     value={newMessage}
@@ -775,7 +775,7 @@ export default function ClientPortalDashboard() {
                   <button
                     type="submit"
                     disabled={!newMessage.trim() || sendingMessage}
-                    className="bg-foreground text-white hover:bg-primary py-1.5 px-3 rounded-full text-[10px] font-bold font-mono transition-all disabled:opacity-30"
+                    className="bg-foreground text-white hover:bg-primary py-1.5 px-3 rounded-full text-[10px] font-bold font-mono transition-[color,background-color,scale] duration-200 active:scale-[0.97] disabled:opacity-30"
                   >
                     SEND
                   </button>
@@ -852,14 +852,14 @@ export default function ClientPortalDashboard() {
                 <button
                   type="button"
                   onClick={() => setSigningContract(null)}
-                  className="bg-white shadow-md hover:text-primary text-muted py-2.5 px-4 rounded-full text-xs font-bold transition-all font-mono uppercase tracking-wider"
+                  className="bg-white shadow-md hover:text-primary text-muted py-2.5 px-4 rounded-full text-xs font-bold transition-[color,background-color,scale] duration-200 active:scale-[0.97] font-mono uppercase tracking-wider"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!sigName.trim() || !sigEmail.trim() || signing}
-                  className="bg-foreground hover:bg-primary text-white py-2.5 px-5 rounded-full text-xs font-bold transition-all font-mono uppercase tracking-wider disabled:opacity-30"
+                  className="bg-foreground hover:bg-primary text-white py-2.5 px-5 rounded-full text-xs font-bold transition-[color,background-color,scale] duration-200 active:scale-[0.97] font-mono uppercase tracking-wider disabled:opacity-30"
                 >
                   {signing ? "Processing signature..." : "Sign Agreement"}
                 </button>

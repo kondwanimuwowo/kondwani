@@ -59,16 +59,8 @@ export function Hero() {
             >
               <div className="relative">
                 {/* Animated pulse rings */}
-                <motion.div
-                  className="absolute inset-0 rounded-full bg-primary-tint"
-                  animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.6, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                />
-                <motion.div
-                  className="absolute inset-0 rounded-full bg-primary-tint"
-                  animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.4, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: 2 }}
-                />
+                <div className="pulse-ring absolute inset-0 rounded-full bg-primary-tint" style={{ "--ring-peak": 0.6 } as React.CSSProperties} />
+                <div className="pulse-ring absolute inset-0 rounded-full bg-primary-tint" style={{ "--ring-peak": 0.4, animationDelay: "2s" } as React.CSSProperties} />
                 <motion.div
                   animate={{ y: [0, -4, 0] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -106,7 +98,7 @@ export function Hero() {
             >
               <Link
                 href="/projects"
-                className="bg-foreground text-white px-7 py-3.5 rounded-full font-medium hover:bg-primary transition-colors shadow-md text-sm"
+                className="bg-foreground text-white px-7 py-3.5 rounded-full font-medium hover:bg-primary transition-[color,background-color,scale] duration-200 active:scale-[0.97] shadow-md text-sm"
               >
                 View My Work
               </Link>
@@ -138,16 +130,8 @@ export function Hero() {
           >
             <div className="relative">
               {/* Animated pulse rings */}
-              <motion.div
-                className="absolute inset-0 rounded-full bg-[#7E1416] bg-opacity-10 border border-[#7E1416] border-opacity-20"
-                animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.15, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-              />
-              <motion.div
-                className="absolute inset-0 rounded-full bg-[#7E1416] bg-opacity-5 border border-[#7E1416] border-opacity-10"
-                animate={{ scale: [1, 1.25, 1.45], opacity: [0, 0.1, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: 2 }}
-              />
+              <div className="pulse-ring absolute inset-0 rounded-full bg-[#7E1416] bg-opacity-10 border border-[#7E1416] border-opacity-20" style={{ "--ring-peak": 0.15 } as React.CSSProperties} />
+              <div className="pulse-ring absolute inset-0 rounded-full bg-[#7E1416] bg-opacity-5 border border-[#7E1416] border-opacity-10" style={{ "--ring-peak": 0.1, animationDelay: "2s" } as React.CSSProperties} />
               <Tilt className="relative w-80 h-80 xl:w-96 xl:h-96 cursor-pointer">
                 <Image
                   src="/kondwani.png"

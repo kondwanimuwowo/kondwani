@@ -64,7 +64,7 @@ export function Header({ showBlog = false }: HeaderProps) {
       animate={hidden ? "hidden" : "visible"}
       transition={{ duration: 0.35, ease: "easeInOut" }}
       className={cn(
-        "fixed top-0 inset-x-0 z-50 transition-all duration-300",
+        "fixed top-0 inset-x-0 z-50 transition-[background-color,box-shadow,padding] duration-300",
         isScrolled ? "glass py-4 shadow-md" : "bg-transparent py-5"
       )}
     >

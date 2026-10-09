@@ -88,7 +88,7 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
             type="button"
             onClick={() => go(-1)}
             aria-label="Previous screen"
-            className="rounded-full bg-white p-3 text-foreground shadow-md transition-colors hover:text-primary"
+            className="rounded-full bg-white p-3 text-foreground shadow-md transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:text-primary"
           >
             <ArrowBack sx={{ fontSize: 20 }} />
           </button>
@@ -103,7 +103,7 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
             type="button"
             onClick={() => go(1)}
             aria-label="Next screen"
-            className="rounded-full bg-white p-3 text-foreground shadow-md transition-colors hover:text-primary"
+            className="rounded-full bg-white p-3 text-foreground shadow-md transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:text-primary"
           >
             <ArrowForward sx={{ fontSize: 20 }} />
           </button>
@@ -111,7 +111,7 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
         <button
           type="button"
           onClick={() => setLightbox(active)}
-          className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-primary"
+          className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-white transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:bg-primary"
         >
           <Fullscreen sx={{ fontSize: 18 }} /> Full size
         </button>

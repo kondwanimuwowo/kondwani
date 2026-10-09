@@ -205,3 +205,21 @@ body {
     font-size: 1.875rem;
   }
 }
+
+/* Hero portrait pulse rings. CSS keyframes run off the main thread; an infinite JS animation never rests. */
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0; }
+  50% { transform: scale(1.25); opacity: var(--ring-peak, 0.6); }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+.pulse-ring {
+  animation: pulse-ring 4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-ring {
+    animation: none;
+    opacity: 0;
+  }
+}

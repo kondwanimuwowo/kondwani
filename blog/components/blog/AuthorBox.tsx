@@ -16,7 +16,7 @@ export function AuthorBox() {
       </div>
       <a
         href={MAIN_SITE}
-        className="inline-flex shrink-0 items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary"
+        className="inline-flex shrink-0 items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-white transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:bg-primary"
       >
         See my work <ArrowForward sx={{ fontSize: 16 }} />
       </a>

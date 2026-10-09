@@ -9,7 +9,7 @@ export function FeaturedPost({ post }: { post: PostSummary }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group grid grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-frame-lift transition-transform duration-500 hover:-translate-y-1 md:grid-cols-2"
+      className="group grid grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-frame-lift transition-[translate,scale] duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-1 active:scale-[0.99] md:grid-cols-2"
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-surface md:aspect-auto md:min-h-80">
         {post.coverImage ? (

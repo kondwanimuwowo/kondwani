@@ -37,7 +37,7 @@ export default async function BlogPage() {
           </p>
           <a
             href={BLOG_SITE}
-            className="inline-flex items-center gap-2 rounded-full bg-primary-dark px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
+            className="inline-flex items-center gap-2 rounded-full bg-primary-dark px-5 py-2.5 text-sm font-medium text-white transition-[color,background-color,scale] duration-200 active:scale-[0.97] hover:bg-primary-hover"
           >
             Faith, chess, the gym and more on my personal blog <ArrowForward sx={{ fontSize: 16 }} />
           </a>

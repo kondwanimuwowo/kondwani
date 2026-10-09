@@ -99,8 +99,7 @@ export function Skills({ techPills = defaultPills, skillCategories = defaultCate
               <motion.span
                 key={tech}
                 variants={fadeUp}
-                whileHover={{ scale: 1.1, y: -4 }}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full text-sm font-medium text-foreground shadow-md cursor-default hover:bg-primary-tint transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full text-sm font-medium text-foreground shadow-md cursor-default transition-[translate,scale,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-1 hover:scale-105 hover:bg-primary-tint transition-colors"
               >
                 {Icon && <Icon size={16} className="text-primary" />}
                 {tech}
@@ -122,8 +121,7 @@ export function Skills({ techPills = defaultPills, skillCategories = defaultCate
               <motion.div
                 key={category.id}
                 variants={fadeUp}
-                whileHover={{ y: -6 }}
-                className="relative group overflow-hidden bg-white rounded-3xl p-5 shadow-md hover:shadow-md transition-all duration-300"
+                className="relative group overflow-hidden bg-white rounded-3xl p-5 shadow-md hover:-translate-y-1.5 hover:shadow-lg transition-[translate,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
               >
                 <div className="relative z-10">
                   {/* Icon + Title row */}

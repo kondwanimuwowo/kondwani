@@ -39,7 +39,7 @@ export default function BeyondCodePage() {
           {organizations.map((org) => (
             <div
               key={org.id}
-              className="relative group overflow-hidden bg-white rounded-3xl shadow-md grayscale hover:grayscale-0 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 flex flex-col min-h-[300px]"
+              className="relative group overflow-hidden bg-white rounded-3xl shadow-md grayscale hover:grayscale-0 hover:shadow-xl hover:-translate-y-1.5 transition-[translate,scale,box-shadow,filter,border-color] duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] flex flex-col min-h-[300px]"
             >
               {/* Content */}
               <div className="relative z-10 p-8 flex flex-col flex-1">
