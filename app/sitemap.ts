@@ -49,7 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const posts = await db
       .select({ slug: blogPost.slug, updatedAt: blogPost.updatedAt })
       .from(blogPost)
-      .where(eq(blogPost.published, true))
+      .where(and(eq(blogPost.published, true), eq(blogPost.category, "tech")))
     blogRoutes = posts.map((post) => ({
       url: `${BASE_URL}/blog/${post.slug}`,
       lastModified: post.updatedAt,

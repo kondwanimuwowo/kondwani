@@ -183,7 +183,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
         {cs.content && (
           <section className="container-custom max-w-4xl pb-24">
             <AnimateIn>
-              <div className="case-study-body max-w-3xl" dangerouslySetInnerHTML={{ __html: cs.content }} />
+              <div className="article-body max-w-3xl" dangerouslySetInnerHTML={{ __html: cs.content }} />
             </AnimateIn>
           </section>
         )}

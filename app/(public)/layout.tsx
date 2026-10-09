@@ -3,11 +3,11 @@ import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
 import { AnalyticsTracker } from "@/components/layout/AnalyticsTracker"
 import { db, blogPost } from "@/lib/db"
-import { count, eq } from "drizzle-orm"
+import { and, count, eq } from "drizzle-orm"
 
 async function getPublishedBlogCount() {
   try {
-    const [row] = await db.select({ count: count() }).from(blogPost).where(eq(blogPost.published, true))
+    const [row] = await db.select({ count: count() }).from(blogPost).where(and(eq(blogPost.published, true), eq(blogPost.category, "tech")))
     return row?.count ?? 0
   } catch {
     return 0

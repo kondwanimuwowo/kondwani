@@ -11,7 +11,7 @@ export async function GET() {
       .findMany({ where: (t, { eq }) => eq(t.published, true), orderBy: (t, { asc }) => asc(t.order) })
       .catch(() => []),
     db.query.blogPost
-      .findMany({ where: (t, { eq }) => eq(t.published, true), orderBy: (t, { desc }) => desc(t.publishedAt) })
+      .findMany({ where: (t, { eq, and }) => and(eq(t.published, true), eq(t.category, "tech")), orderBy: (t, { desc }) => desc(t.publishedAt) })
       .catch(() => []),
   ])
 
@@ -45,6 +45,7 @@ export async function GET() {
     "## Contact",
     "",
     `- [Contact page](${SITE.url}/contact): project enquiries`,
+    "- [Personal blog](https://blog.kondwanimuwowo.com): writing on faith, chess, the gym, hiking and everyday life",
     ...SITE.sameAs.map((url) => `- ${url}`),
     "",
   )

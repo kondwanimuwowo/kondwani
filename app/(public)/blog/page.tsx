@@ -1,17 +1,19 @@
 import type { Metadata } from "next"
+import { ArrowForward } from "@mui/icons-material"
 import { ogImage, twitterCard } from "@/lib/seo"
-import Link from "next/link"
-import Image from "next/image"
-import { db, blogPost } from "@/lib/db"
-import { desc, eq } from "drizzle-orm"
+import { getPosts } from "@/lib/blogPosts"
+import { BLOG_SITE } from "@/lib/blogSite"
+import { AnimateIn } from "@/components/ui/AnimateIn"
+import { FeaturedPost } from "@/components/blog/FeaturedPost"
+import { PostCard } from "@/components/blog/PostCard"
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Notes on web development, design and building websites and web systems for businesses in Zambia, by Kondwani Muwowo.",
+  description: "Notes on coding, websites and building systems for businesses in Zambia, by Kondwani Muwowo.",
   alternates: { canonical: "/blog" },
   openGraph: {
     title: "Blog, Kondwani Muwowo",
-    description: "Notes on web development, design and building for businesses in Zambia.",
+    description: "Notes on coding, websites and building systems.",
     url: "/blog",
     images: ogImage("page", "blog", "Blog by Kondwani Muwowo"),
   },
@@ -20,88 +22,59 @@ export const metadata: Metadata = {
 
 export const revalidate = 300
 
-type PostSummary = {
-  id: string
-  title: string
-  slug: string
-  excerpt: string
-  coverImage: string | null
-  tags: string[]
-  publishedAt: Date | null
-}
-
-async function getPosts(): Promise<PostSummary[]> {
-  try {
-    return await db
-      .select({
-        id: blogPost.id,
-        title: blogPost.title,
-        slug: blogPost.slug,
-        excerpt: blogPost.excerpt,
-        coverImage: blogPost.coverImage,
-        tags: blogPost.tags,
-        publishedAt: blogPost.publishedAt,
-      })
-      .from(blogPost)
-      .where(eq(blogPost.published, true))
-      .orderBy(desc(blogPost.publishedAt))
-  } catch {
-    return []
-  }
-}
-
+// Only Tech posts live here; faith and life posts live on the personal blog
 export default async function BlogPage() {
-  const posts = await getPosts()
+  const posts = await getPosts("tech")
+  const [featured, ...rest] = posts
 
   return (
-    <main className="min-h-screen bg-surface pt-32 pb-20">
-      <div className="container-custom max-w-4xl">
-        <div className="mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-6">Blog</h1>
-          <div className="h-1 w-20 bg-primary rounded-full mx-auto mb-6" />
-          <p className="text-lg text-muted max-w-2xl mx-auto">
-            Thoughts on front-end development, design, and building purposeful products.
+    <main className="min-h-screen bg-white">
+      <section className={`bg-primary pt-40 ${featured ? "pb-32 md:pb-40" : "pb-24"}`}>
+        <AnimateIn className="container-custom max-w-3xl text-center">
+          <h1 className="mb-6 text-3xl font-bold tracking-tight text-white md:text-5xl">Blog</h1>
+          <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-primary-tint">
+            Notes on coding, websites and building systems.
           </p>
-        </div>
+          <a
+            href={BLOG_SITE}
+            className="inline-flex items-center gap-2 rounded-full bg-primary-dark px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
+          >
+            Faith, chess, the gym and more on my personal blog <ArrowForward sx={{ fontSize: 16 }} />
+          </a>
+        </AnimateIn>
+      </section>
 
-        {posts.length === 0 ? (
-          <div className="text-center py-24 bg-white rounded-3xl shadow-md">
-            <h2 className="text-xl font-bold text-foreground mb-2">Coming soon</h2>
-            <p className="text-muted text-sm">First post is on its way, check back soon.</p>
+      {featured ? (
+        <div className="container-custom relative z-10 -mt-24 max-w-5xl md:-mt-28">
+          <AnimateIn>
+            <FeaturedPost post={featured} />
+          </AnimateIn>
+        </div>
+      ) : (
+        <section className="container-custom max-w-3xl py-24 text-center">
+          <div className="rounded-3xl bg-white px-8 py-16 shadow-md">
+            <h2 className="mb-2 text-xl font-bold text-foreground">The first post is on its way</h2>
+            <p className="text-muted">Check back soon.</p>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {posts.map((post) => (
-              <Link key={post.id} href={`/blog/${post.slug}`}
-                className="group flex gap-6 bg-white rounded-3xl p-6 shadow-md hover:shadow-lg transition-all duration-300">
-                {post.coverImage && (
-                  <div className="relative w-36 h-24 rounded-xl overflow-hidden shrink-0 bg-surface">
-                    <Image src={post.coverImage} alt={post.title} fill className="object-cover" sizes="144px" />
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    {post.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary-tint px-2.5 py-0.5 rounded-full">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <h2 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors mb-1.5 line-clamp-2">
-                    {post.title}
-                  </h2>
-                  <p className="text-sm text-muted line-clamp-2 mb-2">{post.excerpt}</p>
-                  {post.publishedAt && (
-                    <p className="text-xs text-muted">
-                      {new Date(post.publishedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-                    </p>
-                  )}
-                </div>
-              </Link>
+        </section>
+      )}
+
+      {rest.length > 0 && (
+        <section className="container-custom max-w-5xl py-24">
+          <AnimateIn>
+            <h2 className="mb-12 text-2xl font-bold text-foreground md:text-3xl">More posts</h2>
+          </AnimateIn>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {rest.map((post, i) => (
+              <AnimateIn key={post.id} delay={Math.min(i, 5) * 0.05}>
+                <PostCard post={post} />
+              </AnimateIn>
             ))}
           </div>
-        )}
-      </div>
+        </section>
+      )}
+
+      {featured && rest.length === 0 && <div className="pb-24" />}
     </main>
   )
 }
