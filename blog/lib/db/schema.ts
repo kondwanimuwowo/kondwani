@@ -18,6 +18,8 @@ export const blogPost = pgTable("BlogPost", {
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
   coverImage: text("coverImage"),
+  // tech | faith | life; see data/blogCategories.ts
+  category: text("category").notNull().default("life"),
   tags: text("tags").array().notNull(),
   published: boolean("published").notNull().default(false),
   publishedAt: timestamp("publishedAt", { withTimezone: true }),
@@ -28,3 +30,11 @@ export const blogPost = pgTable("BlogPost", {
 ])
 
 export type BlogPost = typeof blogPost.$inferSelect
+
+export const newsletterSubscriber = pgTable("NewsletterSubscriber", {
+  id: id(),
+  email: text("email").notNull(),
+  createdAt: createdAt(),
+}, (t) => [
+  uniqueIndex("NewsletterSubscriber_email_key").on(t.email),
+])

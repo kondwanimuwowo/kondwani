@@ -60,6 +60,8 @@ export const blogPost = pgTable("BlogPost", {
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
   coverImage: text("coverImage"),
+  // tech | faith | life; see data/blogCategories.ts
+  category: text("category").notNull().default("life"),
   tags: text("tags").array().notNull(),
   published: boolean("published").notNull().default(false),
   publishedAt: timestamp("publishedAt", { withTimezone: true }),
