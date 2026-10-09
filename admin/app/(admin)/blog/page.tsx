@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -7,6 +8,7 @@ import { toast } from "@/lib/toast"
 import { removeFromList } from "@/lib/queries"
 import { responseError } from "@/lib/http"
 import type { Post } from "./PostForm"
+import { BLOG_CATEGORIES, categoryLabel } from "@/data/blogCategories"
 
 type PostSummary = Omit<Post, "content">
 
@@ -54,7 +56,9 @@ export default function BlogPage() {
     onError: e => toast.error(e.message),
   })
 
+  const [category, setCategory] = useState("all")
   const publishedCount = posts.filter(p => p.published).length
+  const visiblePosts = category === "all" ? posts : posts.filter(p => p.category === category)
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -68,6 +72,22 @@ export default function BlogPage() {
           New post
         </Link>
       </div>
+
+      {posts.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {[{ key: "all", label: "All" }, ...BLOG_CATEGORIES].map(c => (
+            <button
+              key={c.key}
+              onClick={() => setCategory(c.key)}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold shadow-md transition-colors ${
+                category === c.key ? "bg-primary text-white" : "bg-white text-muted hover:text-foreground"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {isError ? (
         <div className="bg-white px-6 py-16 text-center shadow-md rounded-3xl space-y-3">
@@ -88,7 +108,10 @@ export default function BlogPage() {
         </div>
       ) : (
         <div className="bg-white rounded-3xl shadow-md overflow-hidden">
-          {posts.map((post, i) => {
+          {visiblePosts.length === 0 && (
+            <p className="px-6 py-12 text-center text-sm text-muted">No posts in this category yet.</p>
+          )}
+          {visiblePosts.map((post, i) => {
             const toggling = publishMutation.isPending && publishMutation.variables?.id === post.id
             const deleting = deleteMutation.isPending && deleteMutation.variables === post.id
             return (
@@ -102,6 +125,8 @@ export default function BlogPage() {
                     {post.title}
                   </Link>
                   <p className="text-xs text-muted mt-0.5 truncate">
+                    <span className="font-semibold text-primary">{categoryLabel(post.category)}</span>
+                    <span> · </span>
                     <span className="font-mono">/{post.slug}</span>
                     <span className="hidden md:inline"> · {formatDate(post.publishedAt ?? post.createdAt)}</span>
                     {post.tags.length > 0 && <span className="hidden lg:inline"> · {post.tags.slice(0, 3).join(", ")}</span>}

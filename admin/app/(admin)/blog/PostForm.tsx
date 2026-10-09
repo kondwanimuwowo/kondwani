@@ -12,15 +12,16 @@ import { removeFromList } from "@/lib/queries"
 import { responseError } from "@/lib/http"
 import { uploadImage } from "@/lib/upload"
 import { BLOG_URL } from "@/lib/site"
+import { BLOG_CATEGORIES, DEFAULT_BLOG_CATEGORY } from "@/data/blogCategories"
 
 export type Post = {
   id: string; title: string; slug: string; excerpt: string; content: string
-  coverImage: string | null; tags: string[]; published: boolean
+  coverImage: string | null; category: string; tags: string[]; published: boolean
   publishedAt: string | null; createdAt: string; updatedAt: string
 }
 
 type FormState = {
-  title: string; slug: string; excerpt: string; tags: string; content: string; coverImage: string
+  title: string; slug: string; excerpt: string; category: string; tags: string; content: string; coverImage: string
 }
 
 function slugify(value: string) {
@@ -32,6 +33,7 @@ function toFormState(post?: Post): FormState {
     title: post?.title ?? "",
     slug: post?.slug ?? "",
     excerpt: post?.excerpt ?? "",
+    category: post?.category ?? DEFAULT_BLOG_CATEGORY,
     tags: post?.tags.join(", ") ?? "",
     content: post?.content ?? "",
     coverImage: post?.coverImage ?? "",
@@ -78,6 +80,7 @@ export function PostForm({ post }: { post?: Post }) {
           title: form.title.trim(),
           slug: slugify(form.slug),
           excerpt: form.excerpt.trim(),
+          category: form.category,
           content: form.content,
           tags: form.tags.split(",").map(t => t.trim()).filter(Boolean),
           coverImage: form.coverImage || null,
@@ -174,14 +177,21 @@ export function PostForm({ post }: { post?: Post }) {
         <input value={form.title} onChange={e => handleTitle(e.target.value)} placeholder="Post title"
           className="w-full text-3xl font-bold text-foreground placeholder:text-muted focus:outline-none bg-transparent" />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>Category</label>
+            <select value={form.category} onChange={e => set("category", e.target.value)} className={inputCls}>
+              {BLOG_CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+            </select>
+            <p className="text-xs text-muted mt-1.5 px-1">{BLOG_CATEGORIES.find(c => c.key === form.category)?.hint}</p>
+          </div>
           <div>
             <label className={labelCls}>Slug</label>
             <input value={form.slug} onChange={e => { setSlugTouched(true); set("slug", e.target.value) }}
               className={`${inputCls} font-mono`} />
           </div>
           <div>
-            <label className={labelCls}>Tags <span className="font-normal lowercase">(comma separated)</span></label>
+            <label className={labelCls}>Tags <span className="font-normal lowercase">(optional, comma separated)</span></label>
             <input value={form.tags} onChange={e => set("tags", e.target.value)} placeholder="nextjs, design, tips" className={inputCls} />
           </div>
         </div>

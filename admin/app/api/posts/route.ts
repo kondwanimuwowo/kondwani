@@ -16,6 +16,7 @@ export async function GET() {
       slug: blogPost.slug,
       excerpt: blogPost.excerpt,
       coverImage: blogPost.coverImage,
+      category: blogPost.category,
       tags: blogPost.tags,
       published: blogPost.published,
       publishedAt: blogPost.publishedAt,
