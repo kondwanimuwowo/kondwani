@@ -1,78 +1,71 @@
-import { db, blogPost } from "@/lib/db"
-import { desc, eq } from "drizzle-orm"
-import Link from "next/link"
-import Image from "next/image"
 import type { Metadata } from "next"
-
-export const metadata: Metadata = { title: "Blog" }
+import { BLOG_CATEGORIES } from "@/data/blogCategories"
+import { getPosts } from "@/lib/posts"
+import { BLOG_SITE, MAIN_SITE, TWITTER } from "@/lib/site"
+import { AnimateIn } from "@/components/ui/AnimateIn"
+import { BlogHero } from "@/components/blog/BlogHero"
+import { FeaturedPost } from "@/components/blog/FeaturedPost"
+import { PostCard } from "@/components/blog/PostCard"
 
 export const revalidate = 60
 
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(date)
+const description = "Writing on code, faith, chess, the gym, hiking and everyday life, by Kondwani Muwowo."
+const card = [{ url: `${MAIN_SITE}/images/og/blog.png`, width: 1200, height: 630, alt: "Blog by Kondwani Muwowo" }]
+
+export const metadata: Metadata = {
+  title: { absolute: "Blog, Kondwani Muwowo" },
+  description,
+  alternates: { canonical: BLOG_SITE },
+  openGraph: { type: "website", url: BLOG_SITE, title: "Blog, Kondwani Muwowo", description, images: card },
+  twitter: { card: "summary_large_image", creator: TWITTER, site: TWITTER, images: card },
 }
 
-export default async function BlogListing() {
-  const posts = await db
-    .select({
-      id: blogPost.id,
-      title: blogPost.title,
-      slug: blogPost.slug,
-      excerpt: blogPost.excerpt,
-      coverImage: blogPost.coverImage,
-      tags: blogPost.tags,
-      publishedAt: blogPost.publishedAt,
-    })
-    .from(blogPost)
-    .where(eq(blogPost.published, true))
-    .orderBy(desc(blogPost.publishedAt))
+export default async function BlogHome() {
+  const posts = await getPosts()
+  const [featured, ...rest] = posts
+  const categories = BLOG_CATEGORIES.filter((c) => posts.some((p) => p.category === c.key))
 
   return (
-    <div className="container-custom py-16">
-      <div className="max-w-2xl mb-14">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground mb-4">Blog</h1>
-        <p className="text-muted">Thoughts on front-end development, design, and building things that matter.</p>
-      </div>
+    <>
+      <BlogHero
+        title="Blog"
+        subtitle="Writing on code, faith, chess, the gym, hiking and everyday life."
+        categories={categories}
+        active="all"
+        overlap={Boolean(featured)}
+      />
 
-      {posts.length === 0 ? (
-        <p className="text-muted">No posts yet. Check back soon.</p>
-      ) : (
-        <div className="space-y-10">
-          {posts.map((post) => (
-            <article key={post.id} className="group grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6 pb-10">
-              <div>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {post.tags.map((tag) => (
-                    <span key={tag} className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary-tint px-2.5 py-0.5 rounded-full">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <Link href={`/${post.slug}`}>
-                  <h2 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors mb-2 leading-snug">
-                    {post.title}
-                  </h2>
-                </Link>
-                <p className="text-muted leading-relaxed mb-4 line-clamp-2">{post.excerpt}</p>
-                <div className="flex items-center justify-between">
-                  <time className="text-sm text-muted">
-                    {post.publishedAt ? formatDate(post.publishedAt) : ""}
-                  </time>
-                  <Link href={`/${post.slug}`}
-                    className="text-sm font-medium text-primary hover:text-primary-hover transition-colors">
-                    Read more
-                  </Link>
-                </div>
-              </div>
-              {post.coverImage && (
-                <div className="relative h-48 md:h-auto rounded-3xl overflow-hidden bg-surface order-first md:order-last">
-                  <Image src={post.coverImage} alt={post.title} fill className="object-cover" sizes="280px" />
-                </div>
-              )}
-            </article>
-          ))}
+      {featured ? (
+        <div className="container-custom relative z-10 -mt-24 max-w-5xl md:-mt-28">
+          <AnimateIn>
+            <FeaturedPost post={featured} />
+          </AnimateIn>
         </div>
+      ) : (
+        <section className="container-custom max-w-3xl py-24 text-center">
+          <div className="rounded-3xl bg-white px-8 py-16 shadow-md">
+            <h2 className="mb-2 text-xl font-bold text-foreground">The first post is on its way</h2>
+            <p className="text-muted">Check back soon.</p>
+          </div>
+        </section>
       )}
-    </div>
+
+      {rest.length > 0 && (
+        <section className="container-custom max-w-5xl py-24">
+          <AnimateIn>
+            <h2 className="mb-12 text-2xl font-bold text-foreground md:text-3xl">More posts</h2>
+          </AnimateIn>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {rest.map((post, i) => (
+              <AnimateIn key={post.id} delay={Math.min(i, 5) * 0.05}>
+                <PostCard post={post} />
+              </AnimateIn>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {featured && rest.length === 0 && <div className="pb-24" />}
+    </>
   )
 }

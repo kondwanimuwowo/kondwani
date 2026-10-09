@@ -1,23 +1,34 @@
-import { db } from "@/lib/db"
+import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import type { Metadata } from "next"
-import { MAIN_SITE } from "@/lib/site"
 import { ArrowBack } from "@mui/icons-material"
+import { db } from "@/lib/db"
+import { categoryLabel } from "@/data/blogCategories"
+import { canonicalUrl, formatDate, getRelated, readingMinutes } from "@/lib/posts"
+import { MAIN_SITE, TWITTER } from "@/lib/site"
+import { AnimateIn } from "@/components/ui/AnimateIn"
+import { AuthorBox } from "@/components/blog/AuthorBox"
+import { PostCard } from "@/components/blog/PostCard"
 
 export const revalidate = 60
 
 type Props = { params: Promise<{ slug: string }> }
 
+async function getPost(slug: string) {
+  try {
+    return await db.query.blogPost.findFirst({ where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)) })
+  } catch {
+    return undefined
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const post = await db.query.blogPost.findFirst({
-    where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)),
-    columns: { title: true, excerpt: true, publishedAt: true, updatedAt: true },
-  })
+  const post = await getPost(slug)
   if (!post) return {}
-  const url = `${MAIN_SITE}/blog/${slug}`
+  // Tech posts point search engines at their copy on the portfolio
+  const url = canonicalUrl(post)
   const images = [{ url: `${MAIN_SITE}/og/blog/${slug}?v=${post.updatedAt.getTime()}`, width: 1200, height: 630, alt: post.title }]
   return {
     title: post.title,
@@ -30,69 +41,106 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url,
       publishedTime: post.publishedAt?.toISOString(),
       modifiedTime: post.updatedAt.toISOString(),
+      section: categoryLabel(post.category),
       images,
     },
-    twitter: { card: "summary_large_image", creator: "@kondwanimuwow0", site: "@kondwanimuwow0", images },
+    twitter: { card: "summary_large_image", creator: TWITTER, site: TWITTER, images },
   }
 }
 
 export async function generateStaticParams() {
-  const posts = await db.query.blogPost.findMany({ where: (t, { eq }) => eq(t.published, true), columns: { slug: true } })
-  return posts.map((p) => ({ slug: p.slug }))
-}
-
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(date)
+  try {
+    const posts = await db.query.blogPost.findMany({ where: (t, { eq }) => eq(t.published, true), columns: { slug: true } })
+    return posts.map((p) => ({ slug: p.slug }))
+  } catch {
+    return []
+  }
 }
 
 export default async function BlogPost({ params }: Props) {
   const { slug } = await params
-  const post = await db.query.blogPost.findFirst({ where: (t, { eq, and }) => and(eq(t.slug, slug), eq(t.published, true)) })
+  const post = await getPost(slug)
   if (!post) notFound()
 
+  const related = await getRelated(slug, post.category)
+  const minutes = readingMinutes(post.content)
+  const url = canonicalUrl(post)
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    url,
+    mainEntityOfPage: url,
+    image: post.coverImage ?? `${MAIN_SITE}/og/blog/${slug}`,
+    datePublished: post.publishedAt?.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
+    articleSection: categoryLabel(post.category),
+    wordCount: post.content.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length,
+    author: { "@type": "Person", "@id": `${MAIN_SITE}/#person`, name: "Kondwani Muwowo", url: MAIN_SITE },
+    publisher: { "@type": "Person", "@id": `${MAIN_SITE}/#person`, name: "Kondwani Muwowo", url: MAIN_SITE },
+  }
+
   return (
-    <article className="container-custom py-16 max-w-3xl mx-auto">
-      {/* Back */}
-      <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-10">
-        <ArrowBack sx={{ fontSize: 16 }} /> All posts
-      </Link>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* Tags */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {post.tags.map((tag) => (
-          <span key={tag} className="text-[10px] font-bold tracking-widest uppercase text-primary bg-primary-tint px-2.5 py-0.5 rounded-full">
-            {tag}
-          </span>
-        ))}
-      </div>
+      <section className={`bg-primary pt-40 ${post.coverImage ? "pb-32 md:pb-48" : "pb-24"}`}>
+        <AnimateIn className="container-custom max-w-3xl text-center">
+          <Link
+            href={`/category/${post.category}`}
+            className="mb-8 inline-flex rounded-full bg-primary-dark px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
+          >
+            {categoryLabel(post.category)}
+          </Link>
+          <h1 className="mb-6 text-3xl font-bold leading-tight tracking-tight text-white md:text-5xl">{post.title}</h1>
+          <p className="mx-auto mb-6 max-w-2xl text-lg leading-relaxed text-primary-tint">{post.excerpt}</p>
+          <p className="text-sm font-medium text-primary-tint">
+            {formatDate(post.publishedAt)} · {minutes} min read
+          </p>
+        </AnimateIn>
+      </section>
 
-      {/* Title */}
-      <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4 leading-tight">
-        {post.title}
-      </h1>
-      <p className="text-muted mb-3">{post.excerpt}</p>
-      {post.publishedAt && (
-        <time className="text-sm text-muted">{formatDate(post.publishedAt)}</time>
-      )}
-
-      {/* Cover image */}
       {post.coverImage && (
-        <div className="relative h-72 md:h-96 rounded-3xl overflow-hidden bg-surface my-10">
-          <Image src={post.coverImage} alt={post.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 768px" priority />
+        <div className="container-custom relative z-10 -mt-24 max-w-4xl md:-mt-36">
+          <AnimateIn>
+            <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-surface shadow-frame-lift">
+              <Image src={post.coverImage} alt={post.title} fill priority sizes="(max-width: 896px) 100vw, 896px" className="object-cover" />
+            </div>
+          </AnimateIn>
         </div>
       )}
 
-      {/* Content */}
-      <div
-        className="prose prose-neutral max-w-none mt-10 text-foreground leading-relaxed
-          prose-headings:font-bold prose-headings:text-foreground
-          prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-          prose-blockquote:border-l-primary prose-blockquote:text-muted
-          prose-code:bg-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-          prose-pre:bg-foreground prose-pre:text-white
-          prose-img:rounded-3xl"
-        dangerouslySetInnerHTML={{ __html: post.content }}
-      />
-    </article>
+      <article className="container-custom max-w-3xl py-24">
+        <div className="article-body" dangerouslySetInnerHTML={{ __html: post.content }} />
+      </article>
+
+      <div className="container-custom max-w-3xl pb-24">
+        <AuthorBox />
+      </div>
+
+      {related.length > 0 && (
+        <section className="bg-surface py-24">
+          <div className="container-custom max-w-5xl">
+            <AnimateIn>
+              <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
+                <h2 className="text-2xl font-bold text-foreground md:text-3xl">Keep reading</h2>
+                <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-primary">
+                  <ArrowBack sx={{ fontSize: 16 }} /> All posts
+                </Link>
+              </div>
+            </AnimateIn>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {related.map((p, i) => (
+                <AnimateIn key={p.id} delay={i * 0.05}>
+                  <PostCard post={p} />
+                </AnimateIn>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+    </>
   )
 }

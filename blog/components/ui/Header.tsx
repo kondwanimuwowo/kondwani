@@ -7,9 +7,10 @@ import { Menu, X } from "@mui/icons-material"
 import { cn } from "@/lib/utils"
 
 const navLinks = [
+  { name: "Tech", href: "/category/tech" },
+  { name: "Faith", href: "/category/faith" },
+  { name: "Life", href: "/category/life" },
   { name: "Portfolio", href: "https://kondwanimuwowo.com" },
-  { name: "Projects", href: "https://kondwanimuwowo.com/#projects" },
-  { name: "Contact", href: "https://kondwanimuwowo.com/contact" },
 ]
 
 export function Header() {
@@ -18,6 +19,8 @@ export function Header() {
   const [isScrolled, setIsScrolled] = React.useState(false)
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const lastScrollDownStart = React.useRef(0)
+  // Every page opens on a maroon band, so the header starts light until it gets its own background
+  const onDark = !isScrolled && !mobileOpen
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() ?? 0
@@ -47,14 +50,17 @@ export function Header() {
       transition={{ duration: 0.35, ease: "easeInOut" }}
       className={cn(
         "fixed top-0 inset-x-0 z-50 transition-all duration-300",
-        isScrolled ? "glass py-4 shadow-md" : "bg-transparent py-5"
+        isScrolled || mobileOpen ? "glass py-4 shadow-md" : "bg-transparent py-5"
       )}
     >
       <div className="container-custom flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-extrabold tracking-tight text-foreground hover:text-primary transition-colors duration-300"
+          className={cn(
+            "text-xl font-extrabold tracking-tight transition-colors duration-300",
+            onDark ? "text-white hover:text-primary-tint" : "text-foreground hover:text-primary"
+          )}
         >
           [&lt;ondwani / blog
         </Link>
@@ -65,7 +71,10 @@ export function Header() {
             <Link
               key={link.name}
               href={link.href}
-              className="px-4 py-2 text-sm font-medium text-muted hover:text-foreground transition-colors duration-200"
+              className={cn(
+                "px-4 py-2 text-sm font-medium transition-colors duration-200",
+                onDark ? "text-primary-tint hover:text-white" : "text-muted hover:text-foreground"
+              )}
             >
               {link.name}
             </Link>
@@ -75,7 +84,10 @@ export function Header() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
+          className={cn(
+            "md:hidden p-2 transition-colors",
+            onDark ? "text-white hover:text-primary-tint" : "text-foreground hover:text-primary"
+          )}
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
         >

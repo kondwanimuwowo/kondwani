@@ -7,13 +7,25 @@ import { Check } from "@mui/icons-material"
 export function NewsletterForm() {
   const [email, setEmail] = useState("")
   const [state, setState] = useState<"idle" | "loading" | "done">("idle")
+  const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim()) return
     setState("loading")
-    await new Promise((r) => setTimeout(r, 900))
-    setState("done")
+    setError(null)
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
+      })
+      if (!res.ok) throw new Error(res.status === 400 ? "That email address doesn't look right." : "Something went wrong. Please try again.")
+      setState("done")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
+      setState("idle")
+    }
   }
 
   return (
@@ -69,6 +81,7 @@ export function NewsletterForm() {
           </motion.div>
         )}
       </AnimatePresence>
+      {error && <p className="mt-3 text-center text-sm text-danger-bg">{error}</p>}
     </div>
   )
 }
