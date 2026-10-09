@@ -1,10 +1,10 @@
 "use client"
 
-import { useRef, useState, type KeyboardEvent } from "react"
+import { useCallback, useRef, useState, type KeyboardEvent } from "react"
 import { motion } from "motion/react"
 import { ArrowBack, ArrowForward, Fullscreen } from "@mui/icons-material"
 import { BrowserFrame } from "./BrowserFrame"
-import { Lightbox } from "./Lightbox"
+import { Lightbox, measureSource } from "./Lightbox"
 
 interface ProjectGalleryProps {
   images: string[]
@@ -21,15 +21,21 @@ const SPRING = { type: "spring", duration: 0.55, bounce: 0.15 } as const
 export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
   const [active, setActive] = useState(0)
   const [lightbox, setLightbox] = useState<number | null>(null)
-  const [origin, setOrigin] = useState<{ x: number; y: number } | null>(null)
   const stageRef = useRef<HTMLDivElement>(null)
 
-  // The lightbox grows out of the active screen, wherever it is on the page
-  const openLightbox = (i: number) => {
-    const rect = stageRef.current?.getBoundingClientRect()
-    setOrigin(rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null)
+  const openLightbox = (i: number) => setLightbox(i)
+
+  // Browsing inside the lightbox moves the gallery too, so closing contracts into the matching screen
+  const changeLightbox = useCallback((i: number | null) => {
     setLightbox(i)
-  }
+    if (i !== null) setActive(i)
+  }, [])
+
+  // The visible part of a screen: the image, clipped by its frame
+  const getSource = useCallback((i: number) => {
+    const img = stageRef.current?.querySelector<HTMLImageElement>(`[data-frame="${i}"] img`)
+    return measureSource(img, img?.parentElement)
+  }, [])
   const count = images.length
 
   const go = (step: number) => setActive((i) => (i + step + count) % count)
@@ -61,6 +67,7 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
             return (
               <motion.div
                 key={src}
+              data-frame={i}
                 aria-hidden={!isActive}
                 initial={false}
                 animate={{
@@ -131,7 +138,7 @@ export function ProjectGallery({ images, alt, host }: ProjectGalleryProps) {
         </button>
       </div>
 
-      <Lightbox images={images} index={lightbox} alt={alt} onIndexChange={setLightbox} origin={origin} />
+      <Lightbox images={images} index={lightbox} alt={alt} onIndexChange={changeLightbox} getSource={getSource} />
     </div>
   )
 }

@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { motion } from "motion/react"
 import { BrowserFrame } from "./BrowserFrame"
-import { Lightbox } from "./Lightbox"
+import { Lightbox, measureSource } from "./Lightbox"
 
 interface ProjectCoverProps {
   images: string[]
@@ -13,17 +13,19 @@ interface ProjectCoverProps {
 
 export function ProjectCover({ images, alt, host }: ProjectCoverProps) {
   const [open, setOpen] = useState<number | null>(null)
-  const [origin, setOrigin] = useState<{ x: number; y: number } | null>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  // Only the cover itself can be morphed into; other images in the lightbox just fade out on close
+  const getSource = useCallback(
+    (i: number) => (i === 0 ? measureSource(buttonRef.current?.querySelector("img")) : null),
+    [],
+  )
 
   return (
     <>
       <motion.button
         type="button"
-        onClick={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect()
-          setOrigin({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
-          setOpen(0)
-        }}
+        ref={buttonRef}
+        onClick={() => setOpen(0)}
         aria-label={`View ${alt} full size`}
         initial={{ opacity: 0, y: 48 }}
         animate={{ opacity: 1, y: 0 }}
@@ -41,7 +43,7 @@ export function ProjectCover({ images, alt, host }: ProjectCoverProps) {
           elevation="lifted"
         />
       </motion.button>
-      <Lightbox images={images} index={open} alt={alt} onIndexChange={setOpen} origin={origin} />
+      <Lightbox images={images} index={open} alt={alt} onIndexChange={setOpen} getSource={getSource} />
     </>
   )
 }
