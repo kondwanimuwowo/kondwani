@@ -65,6 +65,8 @@ export function Lightbox({ images, index, alt, onIndexChange, getSource }: Light
   const imageRef = useRef<HTMLDivElement>(null)
   const openedIndex = useRef<number | null>(null)
   const [closing, setClosing] = useState(false)
+  // Mirrors `closing` synchronously, so the finish callbacks below can only run the close once
+  const closingRef = useRef(false)
 
   useEffect(() => {
     if (!open) return
@@ -102,21 +104,34 @@ export function Lightbox({ images, index, alt, onIndexChange, getSource }: Light
     )
   }, [index, getSource, reduceMotion])
 
+  const finishClose = useCallback(() => {
+    if (!closingRef.current) return
+    closingRef.current = false
+    setClosing(false)
+    onIndexChange(null)
+  }, [onIndexChange])
+
   const close = useCallback(() => {
-    if (closing || index === null) return
+    if (index === null) return
+    // A second click while contracting closes immediately instead of being ignored
+    if (closingRef.current) {
+      finishClose()
+      return
+    }
     const src = getSource?.(index)
     const el = imageRef.current
-    if (!src || !el || reduceMotion) {
+    if (!src || !el || reduceMotion || document.hidden) {
       onIndexChange(null)
       return
     }
+    closingRef.current = true
     setClosing(true)
     const animation = el.animate([SETTLED, flipFrom(el, src)], { duration: CLOSE_MS, easing: MORPH_EASING, fill: "forwards" })
-    animation.onfinish = () => {
-      setClosing(false)
-      onIndexChange(null)
-    }
-  }, [closing, index, getSource, reduceMotion, onIndexChange])
+    animation.finished.then(finishClose, finishClose)
+    // Backstop: idle or background tabs can delay or drop the animation's finish, which used to leave
+    // the lightbox stuck half-closed with the X hidden and every click ignored
+    window.setTimeout(finishClose, CLOSE_MS + 150)
+  }, [index, getSource, reduceMotion, onIndexChange, finishClose])
 
   useEffect(() => {
     if (index === null) return
