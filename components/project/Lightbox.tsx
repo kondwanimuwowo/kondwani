@@ -40,6 +40,7 @@ const EASE_OUT = [0.23, 1, 0.32, 1] as const
 const MORPH_EASING = "cubic-bezier(0.32, 0.72, 0, 1)"
 const OPEN_MS = 450
 const CLOSE_MS = 350
+// Rounded like the frame on the page; sharp once it fills the lightbox
 const RADIUS = 24
 
 // Transform and clip that make the full-size image sit exactly where the on-page image is
@@ -54,7 +55,7 @@ function flipFrom(el: HTMLElement, src: SourceBox) {
   }
 }
 
-const SETTLED = { transform: "none", clipPath: `inset(0px 0px 0px 0px round ${RADIUS}px)` }
+const SETTLED = { transform: "none", clipPath: "inset(0px 0px 0px 0px round 0px)" }
 
 export function Lightbox({ images, index, alt, onIndexChange, getSource }: LightboxProps) {
   const lenis = useLenis()
@@ -157,7 +158,7 @@ export function Lightbox({ images, index, alt, onIndexChange, getSource }: Light
           </motion.div>
 
           <div key={index} data-lenis-prevent className="relative flex-1 overflow-y-auto px-4 pb-8 md:px-24">
-            <div ref={imageRef} style={{ transformOrigin: "0 0" }} className="mx-auto max-w-6xl overflow-hidden rounded-3xl">
+            <div ref={imageRef} style={{ transformOrigin: "0 0" }} className="mx-auto max-w-6xl overflow-hidden">
               <Image
                 src={images[index]}
                 alt={`${alt}, image ${index + 1}`}
